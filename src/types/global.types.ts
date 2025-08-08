@@ -1,0 +1,1 @@
+export type TypesOfDeleteType = "PD" | "SD" | "RSD";

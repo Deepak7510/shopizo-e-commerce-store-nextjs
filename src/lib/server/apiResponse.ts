@@ -6,7 +6,7 @@ const apiResponse = function (statusCode: number, message: string, data?: unknow
         success: true,
         message,
         data: data || null,
-        resType: resType || "toast"
+        resType: resType || "none"
     }, { status: statusCode });
 
 }

@@ -7,18 +7,19 @@ import generateOTP from "@/lib/server/generateOTP";
 import { generateToken } from "@/lib/server/generateToken";
 import { mailOtpVerifyTemplate } from "@/lib/server/mailOtpVerifyTemplate";
 import { sendMail } from "@/lib/server/sendMail";
-import { loginValidateSchema } from "@/lib/zodSchema";
 import OTPModel, { IOtp } from "@/models/Otp.model";
 import User, { IUser } from "@/models/User.model";
-import VerifyTokenModel from "@/models/Verifytoken.model";
-import { NextRequest } from "next/server";
+import VerifyTokenModel, { IVerifyToken } from "@/models/Verifytoken.model";
+import { NextRequest, NextResponse } from "next/server";
+import { loginZodSchema } from "@/zodSchema/auth.schema";
+import { TypesOfLoginInput } from "@/types/auth.types";
 
-export const POST = async function (req: NextRequest) {
+export const POST = async function (req: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
-        const data = (await req.json()) as Partial<IUser>;
+        const data = (await req.json()) as TypesOfLoginInput;
 
-        const checkValidation = loginValidateSchema.safeParse(data);
+        const checkValidation = loginZodSchema.safeParse(data);
         if (!checkValidation.success) {
             throw new ApiError(
                 401,
@@ -42,16 +43,17 @@ export const POST = async function (req: NextRequest) {
         if (!user.isEmailVerified) {
             const token = await generateToken({ userId: String(user._id) }, "10m");
             await sendMail(
-                "Email Verification",
+                "Email Verification Link",
                 email!,
                 mailEmailVerifylinkTamplate(
                     `${process.env.NEXT_PUBLIC_BASE_URL}/auth/email-verifylink/${token}`
                 )
             );
-            await VerifyTokenModel.create({ email, token });
+
+            await VerifyTokenModel.create<IVerifyToken>({ email, token });
             return apiResponse(
                 200,
-                "Your email is not verified. A verification link has been sent.",
+                "Email is not verified. A verification link has been sent.",
                 null,
                 "EMAIL_VERIFICATION"
             );
@@ -65,7 +67,7 @@ export const POST = async function (req: NextRequest) {
         }
         await OTPModel.deleteMany({ email });
         await OTPModel.create({ email, otp: OTP });
-        return apiResponse(200, "OTP has been sent successfully to your email.", null, "OTP_VERIFICATION")
+        return apiResponse(200, "OTP has been sent successfully.", null, "OTP_VERIFICATION")
 
     } catch (error) {
         return errorHandler(error);

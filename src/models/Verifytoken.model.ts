@@ -1,13 +1,13 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface IverifyToken extends Document {
+export interface IVerifyToken extends Document {
     email: string;
     token: string;
     createdAt: Date;
     expiresAt: Date;
 }
 
-const verifyTokenSchema = new Schema<IverifyToken>({
+const verifyTokenSchema = new Schema<IVerifyToken>({
     email: {
         type: String,
         required: true,
@@ -32,6 +32,6 @@ verifyTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const VerifyTokenModel =
     mongoose.models.VerifyToken ||
-    mongoose.model<IverifyToken>("VerifyToken", verifyTokenSchema);
+    mongoose.model<IVerifyToken>("VerifyToken", verifyTokenSchema);
 
 export default VerifyTokenModel;

@@ -3,34 +3,36 @@ import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler"
 import { generateToken } from "@/lib/server/generateToken";
-import { verifyOptValidationSchema } from "@/lib/zodSchema";
-import OTPModel from "@/models/Otp.model";
-import User from "@/models/User.model";
+import OTPModel, { IOtp } from "@/models/Otp.model";
+import User, { IUser } from "@/models/User.model";
 import VerifyTokenModel from "@/models/Verifytoken.model";
-import { NextRequest } from "next/server"
+import { TypesOfVerifyOtpInput } from "@/types/auth.types";
+import { verifyOtpZodSchema } from "@/zodSchema/auth.schema";
+import { NextRequest, NextResponse } from "next/server"
 
 
-export const POST = async function (request: NextRequest) {
+export const POST = async function (request: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
-        const body = await request.json();
-        const checkValidation = verifyOptValidationSchema.safeParse(body);
+        const body = await request.json() as TypesOfVerifyOtpInput;
+
+        const checkValidation = verifyOtpZodSchema.safeParse(body);
         if (!checkValidation.success) {
             throw new ApiError(
                 401,
-                "Validation failed. Please check the input fields.",
-                checkValidation.error.flatten().fieldErrors
+                "Validation failed. Please check the provided information..",
+                checkValidation.error
             );
         }
         const { email, otp } = checkValidation.data;
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne<IUser>({ email });
 
         if (!user) {
             throw new ApiError(404, "User not found!")
         }
 
-        const existingOtp = await OTPModel.findOne({ email, otp });
+        const existingOtp = await OTPModel.findOne<IOtp>({ email, otp });
 
         if (!existingOtp) {
             throw new ApiError(410, "Invalid or expired OTP.");

@@ -4,26 +4,28 @@ import { mailEmailVerifylinkTamplate } from "@/lib/server/mailEmailVerifylinkTem
 import { errorHandler } from "@/lib/server/errorHandler";
 import { generateToken } from "@/lib/server/generateToken";
 import { sendMail } from "@/lib/server/sendMail";
-import { emailValidationSchema } from "@/lib/zodSchema";
 import User, { IUser } from "@/models/User.model";
-import VerifyTokenModel from "@/models/Verifytoken.model";
+import VerifyTokenModel, { IVerifyToken } from "@/models/Verifytoken.model";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/server/databaseConnection";
+import { emailZodSchema } from "@/zodSchema/auth.schema";
+import { TypesOfEmailInput } from "@/types/auth.types";
 
 const MIN_RESEND_INTERVAL_MS = 60 * 1000; // 1 minute
 
 export const POST = async (request: NextRequest) => {
     try {
         await connectDB();
-        const body = await request.json();
-        const validation = emailValidationSchema.safeParse(body);
-        if (!validation.success) {
-            throw new ApiError(401, "Validation failed. Please check input fields.", {
-                errors: validation.error,
+        const body = await request.json() as TypesOfEmailInput;
+
+        const checkValidation = emailZodSchema.safeParse(body);
+        if (!checkValidation.success) {
+            throw new ApiError(401, "Validation failed. Please check the  provided information.", {
+                errors: checkValidation.error,
             });
         }
 
-        const { email } = validation.data;
+        const { email } = checkValidation.data;
 
         const user = await User.findOne<IUser>({ email });
 
@@ -32,10 +34,10 @@ export const POST = async (request: NextRequest) => {
         }
 
         if (user.isEmailVerified) {
-            throw new ApiError(400, "Email is already verified.");
+            throw new ApiError(400, "Email already verified.");
         }
 
-        const existingToken = await VerifyTokenModel.findOne({ email });
+        const existingToken = await VerifyTokenModel.findOne<IVerifyToken>({ email });
 
         if (existingToken) {
             const timeSinceLastSent =
@@ -56,7 +58,7 @@ export const POST = async (request: NextRequest) => {
         const token = await generateToken({ userId: String(user._id) }, "10m");
 
         const emailSent = await sendMail(
-            "Email Verification",
+            "Email Verification Link",
             email,
             mailEmailVerifylinkTamplate(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/auth/email-verifylink/${token}`
@@ -67,7 +69,7 @@ export const POST = async (request: NextRequest) => {
             throw new ApiError(500, "Failed to send verification link.");
         }
 
-        await VerifyTokenModel.create({ email, token });
+        await VerifyTokenModel.create<IVerifyToken>({ email, token });
 
         return apiResponse(200, "Verification link resent successfully.");
     } catch (error: any) {

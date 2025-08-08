@@ -24,11 +24,53 @@ export const authRoutes = {
 
 
 export const adminRoutes = {
-    dashboard: '/admin/dashboard'
-
+    dashboard: '/admin/dashboard',
+    brands: {
+        brands: `/admin/brands`,
+        addBrands: `/admin/brands/add`,
+        editBrands: (id: string) => {
+            return `/admin/brands/edit/${id}`
+        },
+    },
+    categories: {
+        categories: `/admin/categories`,
+        addCategory: `/admin/categories/add`,
+        editCategory: (id: string) => {
+            return `/admin/categories/edit/${id}`
+        },
+    },
+    subcategories: {
+        subcategories: `/admin/subcategories`,
+        addSubcategory: `/admin/subcategories/add`,
+        editSubcategory: (id: string) => {
+            return `/admin/subcategories/edit/${id}`
+        },
+    },
+    products: {
+        products: `/admin/products`,
+        addProduct: `/admin/products/add`,
+        editProduct: (id: string) => {
+            return `/admin/products/edit/${id}`
+        },
+    },
+    variants: {
+        variants: `/admin/variants`,
+        addVariant: `/admin/variants/add`,
+        editVariant: (id: string) => {
+            return `/admin/variants/edit/${id}`
+        },
+    },
+    medias: {
+        media: '/admin/media',
+        editMedia: function (id: string) {
+            return `/admin/media/edit/${id}`
+        }
+    }
 }
 
-export const usersRoutes = {
+
+
+export const userRoutes = {
     home: '/',
 
 

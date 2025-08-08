@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 // import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import GlobalReduxProvider from "@/components/application/common/GlobalReduxProvider";
 import GlobalLayout from "@/components/application/common/GlobalLayout";
-
+import { ThemeProvider } from "@/components/application/common/ThemeProvider";
+import GlobalProvider from "@/components/application/common/GlobalProvider";
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
 //   subsets: ["latin"],
@@ -29,17 +29,24 @@ export default function RootLayout({
 
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`antialiased`}
       >
-        <GlobalReduxProvider>
-          <GlobalLayout>
-            {children}
-            <Toaster position="top-right" richColors />
-          </GlobalLayout>
-        </GlobalReduxProvider>
+        <GlobalProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <GlobalLayout>
+              {children}
+              <Toaster position="top-right" richColors />
+            </GlobalLayout>
+          </ThemeProvider>
 
+        </GlobalProvider>
       </body>
     </html>
   );

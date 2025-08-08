@@ -1,22 +1,24 @@
 import { connectDB } from "@/lib/server/databaseConnection";
 import { sendMail } from "@/lib/server/sendMail";
-import { registerValidateSchema } from "@/lib/zodSchema";
 import User, { IUser } from "@/models/User.model";
 import { ApiError } from "@/lib/server/apiError";
 import apiResponse from "@/lib/server/apiResponse";
 import { errorHandler } from "@/lib/server/errorHandler";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { generateToken } from "@/lib/server/generateToken";
-import VerifyTokenModel from "@/models/Verifytoken.model";
+import VerifyTokenModel, { IVerifyToken } from "@/models/Verifytoken.model";
 import { mailEmailVerifylinkTamplate } from "@/lib/server/mailEmailVerifylinkTemplate";
+import { TypesOfRegisterInput } from "@/types/auth.types";
+import { registerZodSchema } from "@/zodSchema/auth.schema";
 
-export const POST = async function (req: NextRequest) {
+export const POST = async function (req: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
-        const data = (await req.json()) as Partial<IUser>;
-        const validateData = registerValidateSchema.safeParse(data);
+        const data = (await req.json()) as TypesOfRegisterInput;
+
+        const validateData = registerZodSchema.safeParse(data);
         if (!validateData.success) {
-            throw new ApiError(401, "Validation failed. Please check input fields.", {
+            throw new ApiError(401, "Validation failed. Please check the  provided information.", {
                 errors: validateData.error,
             });
         }
@@ -28,13 +30,13 @@ export const POST = async function (req: NextRequest) {
             throw new ApiError(409, "Email already registered.");
         }
 
-        const newUser = new User({ name, email, password });
+        const newUser: IUser = new User({ name, email, password });
         await newUser.save();
 
         const token = await generateToken({ userId: String(newUser._id) }, "10m");
 
         const result = await sendMail(
-            "Email Verification",
+            "Email Verification Link",
             email,
             mailEmailVerifylinkTamplate(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/auth/email-verifylink/${token}`
@@ -42,11 +44,11 @@ export const POST = async function (req: NextRequest) {
         );
 
         if (!result.success) {
-            throw apiResponse(400, "Registration failed.")
+            throw apiResponse(400, "Registration failed.");
         }
 
-        await VerifyTokenModel.create({ email, token });
-        return apiResponse(201, "Registration successful.");
+        await VerifyTokenModel.create<IVerifyToken>({ email, token });
+        return apiResponse(201, "Registration successful.", null, "EMAIL_VERIFICATION");
     } catch (error) {
         return errorHandler(error as Error);
     }

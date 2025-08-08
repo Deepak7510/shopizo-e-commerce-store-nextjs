@@ -1,13 +1,16 @@
 import Image from 'next/image'
 import React from 'react'
 
-import applicationLogoImage from '../../../../public/applicationLogo.svg'
+import applicationLightLogo from '../../../../public/applicationLightLogo.svg'
+import applicationDarkLogo from '../../../../public/applicationDarkLogo.svg'
 import Link from 'next/link'
-import { usersRoutes } from '@/lib/client/routes'
+import { userRoutes } from '@/lib/client/routes'
 
 const ApplicationLogo = () => {
-    return (
-        <Link href={usersRoutes.home}> <Image src={applicationLogoImage} alt='Application-logo' /></Link>
+    return (<>
+        <Link className='dark:hidden' href={userRoutes.home}> <Image src={applicationLightLogo} alt='Application-logo' /></Link>
+        <Link className='hidden dark:block' href={userRoutes.home}> <Image src={applicationDarkLogo} alt='Application-logo' /></Link>
+    </>
     )
 }
 

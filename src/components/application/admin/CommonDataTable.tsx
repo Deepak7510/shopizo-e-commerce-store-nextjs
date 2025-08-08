@@ -1,0 +1,504 @@
+"use client";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+    AlertDialogFooter,
+    AlertDialogHeader,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { useDeleteMutation } from "@/hooks/useDeleteMutation";
+import { TypesOfDeleteType } from "@/types/global.types";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+    keepPreviousData,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    SortingState,
+    useReactTable,
+} from "@tanstack/react-table";
+import {
+    ArchiveRestore,
+    DatabaseIcon,
+    Recycle,
+    Trash,
+    Undo,
+    Undo2,
+} from "lucide-react";
+import React, { SetStateAction, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import axiosInstance from "@/lib/client/axios";
+
+type CommonDataTableProps<TData, TValue> = {
+    columns: ColumnDef<TData, TValue>[];
+    queryKey: string;
+    deleteEndPoint: string;
+    fetchDataURL: string;
+    editEndPoint: (id: string) => string;
+    deleteType: TypesOfDeleteType;
+    setDeleteType: React.Dispatch<SetStateAction<TypesOfDeleteType>>;
+    actions: (
+        editEndPoint: (id: string) => string,
+        row: any,
+        deleteType: TypesOfDeleteType,
+        handleDeleteAlert: (
+            getDeleteType: TypesOfDeleteType,
+            getDeleteIdList?: string[]
+        ) => void
+    ) => React.ReactNode;
+};
+
+export function CommonDataTable<TData, TValue>({
+    queryKey,
+    deleteEndPoint,
+    fetchDataURL,
+    editEndPoint,
+    deleteType,
+    setDeleteType,
+    columns,
+    actions,
+}: CommonDataTableProps<TData, TValue>) {
+    const queryClient = useQueryClient();
+    const deleteMutation = useDeleteMutation(deleteEndPoint);
+    const [rowSelection, setRowSelection] = useState({});
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 10,
+    });
+
+    const [searchValue, setSearchValue] = useState<string>("");
+    const [globalFilter, setGlobalFilter] = useState<string>("");
+
+    const [openDeleteAlert, setOpenDeleteAlert] = useState<boolean>(false);
+    const [alertDecsMessage, setAlertDecsMessage] = useState<string>("");
+
+    const [deleteActionType, setDeleteActionType] =
+        useState<TypesOfDeleteType | null>(null);
+    const [deleteIdList, setDeleteIdList] = useState<string[]>([]);
+
+    async function fetchData(
+        fetchDataURL: string,
+        page: number,
+        limit: number,
+        deleteType: TypesOfDeleteType,
+        sortby: string,
+        order: string
+    ): Promise<TypesOfAxoisResponse> {
+        try {
+            const response = await axiosInstance.get(
+                `${fetchDataURL}?page=${page}&limit=${limit}&deleteType=${deleteType}&globalFilter=${globalFilter}&sortby=${sortby}&order=${order}`
+            );
+            return response.data;
+        } catch (error: any) {
+            console.error("Axios Error", error);
+            return error?.response?.data;
+        }
+    }
+
+    const { data, status, error } = useQuery({
+        queryKey: [
+            queryKey,
+            pagination,
+            deleteType,
+            fetchDataURL,
+            globalFilter,
+            sorting,
+        ],
+        queryFn: () => {
+            const page = pagination?.pageIndex;
+            const limit = pagination?.pageSize;
+            let sortby = "createdAt";
+            let order = "desc";
+            if (sorting.length > 0) {
+                sortby = sorting[0]?.id;
+                order = sorting[0]?.desc ? "desc" : "asc";
+            }
+            return fetchData(fetchDataURL, page, limit, deleteType, sortby, order);
+        },
+        placeholderData: keepPreviousData,
+    });
+
+    const table = useReactTable({
+        data: data?.data.dataList,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onRowSelectionChange: setRowSelection,
+        onPaginationChange: setPagination,
+        onSortingChange: setSorting,
+        getSortedRowModel: getSortedRowModel(),
+        autoResetPageIndex: false,
+        manualPagination: true,
+        manualSorting: true,
+        rowCount: data?.data.totalRow,
+        pageCount: data?.data.totalPage,
+        state: {
+            rowSelection,
+            sorting,
+            pagination,
+        },
+    });
+
+    function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
+        setSearchValue(event.target.value);
+    }
+
+    useEffect(() => {
+        const debounce = setTimeout(() => {
+            setGlobalFilter(searchValue);
+        }, 1000);
+
+        return () => clearTimeout(debounce);
+    }, [searchValue]);
+
+    function handleDeleteAlert(
+        getDeleteType: TypesOfDeleteType,
+        getDeleteIdList?: string[]
+    ) {
+        let getDeleteIdListData: string[] = [];
+        if (getDeleteIdList && getDeleteIdList?.length > 0) {
+            getDeleteIdListData = getDeleteIdList;
+        } else {
+            const dataIndexs = Object.keys(rowSelection);
+            getDeleteIdListData = data?.data.dataList
+                .filter((_: any, index: number) => dataIndexs.includes(String(index)))
+                .map((dataItem: any) => dataItem._id);
+        }
+        setOpenDeleteAlert(true);
+        setDeleteIdList(getDeleteIdListData);
+        setDeleteActionType(getDeleteType);
+        let alertMessage = "";
+        switch (getDeleteType) {
+            case "PD":
+                alertMessage = "Are you sure you want to delete this permanently?";
+                break;
+            case "SD":
+                alertMessage = "Are you sure you want to soft delete this data?";
+                break;
+            case "RSD":
+                alertMessage = "Are you sure you want to restore this data?";
+                break;
+            default:
+                alertMessage = "Unknown delete action.";
+        }
+        setAlertDecsMessage(alertMessage);
+    }
+
+    function handleDelete() {
+        deleteMutation.mutate(
+            { selectedIdList: deleteIdList, deleteType: deleteActionType! },
+            {
+                onSuccess(data) {
+                    if (data.success) {
+                        toast.success(data.message);
+                        setRowSelection({});
+                        queryClient.invalidateQueries({ queryKey: [queryKey] });
+                    }
+                },
+                onError(error: any) {
+                    toast.error(error.message || "Something went wrong");
+                },
+            }
+        );
+    }
+
+    function handleClosedeleteAlert() {
+        setDeleteActionType(null);
+        setDeleteIdList([]);
+        setOpenDeleteAlert(false);
+    }
+
+    function handleSetDeleteType(getDeletetype: TypesOfDeleteType) {
+        setRowSelection({});
+        setDeleteType(getDeletetype);
+        setPagination({
+            pageIndex: 0,
+            pageSize: 10,
+        });
+        setGlobalFilter("");
+        setSorting([]);
+        setSearchValue("");
+    }
+
+    if (status === "pending") {
+        return <div>Loading....</div>;
+    }
+
+    if (error) {
+        console.error(error);
+        return (
+            <div className="text-red-700 font-medium text-lg text-center py-10">
+                Somthing went worng
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            <AlertDialog
+                open={openDeleteAlert}
+                onOpenChange={() => handleClosedeleteAlert()}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-red-700">Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>{alertDecsMessage}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>
+                            Continue
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <div className="flex justify-between my-2 gap-2">
+                <div className="md:w-1/2">
+                    <Input
+                        placeholder="Search..."
+                        value={searchValue}
+                        onChange={handleSearch}
+                        className="max-w-sm rounded-full"
+                    />
+                </div>
+                <>
+                    {deleteType === "SD" ? (
+                        <div className="flex justify-between gap-2">
+                            {rowSelection && Object.keys(rowSelection).length > 0 && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant={"destructive"}
+                                            onClick={() => handleDeleteAlert("SD")}
+                                            size={"icon"}
+                                            className="size-8"
+                                        >
+                                            <Trash />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        <p className="font-medium">Move to Trash</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+
+                            {sorting.length > 0 && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={() => table.resetSorting()}
+                                            size={"icon"}
+                                            className="size-8"
+                                        >
+                                            <Undo2 />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        <p className="font-medium"> Reset Sorting</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                            <Button onClick={() => handleSetDeleteType("PD")} size={"sm"}>
+                                <Recycle /> View Trash
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="flex justify-between gap-3">
+                            {rowSelection && Object.keys(rowSelection).length > 0 && (
+                                <>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant={"destructive"}
+                                                onClick={() => handleDeleteAlert("PD")}
+                                                size={"icon"}
+                                                className="size-8"
+                                            >
+                                                <Trash />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom">
+                                            <p className="font-medium">Delete Permanently</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                className="bg-green-500 hover:bg-green-400"
+                                                onClick={() => handleDeleteAlert("RSD")}
+                                                size={"sm"}
+                                            >
+                                                <ArchiveRestore />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom">
+                                            <p className="font-medium">Restore</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </>
+                            )}
+                            <Button onClick={() => handleSetDeleteType("SD")} size={"sm"}>
+                                <DatabaseIcon />
+                                Back to Records
+                            </Button>
+                        </div>
+                    )}
+                </>
+            </div>
+
+            <div className="rounded-md border overflow-hidden">
+                <Table>
+                    <TableHeader className="bg-muted">
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead className="font-medium" key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                        </TableHead>
+                                    );
+                                })}
+                                <TableHead>Action</TableHead>
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                    <TableCell>
+                                        {actions(editEndPoint, row, deleteType, handleDeleteAlert)}
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-12 font-medium text-center"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            <div className="flex justify-between">
+                <div className="text-muted-foreground flex-1 text-sm">
+                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                    {table.getFilteredRowModel().rows.length} rows selected.
+                </div>
+                <div className="flex gap-1">
+                    <Select
+                        value={String(table.getState().pagination.pageSize)}
+                        onValueChange={(value) => {
+                            table.setPageSize(Number(value));
+                            table.setPageIndex(0);
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Page Size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[10, 20, 30, 40, 50].map((pageSize) => (
+                                <SelectItem
+                                    disabled={table.getRowCount() < pageSize}
+                                    key={pageSize}
+                                    value={String(pageSize)}
+                                >
+                                    {pageSize}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Button
+                        size={"icon"}
+                        className="size-8"
+                        onClick={() => table.firstPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        {"<<"}
+                    </Button>
+                    <Button
+                        size={"icon"}
+                        className="size-8"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        {"<"}
+                    </Button>
+                    <Button
+                        size={"icon"}
+                        className="size-8"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        {">"}
+                    </Button>
+                    <Button
+                        size={"icon"}
+                        className="size-8"
+                        onClick={() => table.lastPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        {">>"}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+export default CommonDataTable;
