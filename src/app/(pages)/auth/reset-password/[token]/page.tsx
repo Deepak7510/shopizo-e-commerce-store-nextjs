@@ -8,7 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { authRoutes } from '@/lib/client/routes'
 import { resetPasswordService } from '@/services/client/auth/resetPasswordService'
-import { TypesOfResetPasswordInput } from '@/types/auth.types'
+import { TypeOfResetPasswordInput } from '@/types/auth.types'
 import { resetPasswordZodSchema } from '@/zodSchema/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeClosed } from 'lucide-react'
@@ -29,7 +29,7 @@ const ResetPassowrdPage: React.FC<ResetPassowrdPageProps> = ({ params }) => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showconfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
-    const form = useForm<TypesOfResetPasswordInput>({
+    const form = useForm<TypeOfResetPasswordInput>({
         resolver: zodResolver(resetPasswordZodSchema),
         defaultValues: {
             password: "",
@@ -37,7 +37,7 @@ const ResetPassowrdPage: React.FC<ResetPassowrdPageProps> = ({ params }) => {
         }
     })
 
-    async function onSubmit(value: TypesOfResetPasswordInput) {
+    async function onSubmit(value: TypeOfResetPasswordInput) {
 
         if (!token) {
             toast.error("Token is required to reset password.");

@@ -14,13 +14,13 @@ import { Copy, Edit, EllipsisVertical, Trash, Undo } from "lucide-react";
 import { mediaType } from "@/types/admin.media.types";
 import Link from "next/link";
 import { adminRoutes } from "@/lib/client/routes";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 
 export interface MediaCardProps {
     media: mediaType;
-    handleDelete: (selectedMedia: string[], deleteType: TypesOfDeleteType) => void;
+    handleDelete: (selectedMedia: string[], deleteType: TypeOfDeleteType) => void;
     handleCopy: (secure_url: string) => void;
-    deleteType: TypesOfDeleteType;
+    deleteType: TypeOfDeleteType;
     selectedMedia: string[];
     handleSelectedMedia: (mediaId: string) => void;
 }

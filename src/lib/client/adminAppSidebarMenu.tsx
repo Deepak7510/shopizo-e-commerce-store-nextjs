@@ -5,7 +5,6 @@ import {
     FolderKanban,
     LayoutGrid,
     PackageSearch,
-    Package,
     Tag,
     ShoppingCart,
     Users2,
@@ -43,7 +42,7 @@ export const adminAppSidebarMenu = [
     },
     {
         title: "Product Variants",
-        url: adminRoutes.variants.variants,
+        url: adminRoutes.productVariants.productVariants,
         icon: <PackageSearch />,
     },
     {

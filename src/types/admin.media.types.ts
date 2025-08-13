@@ -1,7 +1,7 @@
 import { editMediaZodSchema, uploadMediaArrayZodSchema, uploadMediaZodSchema } from "@/zodSchema/admin.media.schema";
 import { z } from "zod";
 
-export type TypesOfMediaInput = z.infer<typeof uploadMediaZodSchema>
+export type TypeOfMediaInput = z.infer<typeof uploadMediaZodSchema>
 
 export type TypedOfUploadMediaArray = z.infer<typeof uploadMediaArrayZodSchema>
 
@@ -17,4 +17,4 @@ export type mediaType = {
     deletedAt?: Date | null;
 };
 
-export type TypesOfEditMedia = z.infer<typeof editMediaZodSchema>
+export type TypeOfEditMedia = z.infer<typeof editMediaZodSchema>

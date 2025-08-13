@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { authRoutes } from "@/lib/client/routes";
 import registerService from "@/services/client/auth/registerService";
-import { TypesOfRegisterInput } from "@/types/auth.types";
+import { TypeOfRegisterInput } from "@/types/auth.types";
 import { registerZodSchema } from "@/zodSchema/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeClosed } from "lucide-react";
@@ -27,7 +27,7 @@ import { toast } from "sonner";
 const RegisterPage = () => {
     const router = useRouter()
     const [showPassword, setShowPassword] = useState<boolean>(false);
-    const form = useForm<TypesOfRegisterInput>({
+    const form = useForm<TypeOfRegisterInput>({
         resolver: zodResolver(registerZodSchema),
         defaultValues: {
             name: "",
@@ -36,7 +36,7 @@ const RegisterPage = () => {
         }
     });
 
-    async function onSubmit(data: TypesOfRegisterInput) {
+    async function onSubmit(data: TypeOfRegisterInput) {
         const result = await registerService(data);
         if (!result.success) {
             toast.error(result.message)

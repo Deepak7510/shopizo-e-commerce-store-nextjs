@@ -5,7 +5,7 @@ import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
 import MediaModel, { IMedia } from "@/models/Media.model";
 import { UserRole } from "@/models/User.model";
-import { TypesOfEditMedia } from "@/types/admin.media.types";
+import { TypeOfEditMedia } from "@/types/admin.media.types";
 import { editMediaZodSchema } from "@/zodSchema/admin.media.schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,11 +13,11 @@ export const PUT = async function (req: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
         await verifyRole(req, UserRole.ADMIN);
-        const body = await req.json() as TypesOfEditMedia;
+        const body = await req.json() as TypeOfEditMedia;
 
         const checkValidation = editMediaZodSchema.safeParse(body);
         if (!checkValidation.success) {
-            throw new ApiError(400, "Invalid input fields data", { error: checkValidation.error });
+            throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
         const { _id, title, alt } = checkValidation.data

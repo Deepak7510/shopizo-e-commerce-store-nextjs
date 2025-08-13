@@ -5,7 +5,7 @@ import { errorHandler } from "@/lib/server/errorHandler"
 import { verifyRole } from "@/lib/server/verifyRole"
 import CategoryModel, { ICategory } from "@/models/Category.model"
 import { UserRole } from "@/models/User.model"
-import { TypesOfEditCategoryInput } from "@/types/admin.category.types"
+import { TypeOfEditCategoryInput } from "@/types/admin.category.types"
 import { editCatgeoryZodSchema } from "@/zodSchema/admin.category.schema"
 import { isValidObjectId } from "mongoose"
 import { NextRequest, NextResponse } from "next/server"
@@ -15,7 +15,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         await connectDB();
         await verifyRole(request, UserRole.ADMIN);
 
-        const body = await request.json() as TypesOfEditCategoryInput;
+        const body = await request.json() as TypeOfEditCategoryInput;
 
         const checkValidation = editCatgeoryZodSchema.safeParse(body);
 

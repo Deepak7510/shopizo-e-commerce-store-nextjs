@@ -15,7 +15,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
 
         const checkValidation = verifyOtpZodSchema.safeParse(body);
         if (!checkValidation.success) {
-            throw new ApiError(400, "Validation failed. Please check the provided information.", {
+            throw new ApiError(400, "Invalid input or missing fields", {
                 errors: checkValidation.error,
             });
         }

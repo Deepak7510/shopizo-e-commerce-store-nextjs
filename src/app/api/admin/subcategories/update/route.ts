@@ -5,7 +5,7 @@ import { errorHandler } from "@/lib/server/errorHandler"
 import { verifyRole } from "@/lib/server/verifyRole"
 import SubcategoryModel, { ISubcategory } from "@/models/Subcategory.model"
 import { UserRole } from "@/models/User.model"
-import { TypesOfEditSubcategoryInput } from "@/types/admin.subcategories.types"
+import { TypeOfEditSubcategoryInput } from "@/types/admin.subcategories.types"
 import { editSubcategoryZodSchema } from "@/zodSchema/admin.subcategories.schema"
 import { isValidObjectId } from "mongoose"
 import { NextRequest, NextResponse } from "next/server"
@@ -15,12 +15,12 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         await connectDB();
         await verifyRole(request, UserRole.ADMIN);
 
-        const body = await request.json() as TypesOfEditSubcategoryInput;
+        const body = await request.json() as TypeOfEditSubcategoryInput;
 
         const checkValidation = editSubcategoryZodSchema.safeParse(body);
 
         if (!checkValidation.success) {
-            throw new ApiError(400, "Invalid input fields data", { error: checkValidation.error });
+            throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
         const { _id, name, slug, category } = checkValidation.data;

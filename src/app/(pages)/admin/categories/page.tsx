@@ -10,11 +10,11 @@ import { adminRoutes } from "@/lib/client/routes";
 import { ArrowUpDown, Plus } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { tableAction } from "@/components/application/admin/tableAction";
-import { TypesOfCategoryData } from "@/types/admin.category.types";
+import { TypeOfCategoryData } from "@/types/admin.category.types";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -27,7 +27,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const categoriesColumns: ColumnDef<TypesOfCategoryData>[] = [
+export const categoriesColumns: ColumnDef<TypeOfCategoryData>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -104,42 +104,38 @@ export const categoriesColumns: ColumnDef<TypesOfCategoryData>[] = [
 ];
 
 const CategoriesPage = () => {
-    const [deleteType, setDeleteType] = useState<TypesOfDeleteType>("SD");
+    const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/categories/delete";
     const fetchDataURL = "/api/admin/categories";
     const queryKey = "categories";
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <Card className="rounded-sm shadow-none py-3 gap-1">
-                <CardHeader>
-                    <div className="flex justify-between">
-                        <h1 className="text-xl text-violet-700 font-semibold">
-                            Categories
-                        </h1>
-                        <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.categories.addCategory}>
-                                <Plus />
-                                Add Category
-                            </Link>
-                        </Button>
-                    </div>
-                    <Separator />
-                </CardHeader>
-                <CardContent>
-                    <CommonDataTable<TypesOfCategoryData, unknown>
-                        editEndPoint={adminRoutes.categories.editCategory}
-                        columns={categoriesColumns}
-                        deleteEndPoint={deleteEndPoint}
-                        queryKey={queryKey}
-                        deleteType={deleteType}
-                        setDeleteType={setDeleteType}
-                        fetchDataURL={fetchDataURL}
-                        actions={tableAction}
-                    />
-                </CardContent>
-            </Card>
+            <div className="border rounded p-2">
+                <div className="flex justify-between mb-2">
+                    <h1 className="text-xl text-violet-700 font-semibold">
+                        Categories
+                    </h1>
+                    <Button asChild size={"sm"}>
+                        <Link href={adminRoutes.categories.addCategory}>
+                            <Plus />
+                            Add Category
+                        </Link>
+                    </Button>
+                </div>
+                <Separator />
+                <CommonDataTable<TypeOfCategoryData, unknown>
+                    editEndPoint={adminRoutes.categories.editCategory}
+                    columns={categoriesColumns}
+                    deleteEndPoint={deleteEndPoint}
+                    queryKey={queryKey}
+                    deleteType={deleteType}
+                    setDeleteType={setDeleteType}
+                    fetchDataURL={fetchDataURL}
+                    actions={tableAction}
+                />
+            </div>
         </div>
     );
 };

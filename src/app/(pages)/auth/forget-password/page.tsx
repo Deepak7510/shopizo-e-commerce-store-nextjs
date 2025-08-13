@@ -19,18 +19,18 @@ import { authRoutes } from "@/lib/client/routes";
 import Link from "next/link";
 import ApplicationLogo from "@/components/application/common/ApplicationLogo";
 import { emailZodSchema } from "@/zodSchema/auth.schema";
-import { TypesOfEmailInput } from "@/types/auth.types";
+import { TypeOfEmailInput } from "@/types/auth.types";
 
 const ForgetPasswordPage = () => {
     const router = useRouter();
-    const form = useForm<TypesOfEmailInput>({
+    const form = useForm<TypeOfEmailInput>({
         resolver: zodResolver(emailZodSchema),
         defaultValues: {
             email: ""
         }
     })
 
-    async function onSubmit({ email }: TypesOfEmailInput) {
+    async function onSubmit({ email }: TypeOfEmailInput) {
         const result = await resendOtpService({ email });
         if (!result.success) {
             toast.error(result.message)

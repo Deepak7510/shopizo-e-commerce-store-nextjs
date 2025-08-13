@@ -1,0 +1,109 @@
+"use client"
+import { AlertDialogFooter, AlertDialogHeader } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { fetchMediaService } from '@/services/client/media/fetchMediaService';
+import { mediaType } from '@/types/admin.media.types'
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { Check } from 'lucide-react';
+import Image from 'next/image';
+import React, { SetStateAction, useEffect, useState } from 'react'
+
+type SelectMediaModelProps = {
+    openSelectMediaModel: boolean;
+    setOpenSelectMediaModel: React.Dispatch<SetStateAction<boolean>>;
+    selectedMedia: mediaType[];
+    setSelectedMedia: React.Dispatch<SetStateAction<mediaType[]>>;
+}
+
+const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaModel, setOpenSelectMediaModel, selectedMedia, setSelectedMedia }) => {
+
+    const [selecteMediaList, setSelectMediaList] = useState<mediaType[]>([]);
+
+    const { data, fetchNextPage, hasNextPage, isFetching, status } =
+        useInfiniteQuery({
+            queryKey: ["medias"],
+            queryFn: async ({ pageParam = 1 }) =>
+                await fetchMediaService(pageParam, "SD"),
+            initialPageParam: 0,
+            getNextPageParam: (lastPage, allPages) => {
+                return lastPage.data.hasMore ? allPages.length : undefined;
+            },
+        });
+
+    const allMediaList = data?.pages
+        ?.flatMap((group) => group.data.mediaList)
+        .filter((item) => item.secure_url) as mediaType[];
+
+
+    function handleSelecteMediaList(media: mediaType) {
+        const selectedMediaIndex = selecteMediaList.findIndex(mediaItem => mediaItem._id === media._id);
+        if (selectedMediaIndex === -1) {
+            setSelectMediaList(pre => [...pre, media]);
+        } else {
+            const filterSelecteMediaList = selecteMediaList.filter(mediaItem => mediaItem._id !== media._id);
+            setSelectMediaList(filterSelecteMediaList);
+        }
+    }
+
+    function handleSelectMedia() {
+        setSelectedMedia(selecteMediaList);
+        setOpenSelectMediaModel(false);
+    }
+
+    function handleCloseMediaModel() {
+        setSelectMediaList(selectedMedia);
+        setOpenSelectMediaModel(false);
+    }
+
+    return (
+        <Dialog open={openSelectMediaModel} onOpenChange={setOpenSelectMediaModel}  >
+            <DialogContent className="min-w-full md:min-w-[80%] max-h-screen gap-2">
+                <AlertDialogHeader className='h-10 border-b'>
+                    <DialogTitle>Select Media</DialogTitle>
+                </AlertDialogHeader>
+                <div className="border h-[calc(100vh-8rem)] overflow-auto p-1 rounded">
+                    <div className="grid grid-cols-5 gap-2">
+                        {allMediaList?.map((media) => {
+                            return <div onClick={() => handleSelecteMediaList(media)} key={media._id} className="border rounded overflow-hidden space-y-2">
+                                <div className="h-64 relative">
+                                    <Image
+                                        src={media.secure_url}
+                                        alt={media.alt || "Media Image"}
+                                        className="object-cover w-full h-full"
+                                        width={300}
+                                        height={300}
+                                    />
+                                    <div className={`w-full h-full flex justify-center items-center top-0 absolute bg-gray-800 ${selecteMediaList.findIndex(mediItem => mediItem._id === media._id) >= 0 ? "opacity-50" : "opacity-0"}`}>
+                                        <Check className="text-white w-10 h-10" />
+                                    </div>
+                                </div>
+                                <h2 className="text-sm font-medium px-2 line-clamp-1">{media.title || "No Title"}</h2>
+                            </div>
+                        })}
+                    </div>
+                    <div className='flex justify-center my-2'>
+                        {
+                            hasNextPage ?
+                                <Button size={"sm"} type="button" disabled={!hasNextPage} onClick={() => fetchNextPage()}>Load More</Button>
+                                :
+                                <div className='font-medium text-red-400'>No more media</div>
+                        }
+                    </div>
+                </div>
+
+                <AlertDialogFooter className='h-10 border-t pt-1'>
+                    <div className='flex gap-2'>
+                        <Button onClick={handleCloseMediaModel} size={"sm"}>Close</Button>
+                        <Button onClick={handleSelectMedia} size={"sm"}>Select</Button>
+                    </div>
+                </AlertDialogFooter>
+            </DialogContent>
+        </Dialog >
+    )
+}
+
+export default SelectMediaModel
+
+
+

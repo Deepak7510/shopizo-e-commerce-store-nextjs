@@ -10,11 +10,11 @@ import { adminRoutes } from "@/lib/client/routes";
 import { ArrowUpDown, Plus } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
 import { tableAction } from "@/components/application/admin/tableAction";
 import { ColumnDef } from "@tanstack/react-table";
-import { TypesOfSubcategoryData } from "@/types/admin.subcategories.types";
+import { TypeOfSubcategoryData } from "@/types/admin.subcategories.types";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -28,7 +28,7 @@ const breadcrumbList: breadcrumbListType[] = [
 ];
 
 export const subCategoriesColumns: ColumnDef<
-    TypesOfSubcategoryData,
+    TypeOfSubcategoryData,
     unknown
 >[] = [
         {
@@ -113,40 +113,36 @@ export const subCategoriesColumns: ColumnDef<
     ];
 
 const SubcategoriesPage = () => {
-    const [deleteType, setDeleteType] = useState<TypesOfDeleteType>("SD");
+    const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/subcategories/delete";
     const fetchDataURL = "/api/admin/subcategories";
     const queryKey = "subcategories";
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <Card className="rounded-sm shadow-none py-3 gap-2.5">
-                <CardHeader>
-                    <div className="flex justify-between">
-                        <h1 className="text-xl text-violet-700 font-semibold">Subcategories</h1>
-                        <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.subcategories.addSubcategory}>
-                                <Plus />
-                                Add Subcategory
-                            </Link>
-                        </Button>
-                    </div>
-                    <Separator />
-                </CardHeader>
-                <CardContent>
-                    <CommonDataTable<TypesOfSubcategoryData, unknown>
-                        setDeleteType={setDeleteType}
-                        columns={subCategoriesColumns}
-                        editEndPoint={adminRoutes.subcategories.editSubcategory}
-                        actions={tableAction}
-                        queryKey={queryKey}
-                        deleteEndPoint={deleteEndPoint}
-                        deleteType={deleteType}
-                        fetchDataURL={fetchDataURL}
-                    />
-                </CardContent>
-            </Card>
+            <div className="border rounded p-2">
+                <div className="flex justify-between mb-2">
+                    <h1 className="text-xl text-violet-700 font-semibold">Subcategories</h1>
+                    <Button asChild size={"sm"}>
+                        <Link href={adminRoutes.subcategories.addSubcategory}>
+                            <Plus />
+                            Add Subcategory
+                        </Link>
+                    </Button>
+                </div>
+                <Separator />
+                <CommonDataTable<TypeOfSubcategoryData, unknown>
+                    setDeleteType={setDeleteType}
+                    columns={subCategoriesColumns}
+                    editEndPoint={adminRoutes.subcategories.editSubcategory}
+                    actions={tableAction}
+                    queryKey={queryKey}
+                    deleteEndPoint={deleteEndPoint}
+                    deleteType={deleteType}
+                    fetchDataURL={fetchDataURL}
+                />
+            </div>
         </div>
     );
 };

@@ -1,7 +1,6 @@
 "use client"
 import { useSidebar } from '@/components/ui/sidebar'
 import React from 'react'
-import LogoutHandlerButton from '../common/LogoutHandlerButton'
 import SearchHandler from './SearchHandler'
 import { AlignJustify } from 'lucide-react'
 import { ThemeButton } from '@/app/ThemeButton'

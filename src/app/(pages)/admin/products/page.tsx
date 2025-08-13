@@ -10,11 +10,12 @@ import { adminRoutes } from "@/lib/client/routes";
 import { ArrowUpDown, Plus } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
 import { tableAction } from "@/components/application/admin/tableAction";
 import { ColumnDef } from "@tanstack/react-table";
-import { TypesOfSubcategoryData } from "@/types/admin.subcategories.types";
+import { TypeOfProductData } from "@/types/admin.products.types";
+import Image from "next/image";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -27,8 +28,8 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const subCategoriesColumns: ColumnDef<
-    TypesOfSubcategoryData,
+export const ProductsColumns: ColumnDef<
+    TypeOfProductData,
     unknown
 >[] = [
         {
@@ -54,14 +55,14 @@ export const subCategoriesColumns: ColumnDef<
             enableHiding: false,
         },
         {
-            accessorKey: "name",
+            accessorKey: "title",
             header: ({ column }) => {
                 return (
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        Name
+                        Title
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 );
@@ -71,11 +72,45 @@ export const subCategoriesColumns: ColumnDef<
             accessorKey: "slug",
             header: "Slug",
         },
+        {
+            accessorKey: "brand.name",
+            header: "Brand",
+            cell: ({ row }) => row.original.brand?.name || "-",
+        },
 
         {
             accessorKey: "category.name",
             header: "Category",
             cell: ({ row }) => row.original.category?.name || "-",
+        },
+        {
+            accessorKey: "subcategory.name",
+            header: "Subcategory",
+            cell: ({ row }) => row.original.subcategory?.name || "-",
+        },
+        {
+            accessorKey: "media",
+            header: "Media",
+            cell: ({ row }) => {
+
+                const media = row.original.media
+                return <div className="flex gap-1">
+                    {
+                        media && media.length > 0 && media.map((mediaItem, index) =>
+                            < div key={index} className="h-12 w-10 relative rounded overflow-hidden">
+                                <Image
+                                    src={mediaItem.secure_url}
+                                    alt={"Selected Image"}
+                                    className="object-cover w-full h-full"
+                                    width={100}
+                                    height={100}
+                                />
+                            </div>
+                        )
+                    }
+
+                </div>
+            }
         },
 
         {
@@ -112,43 +147,39 @@ export const subCategoriesColumns: ColumnDef<
         },
     ];
 
-const SubcategoriesPage = () => {
-    const [deleteType, setDeleteType] = useState<TypesOfDeleteType>("SD");
-    const deleteEndPoint = "/api/admin/subcategories/delete";
-    const fetchDataURL = "/api/admin/subcategories";
-    const queryKey = "subcategories";
+const ProductPage = () => {
+    const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
+    const deleteEndPoint = "/api/admin/products/delete";
+    const fetchDataURL = "/api/admin/products";
+    const queryKey = "products";
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <Card className="rounded-sm shadow-none py-3 gap-2.5">
-                <CardHeader>
-                    <div className="flex justify-between">
-                        <h1 className="text-xl text-violet-700 font-semibold">Products</h1>
-                        <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.products.addProduct}>
-                                <Plus />
-                                Add Product
-                            </Link>
-                        </Button>
-                    </div>
-                    <Separator />
-                </CardHeader>
-                <CardContent>
-                    <CommonDataTable<TypesOfSubcategoryData, unknown>
-                        setDeleteType={setDeleteType}
-                        columns={subCategoriesColumns}
-                        editEndPoint={adminRoutes.subcategories.editSubcategory}
-                        actions={tableAction}
-                        queryKey={queryKey}
-                        deleteEndPoint={deleteEndPoint}
-                        deleteType={deleteType}
-                        fetchDataURL={fetchDataURL}
-                    />
-                </CardContent>
-            </Card>
+            <div className="border rounded p-2">
+                <div className="flex justify-between mb-2">
+                    <h1 className="text-xl text-violet-700 font-semibold">Products</h1>
+                    <Button asChild size={"sm"}>
+                        <Link href={adminRoutes.products.addProduct}>
+                            <Plus />
+                            Add Product
+                        </Link>
+                    </Button>
+                </div>
+                <Separator />
+                <CommonDataTable<TypeOfProductData, unknown>
+                    setDeleteType={setDeleteType}
+                    columns={ProductsColumns}
+                    editEndPoint={adminRoutes.products.editProduct}
+                    actions={tableAction}
+                    queryKey={queryKey}
+                    deleteEndPoint={deleteEndPoint}
+                    deleteType={deleteType}
+                    fetchDataURL={fetchDataURL}
+                />
+            </div>
         </div>
     );
 };
 
-export default SubcategoriesPage;
+export default ProductPage;

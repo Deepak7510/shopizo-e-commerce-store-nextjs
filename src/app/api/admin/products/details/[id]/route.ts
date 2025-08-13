@@ -3,7 +3,7 @@ import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
-import BrandModel from "@/models/Brand.model";
+import ProductModel from "@/models/Product.model";
 import { UserRole } from "@/models/User.model";
 import { isValidObjectId } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -18,13 +18,16 @@ export const GET = async function (request: NextRequest, { params }: { params: P
             throw new ApiError(400, "Invalid data id");
         }
 
-        const brandDetails = await BrandModel.findById(id);
+        const productDetails = await ProductModel.findById(id).populate({
+            path: "media",
+            select: "secure_url"
+        });
 
-        if (!brandDetails) {
-            throw new ApiError(404, "Brand not found");
+        if (!productDetails) {
+            throw new ApiError(404, "Product not found");
         }
 
-        return apiResponse(200, "Brand details fetched successfully", { brandDetails })
+        return apiResponse(200, "Product details fetched successfully", { productDetails })
     } catch (error) {
         return errorHandler(error);
     }

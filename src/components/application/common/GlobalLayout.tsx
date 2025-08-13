@@ -12,8 +12,6 @@ const GlobalLayout = ({
 }: Readonly<{
     children: React.ReactNode;
 }>) => {
-
-    const { userInfo, isAuthenticated } = useSelector((state: RootState) => state.auth);
     const [loading, setLoading] = useState(true)
     const dispatch = useDispatch();
     const pathName = usePathname();
@@ -41,15 +39,12 @@ const GlobalLayout = ({
         checkAuthHandler();
     }, [pathName]);
 
-
-
     if (loading) return <LoaderOne />
 
-
     return (
-        <RouteProtectGaurd isAuthenticated={isAuthenticated} userInfo={userInfo!}>
+        <>
             {children}
-        </RouteProtectGaurd>
+        </>
     )
 }
 

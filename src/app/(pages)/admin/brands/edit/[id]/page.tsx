@@ -17,8 +17,9 @@ import useFetch from '@/hooks/useFetch';
 import EditCategorySkeleton from '@/components/application/admin/EditCategorySkeleton';
 import { useRouter } from 'next/navigation';
 import { editBrandZodSchema } from '@/zodSchema/admin.brands.schema';
-import { TypesOfEditBrandInput } from '@/types/admin.brands.types';
+import { TypeOfEditBrandInput } from '@/types/admin.brands.types';
 import { updateBrandService } from '@/services/client/brands/updateBrandService';
+import { TypeOfCategoryData } from '@/types/admin.category.types';
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -37,19 +38,20 @@ const breadcrumbList: breadcrumbListType[] = [
 const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = use(params);
     const router = useRouter()
-    const { data, loading, error } = useFetch(`/api/admin/brands/details/${id}`, {}, [id]);
+    const { data, error, loading } = useFetch(`/api/admin/brands/details/${id}`, {}, [id]);
+    const brandDetails = data?.data.brandDetails as TypeOfCategoryData
 
     useEffect(() => {
         if (data && !loading) {
             form.reset({
-                _id: data.data.brandDetails._id || "",
-                name: data.data.brandDetails.name || "",
-                slug: data.data.brandDetails.slug || "",
+                _id: brandDetails._id || "",
+                name: brandDetails.name || "",
+                slug: brandDetails.slug || "",
             })
         }
     }, [data])
 
-    const form = useForm<TypesOfEditBrandInput>({
+    const form = useForm<TypeOfEditBrandInput>({
         resolver: zodResolver(editBrandZodSchema),
         defaultValues: {
             _id: "",
@@ -64,7 +66,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
         form.setValue("slug", slugValue)
     }, [brandName])
 
-    async function onSubmit(data: TypesOfEditBrandInput) {
+    async function onSubmit(data: TypeOfEditBrandInput) {
         const result = await updateBrandService(data);
         if (!result.success) {
             toast.error(result.message);
@@ -81,71 +83,59 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <Card className="rounded-sm shadow-none py-3 gap-2.5">
-            <CardHeader>
-                <div className="flex justify-between">
-                    <h1 className="text-xl text-violet-700 font-semibold">
-                        Edit Brand
-                    </h1>
-                    <div className="flex items-center gap-2">
+        <div className=" border rounded p-2">
+            <div className="flex justify-between mb-2">
+                <h1 className="text-xl text-violet-700 font-semibold"> Edit Brand</h1>
+                <Button asChild size={"sm"}>
+                    <Link href={adminRoutes.brands.brands}>Back to Brands</Link>
+                </Button>
+            </div>
+            <Separator className="mb-2" />
+            <Card className="rounded-sm shadow-none py-3">
+                <CardContent>
+                    {loading ?
+                        <EditCategorySkeleton />
+                        :
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Brand Name <span className="text-red-600">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter the category name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="slug"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Slug <span className="text-red-600">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input readOnly placeholder="Enter the slug" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                        <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.brands.brands}>
-                                Back to Brands
-                            </Link>
-                        </Button>
-                    </div>
-                </div>
-                <Separator />
-
-            </CardHeader>
-            <CardContent>
-                <Card className="rounded-sm shadow-none py-3">
-                    <CardContent>
-                        {loading ?
-                            <EditCategorySkeleton />
-                            :
-                            <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">
-                                    <FormField
-                                        control={form.control}
-                                        name="name"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Brand Name</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Enter the category name" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="slug"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Slug</FormLabel>
-                                                <FormControl>
-                                                    <Input readOnly placeholder="Enter the slug" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <ButtonLoading
-                                        type="submit"
-                                        loading={form.formState.isSubmitting}
-                                        text={"Update Brand"}
-                                    />
-                                </form>
-                            </Form>
-                        }
-                    </CardContent>
-                </Card>
-            </CardContent>
-        </Card>
+                                <ButtonLoading
+                                    type="submit"
+                                    loading={form.formState.isSubmitting}
+                                    text={"Update Brand"}
+                                />
+                            </form>
+                        </Form>
+                    }
+                </CardContent>
+            </Card>
+        </div>
     </div>
     )
 }

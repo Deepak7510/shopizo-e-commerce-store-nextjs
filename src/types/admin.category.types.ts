@@ -1,9 +1,9 @@
 import { addCategoryZodSchema, editCatgeoryZodSchema } from "@/zodSchema/admin.category.schema";
 import { z } from "zod";
-export type TypesOfAddCategoryInput = z.infer<typeof addCategoryZodSchema>
-export type TypesOfEditCategoryInput = z.infer<typeof editCatgeoryZodSchema>
+export type TypeOfAddCategoryInput = z.infer<typeof addCategoryZodSchema>
+export type TypeOfEditCategoryInput = z.infer<typeof editCatgeoryZodSchema>
 
-export type TypesOfCategoryData = {
+export type TypeOfCategoryData = {
     _id: string;
     name: string;
     slug: string;

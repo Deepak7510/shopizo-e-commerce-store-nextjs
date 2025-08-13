@@ -6,7 +6,7 @@ import { generateToken } from "@/lib/server/generateToken";
 import OTPModel, { IOtp } from "@/models/Otp.model";
 import User, { IUser } from "@/models/User.model";
 import VerifyTokenModel from "@/models/Verifytoken.model";
-import { TypesOfVerifyOtpInput } from "@/types/auth.types";
+import { TypeOfVerifyOtpInput } from "@/types/auth.types";
 import { verifyOtpZodSchema } from "@/zodSchema/auth.schema";
 import { NextRequest, NextResponse } from "next/server"
 
@@ -14,13 +14,13 @@ import { NextRequest, NextResponse } from "next/server"
 export const POST = async function (request: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
-        const body = await request.json() as TypesOfVerifyOtpInput;
+        const body = await request.json() as TypeOfVerifyOtpInput;
 
         const checkValidation = verifyOtpZodSchema.safeParse(body);
         if (!checkValidation.success) {
             throw new ApiError(
                 401,
-                "Validation failed. Please check the provided information..",
+                "Invalid input or missing fields",
                 checkValidation.error
             );
         }

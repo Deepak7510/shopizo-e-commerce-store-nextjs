@@ -3,7 +3,7 @@ import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
-import BrandModel from "@/models/Brand.model";
+import BrandModel, { IBrand } from "@/models/Brand.model";
 import { UserRole } from "@/models/User.model";
 import { isValidObjectId } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -18,7 +18,7 @@ export const GET = async function (request: NextRequest, { params }: { params: P
             throw new ApiError(400, "Invalid data id");
         }
 
-        const brandDetails = await BrandModel.findById(id);
+        const brandDetails = await BrandModel.findById<IBrand>(id);
 
         if (!brandDetails) {
             throw new ApiError(404, "Brand not found");

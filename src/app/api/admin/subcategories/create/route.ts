@@ -18,7 +18,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
 
         const checkValidation = addSubcategoryZodSchema.safeParse(body);
         if (!checkValidation.success) {
-            throw new ApiError(400, "Invalid input fields data", { error: checkValidation.error });
+            throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
         const { name, slug, category } = checkValidation.data;

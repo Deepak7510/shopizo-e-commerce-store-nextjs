@@ -1,1 +1,1 @@
-export type TypesOfDeleteType = "PD" | "SD" | "RSD";
+export type TypeOfDeleteType = "PD" | "SD" | "RSD";

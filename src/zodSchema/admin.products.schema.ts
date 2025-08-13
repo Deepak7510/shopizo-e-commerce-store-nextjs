@@ -8,13 +8,7 @@ export const addProductZodSchema = commonZodSchema.pick({
     subcategory: true,
     media: true,
     description: true,
-    mrp: true,
-    sellingPrice: true,
-    discountPercentage: true
-}).refine((data) => data.sellingPrice <= data.mrp, {
-    message: "Selling Price should not be more than MRP.",
-    path: ["sellingPrice"],
-})
+});
 
 export const editProductZodSchema = commonZodSchema.pick({
     _id: true,
@@ -25,10 +19,4 @@ export const editProductZodSchema = commonZodSchema.pick({
     subcategory: true,
     media: true,
     description: true,
-    mrp: true,
-    sellingPrice: true,
-    discountPercentage: true
-}).refine((data) => data.sellingPrice <= data.mrp, {
-    message: "Selling Price should not be more than MRP.",
-    path: ["sellingPrice"],
 })

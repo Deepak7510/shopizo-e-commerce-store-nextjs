@@ -5,7 +5,7 @@ import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
 import BrandModel, { IBrand } from "@/models/Brand.model";
 import { UserRole } from "@/models/User.model";
-import { TypesOfAddBrandInput } from "@/types/admin.brands.types";
+import { TypeOfAddBrandInput } from "@/types/admin.brands.types";
 import { addBrandZodSchema } from "@/zodSchema/admin.brands.schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,16 +15,16 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
         await connectDB();
         await verifyRole(request, UserRole.ADMIN);
 
-        const body = await request.json() as TypesOfAddBrandInput;
+        const body = await request.json() as TypeOfAddBrandInput;
 
         const checkValidation = addBrandZodSchema.safeParse(body);
         if (!checkValidation.success) {
-            throw new ApiError(400, "Invalid input fields data", { error: checkValidation.error });
+            throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
         const { name, slug } = checkValidation.data
 
-        const checkBrandExisting = await BrandModel.findOne({ slug });
+        const checkBrandExisting = await BrandModel.findOne<IBrand>({ slug });
 
         if (checkBrandExisting) {
             throw new ApiError(400, "Brand already exist")

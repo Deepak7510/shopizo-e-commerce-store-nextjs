@@ -9,18 +9,18 @@ import VerifyTokenModel, { IVerifyToken } from "@/models/Verifytoken.model";
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { emailZodSchema } from "@/zodSchema/auth.schema";
-import { TypesOfEmailInput } from "@/types/auth.types";
+import { TypeOfEmailInput } from "@/types/auth.types";
 
 const MIN_RESEND_INTERVAL_MS = 60 * 1000; // 1 minute
 
 export const POST = async (request: NextRequest) => {
     try {
         await connectDB();
-        const body = await request.json() as TypesOfEmailInput;
+        const body = await request.json() as TypeOfEmailInput;
 
         const checkValidation = emailZodSchema.safeParse(body);
         if (!checkValidation.success) {
-            throw new ApiError(401, "Validation failed. Please check the  provided information.", {
+            throw new ApiError(401, "Invalid input or missing fields", {
                 errors: checkValidation.error,
             });
         }

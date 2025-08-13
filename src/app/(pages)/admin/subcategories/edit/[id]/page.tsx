@@ -14,14 +14,14 @@ import Link from 'next/link';
 import slugify from 'slugify'
 import { toast } from 'sonner';
 import useFetch from '@/hooks/useFetch';
-import EditCategorySkeleton from '@/components/application/admin/EditCategorySkeleton';
 import { useRouter } from 'next/navigation';
 import { updateSubcategoryService } from '@/services/client/subcategories/updateSubcategoryService';
-import { TypesOfEditSubcategoryInput } from '@/types/admin.subcategories.types';
+import { TypeOfEditSubcategoryInput } from '@/types/admin.subcategories.types';
 import { editSubcategoryZodSchema } from '@/zodSchema/admin.subcategories.schema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TypesOfCategoryData } from '@/types/admin.category.types';
+import { TypeOfCategoryData } from '@/types/admin.category.types';
 import EditSubcategorySkeleton from '@/components/application/admin/EditSubcategorySkeleton';
+
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -43,13 +43,14 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const router = useRouter()
     const { data: SubcategoryDetails, loading, error } = useFetch(`/api/admin/subcategories/details/${id}`, {}, [id]);
 
-    const { data: categoryList, loading: categoryLoading, error: categoryError } = useFetch(
+    const { data: categoryData, loading: categoryLoading, error: categoryError } = useFetch(
         `/api/admin/categories/fetch-all`,
         {},
         []
     );
+    const categoryList = categoryData?.data.allDataList as TypeOfCategoryData[]
 
-    const form = useForm<TypesOfEditSubcategoryInput>({
+    const form = useForm<TypeOfEditSubcategoryInput>({
         resolver: zodResolver(editSubcategoryZodSchema),
         defaultValues: {
             _id: "",
@@ -77,7 +78,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }, [SubcategoryDetails]);
 
 
-    async function onSubmit(data: TypesOfEditSubcategoryInput) {
+    async function onSubmit(data: TypeOfEditSubcategoryInput) {
         const result = await updateSubcategoryService(data);
         if (!result.success) {
             toast.error(result.message);
@@ -99,107 +100,102 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <Card className="rounded-sm shadow-none py-3 gap-2.5">
-            <CardHeader>
-                <div className="flex justify-between">
-                    <h1 className="text-xl text-violet-700 font-semibold">
-                        Edit Subcategory
-                    </h1>
-                    <div className="flex items-center gap-2">
+        <div className='rounded border p-2'>
+            <div className="flex justify-between mb-2">
+                <h1 className="text-xl text-violet-700 font-semibold">
+                    Edit Subcategory
+                </h1>
+                <div className="flex items-center gap-2">
 
-                        <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.subcategories.subcategories}>
-                                Back to Subcategories
-                            </Link>
-                        </Button>
-                    </div>
+                    <Button asChild size={"sm"}>
+                        <Link href={adminRoutes.subcategories.subcategories}>
+                            Back to Subcategories
+                        </Link>
+                    </Button>
                 </div>
-                <Separator />
+            </div>
+            <Separator className='mb-2' />
+            <Card className="rounded-sm shadow-none py-3">
+                <CardContent>
+                    {loading || categoryLoading ?
+                        <EditSubcategorySkeleton />
+                        :
+                        <Form {...form} key={form.watch("_id") || "edit-subcategory-form"}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Category Name <span className="text-red-600">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter the category name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="slug"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Slug <span className="text-red-600">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input readOnly placeholder="Enter the slug" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-            </CardHeader>
-            <CardContent>
-                <Card className="rounded-sm shadow-none py-3">
-                    <CardContent>
-                        {loading || categoryLoading ?
-                            <EditSubcategorySkeleton />
-                            :
-                            <Form {...form} key={form.watch("_id") || "edit-subcategory-form"}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">
-                                    <FormField
-                                        control={form.control}
-                                        name="name"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Category Name</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Enter the category name" {...field} />
+                                <FormField
+                                    control={form.control}
+                                    name="category"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Category <span className="text-red-600">*</span></FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <FormControl className="w-full" >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a Category" />
+                                                    </SelectTrigger>
                                                 </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="slug"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Slug</FormLabel>
-                                                <FormControl>
-                                                    <Input readOnly placeholder="Enter the slug" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="category"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Category</FormLabel>
-                                                <Select
-                                                    onValueChange={field.onChange}
-                                                    value={field.value}
-                                                >
-                                                    <FormControl className="w-full" >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select a Category" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {categoryLoading ? (
-                                                            <div className="text-sm">Loading...</div>
-                                                        ) : (
-                                                            categoryList &&
-                                                            categoryList.data &&
-                                                            categoryList.data?.allDataList.map(
-                                                                (item: TypesOfCategoryData) => (
-                                                                    <SelectItem key={item._id} value={item._id}>
-                                                                        {item.name}
-                                                                    </SelectItem>
-                                                                )
+                                                <SelectContent>
+                                                    {categoryLoading ? (
+                                                        <div className="text-sm">Loading...</div>
+                                                    ) : (
+                                                        categoryList &&
+                                                        categoryList.length > 0 &&
+                                                        categoryList.map(
+                                                            (item: TypeOfCategoryData) => (
+                                                                <SelectItem key={item._id} value={item._id}>
+                                                                    {item.name}
+                                                                </SelectItem>
                                                             )
-                                                        )}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                                        )
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <ButtonLoading
-                                        type="submit"
-                                        loading={form.formState.isSubmitting}
-                                        text={"Update Subcategory"}
-                                    />
-                                </form>
-                            </Form>
-                        }
-                    </CardContent>
-                </Card>
-            </CardContent>
-        </Card >
+                                <ButtonLoading
+                                    type="submit"
+                                    loading={form.formState.isSubmitting}
+                                    text={"Update Subcategory"}
+                                />
+                            </form>
+                        </Form>
+                    }
+                </CardContent>
+            </Card>
+        </div>
     </div >
     )
 }

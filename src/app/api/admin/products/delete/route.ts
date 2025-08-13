@@ -3,7 +3,7 @@ import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
-import BrandModel, { IBrand } from "@/models/Brand.model";
+import ProductModel, { IProduct } from "@/models/Product.model";
 import { UserRole } from "@/models/User.model";
 import { ApiError } from "next/dist/server/api-utils";
 import { NextRequest, NextResponse } from "next/server";
@@ -21,14 +21,14 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         }
 
         if (deleteType === "SD") {
-            await BrandModel.updateMany<IBrand>({ _id: { $in: selectedIdList } }, { $set: { deletedAt: new Date().toISOString() } });
+            await ProductModel.updateMany<IProduct>({ _id: { $in: selectedIdList } }, { $set: { deletedAt: new Date().toISOString() } });
         } else {
-            await BrandModel.updateMany<IBrand>({ _id: { $in: selectedIdList } }, { $set: { deletedAt: null } });
+            await ProductModel.updateMany<IProduct>({ _id: { $in: selectedIdList } }, { $set: { deletedAt: null } });
         }
 
         const message = deleteType === "SD"
-            ? "Brand moved to trash successfully."
-            : "Brand restored successfully.";
+            ? "Product moved to trash successfully."
+            : "Product restored successfully.";
         return apiResponse(200, message)
 
     } catch (error) {
@@ -49,9 +49,9 @@ export const DELETE = async function (request: NextRequest): Promise<NextRespons
             throw new ApiError(401, "Invalid delete type.");
         }
 
-        await BrandModel.deleteMany({ _id: { $in: selectedIdList } });
+        await ProductModel.deleteMany({ _id: { $in: selectedIdList } });
 
-        return apiResponse(200, "Brand deleted successfully.")
+        return apiResponse(200, "Product deleted successfully.")
 
     } catch (error) {
         return errorHandler(error)

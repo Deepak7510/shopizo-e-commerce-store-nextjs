@@ -5,7 +5,7 @@ import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyToken } from "@/lib/server/verifyToken";
 import User, { IUser } from "@/models/User.model";
 import VerifyTokenModel from "@/models/Verifytoken.model";
-import { TypesOfResetPasswordInput } from "@/types/auth.types";
+import { TypeOfResetPasswordInput } from "@/types/auth.types";
 import { resetPasswordZodSchema } from "@/zodSchema/auth.schema";
 import { NextRequest } from "next/server";
 
@@ -13,12 +13,12 @@ import { NextRequest } from "next/server";
 export const POST = async function (request: NextRequest) {
     try {
         await connectDB()
-        const body = await request.json() as TypesOfResetPasswordInput;
+        const body = await request.json() as TypeOfResetPasswordInput;
 
         const checkValidation = resetPasswordZodSchema.safeParse(body);
 
         if (!checkValidation.success) {
-            throw new ApiError(400, "Validation failed. Please check the provided information..", {
+            throw new ApiError(400, "Invalid input or missing fields", {
                 errors: checkValidation.error,
             });
         }

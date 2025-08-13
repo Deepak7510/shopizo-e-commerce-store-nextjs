@@ -1,10 +1,10 @@
 import { addBrandZodSchema, editBrandZodSchema } from "@/zodSchema/admin.brands.schema";
 import { z } from "zod";
 
-export type TypesOfAddBrandInput = z.infer<typeof addBrandZodSchema>
-export type TypesOfEditBrandInput = z.infer<typeof editBrandZodSchema>
+export type TypeOfAddBrandInput = z.infer<typeof addBrandZodSchema>
+export type TypeOfEditBrandInput = z.infer<typeof editBrandZodSchema>
 
-export type TypesOfBrandData = {
+export type TypeOfBrandData = {
     _id: string;
     name: string;
     slug: string;

@@ -8,17 +8,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateToken } from "@/lib/server/generateToken";
 import VerifyTokenModel, { IVerifyToken } from "@/models/Verifytoken.model";
 import { mailEmailVerifylinkTamplate } from "@/lib/server/mailEmailVerifylinkTemplate";
-import { TypesOfRegisterInput } from "@/types/auth.types";
+import { TypeOfRegisterInput } from "@/types/auth.types";
 import { registerZodSchema } from "@/zodSchema/auth.schema";
 
 export const POST = async function (req: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
-        const data = (await req.json()) as TypesOfRegisterInput;
+        const data = (await req.json()) as TypeOfRegisterInput;
 
         const validateData = registerZodSchema.safeParse(data);
         if (!validateData.success) {
-            throw new ApiError(401, "Validation failed. Please check the  provided information.", {
+            throw new ApiError(401, "Invalid input or missing fields", {
                 errors: validateData.error,
             });
         }

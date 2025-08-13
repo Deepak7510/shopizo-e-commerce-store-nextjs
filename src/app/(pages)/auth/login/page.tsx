@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { authRoutes } from "@/lib/client/routes";
 import loginService from "@/services/client/auth/loginService";
-import { TypesOfLoginInput } from "@/types/auth.types";
+import { TypeOfLoginInput } from "@/types/auth.types";
 import { loginZodSchema } from "@/zodSchema/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeClosed } from "lucide-react";
@@ -27,7 +27,7 @@ import { toast } from "sonner";
 const LoginPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const form = useForm<TypesOfLoginInput>({
+  const form = useForm<TypeOfLoginInput>({
     resolver: zodResolver(loginZodSchema),
     defaultValues: {
       email: "",
@@ -35,7 +35,7 @@ const LoginPage = () => {
     }
   });
 
-  async function onSubmit(data: TypesOfLoginInput) {
+  async function onSubmit(data: TypeOfLoginInput) {
     const result = await loginService(data);
     if (!result.success) {
       toast.error(result.message);

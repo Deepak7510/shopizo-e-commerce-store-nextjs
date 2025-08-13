@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { createmediaService } from '@/services/client/media/createMediaService';
 import { useQueryClient } from '@tanstack/react-query';
-import { TypesOfMediaInput, TypedOfUploadMediaArray } from '@/types/admin.media.types';
+import { TypedOfUploadMediaArray } from '@/types/admin.media.types';
 import { uploadMediaArrayZodSchema } from '@/zodSchema/admin.media.schema';
 
 const UploadMedia = () => {
@@ -67,7 +67,7 @@ const UploadMedia = () => {
                 return (
                     <Button size={'sm'} onClick={() => open()}>
                         <Plus />
-                        Upload Images
+                        Upload
                     </Button>
                 );
             }}

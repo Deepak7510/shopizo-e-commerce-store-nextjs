@@ -1,36 +1,42 @@
+import { ApiError } from "@/lib/server/apiError";
 import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
-import SubcategoryModel from "@/models/Subcategory.model";
+import ProductModel, { IProduct } from "@/models/Product.model";
 import { UserRole } from "@/models/User.model";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async function (req: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
         await verifyRole(req, UserRole.ADMIN);
-        const searchParams = await req.nextUrl.searchParams;
 
-        const page = parseInt(searchParams.get("page") || "1", 10);
+        const searchParams = req.nextUrl.searchParams;
         const limit = parseInt(searchParams.get("limit") || "10", 10);
-        const deleteType = searchParams.get("deleteType") as TypesOfDeleteType;
-        const globalFilter = searchParams.get("globalFilter") || "";
+        const page = parseInt(searchParams.get("page") || "0", 10);
+        const deleteType = (searchParams.get("deleteType") || "SD") as TypeOfDeleteType;
         const sortby = searchParams.get("sortby") || "_id";
-        const order = (searchParams.get("order") || "desc") as "asc" | "desc";
+        const order = (searchParams.get("order") || "desc") as "desc" | "asc";
+        const globalFilter = searchParams.get("globalFilter") || "";
+
+        if (!["SD", "PD"].includes(deleteType)) {
+            throw new ApiError(403, "Invalid delete type.");
+        }
 
         const pipeline: any[] = [];
 
         let filter = {}
         if (deleteType === "SD") {
             filter = { deletedAt: null };
-            pipeline.push({ $match: { deletedAt: null } });
         } else if (deleteType === "PD") {
             filter = { deletedAt: { $ne: null } };
-            pipeline.push({ $match: { deletedAt: { $ne: null } } });
         }
 
+        pipeline.push({
+            $match: filter
+        })
 
         pipeline.push({
             $sort: {
@@ -60,44 +66,97 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
             }
         });
 
+
+        pipeline.push({
+            $lookup: {
+                from: "subcategories",
+                localField: "subcategory",
+                foreignField: "_id",
+                as: "subcategory"
+            },
+        });
+
+        pipeline.push({
+            $unwind: {
+                path: "$subcategory",
+                preserveNullAndEmptyArrays: true
+            }
+        });
+
+        pipeline.push({
+            $lookup: {
+                from: "brands",
+                localField: "brand",
+                foreignField: "_id",
+                as: "brand"
+            },
+        });
+
+        pipeline.push({
+            $unwind: {
+                path: "$brand",
+                preserveNullAndEmptyArrays: true
+            }
+        });
+
+
+        pipeline.push({
+            $lookup: {
+                from: "media",
+                localField: "media",
+                foreignField: "_id",
+                as: "media"
+            }
+        });
+
+
         if (globalFilter) {
             pipeline.push({
                 $match: {
                     $or: [
-                        { name: { $regex: globalFilter, $options: "i" } },
+                        { title: { $regex: globalFilter, $options: "i" } },
                         { slug: { $regex: globalFilter, $options: "i" } },
-                        { "category.name": { $regex: globalFilter, $options: "i" } }
+                        { "brand.name": { $regex: globalFilter, $options: "i" } },
+                        { "category.name": { $regex: globalFilter, $options: "i" } },
+                        { "subcategory.name": { $regex: globalFilter, $options: "i" } },
                     ],
                 }
             });
         }
 
-
         pipeline.push({
             $project: {
                 _id: 1,
-                name: 1,
+                title: 1,
                 slug: 1,
                 category: {
                     _id: "$category._id",
                     name: "$category.name",
                     slug: "$category.slug"
                 },
+                subcategory: {
+                    _id: "$subcategory._id",
+                    name: "$subcategory.name",
+                    slug: "$subcategory.slug"
+                },
+                brand: {
+                    _id: "$brand._id",
+                    name: "$brand.name",
+                    slug: "$brand.slug"
+                },
+                description: 1,
+                media: 1,
                 createdAt: 1,
                 updatedAt: 1,
                 deletedAt: 1
             },
         });
 
-
-
-        const dataList = await SubcategoryModel.aggregate(pipeline);
-        const totalRow = await SubcategoryModel.find(filter).countDocuments();
+        const dataList = await ProductModel.aggregate(pipeline);
+        const totalRow = await ProductModel.find(filter).countDocuments();
         const totalPage = Math.ceil(totalRow / limit);
 
-        console.log(dataList)
-
-        return apiResponse(200, "Subcategories fetched successfully", { dataList, totalRow, totalPage });
+        return apiResponse(200, "Products fetched successfully", { dataList, totalRow, totalPage });
     } catch (error) {
         return errorHandler(error as Error);
     }

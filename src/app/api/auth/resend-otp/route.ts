@@ -7,7 +7,7 @@ import { mailOtpVerifyTemplate } from "@/lib/server/mailOtpVerifyTemplate";
 import { sendMail } from "@/lib/server/sendMail";
 import OTPModel, { IOtp } from "@/models/Otp.model";
 import User, { IUser } from "@/models/User.model";
-import { TypesOfEmailInput } from "@/types/auth.types";
+import { TypeOfEmailInput } from "@/types/auth.types";
 import { emailZodSchema } from "@/zodSchema/auth.schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,13 +16,13 @@ const MIN_RESEND_INTERVAL_MS = 60 * 1000;
 export const POST = async function (request: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
-        const body = await request.json() as TypesOfEmailInput;
+        const body = await request.json() as TypeOfEmailInput;
 
         const checkValidation = emailZodSchema.safeParse(body);
         if (!checkValidation.success) {
             throw new ApiError(
                 401,
-                "Validation failed. Please check the provided information..",
+                "Invalid input or missing fields",
                 checkValidation.error
             );
         }

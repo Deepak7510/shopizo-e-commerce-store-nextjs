@@ -12,18 +12,18 @@ import User, { IUser } from "@/models/User.model";
 import VerifyTokenModel, { IVerifyToken } from "@/models/Verifytoken.model";
 import { NextRequest, NextResponse } from "next/server";
 import { loginZodSchema } from "@/zodSchema/auth.schema";
-import { TypesOfLoginInput } from "@/types/auth.types";
+import { TypeOfLoginInput } from "@/types/auth.types";
 
 export const POST = async function (req: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
-        const data = (await req.json()) as TypesOfLoginInput;
+        const data = (await req.json()) as TypeOfLoginInput;
 
         const checkValidation = loginZodSchema.safeParse(data);
         if (!checkValidation.success) {
             throw new ApiError(
                 401,
-                "Validation failed. Please check the input fields.",
+                "Invalid input or missing fields",
                 checkValidation.error.flatten().fieldErrors
             );
         }

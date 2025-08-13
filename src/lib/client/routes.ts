@@ -53,11 +53,11 @@ export const adminRoutes = {
             return `/admin/products/edit/${id}`
         },
     },
-    variants: {
-        variants: `/admin/variants`,
-        addVariant: `/admin/variants/add`,
-        editVariant: (id: string) => {
-            return `/admin/variants/edit/${id}`
+    productVariants: {
+        productVariants: `/admin/product-variants`,
+        addProductVariants: `/admin/product-variants/add`,
+        editProductVariants: (id: string) => {
+            return `/admin/product-variants/edit/${id}`
         },
     },
     medias: {

@@ -5,7 +5,7 @@ import { errorHandler } from "@/lib/server/errorHandler"
 import { verifyRole } from "@/lib/server/verifyRole";
 import CategoryModel, { ICategory } from "@/models/Category.model";
 import { UserRole } from "@/models/User.model";
-import { TypesOfAddCategoryInput } from "@/types/admin.category.types"
+import { TypeOfAddCategoryInput } from "@/types/admin.category.types"
 import { addCategoryZodSchema } from "@/zodSchema/admin.category.schema";
 import { NextRequest, NextResponse } from "next/server"
 
@@ -15,12 +15,12 @@ export const POST = async function (req: NextRequest): Promise<NextResponse> {
         await connectDB();
         await verifyRole(req, UserRole.ADMIN);
 
-        const body = await req.json() as TypesOfAddCategoryInput;
+        const body = await req.json() as TypeOfAddCategoryInput;
 
         const checkValidation = addCategoryZodSchema.safeParse(body);
 
         if (!checkValidation.success) {
-            throw new ApiError(400, "Invalid input fields data", { error: checkValidation.error });
+            throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
         const { name, slug } = checkValidation.data;

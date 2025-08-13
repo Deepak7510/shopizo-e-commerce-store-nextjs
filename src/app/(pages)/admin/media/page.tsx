@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { IDataForDelete, useDeleteMutation } from "@/hooks/useDeleteMutation";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 
 export const breadcrumbList: breadcrumbListType[] = [
     {
@@ -44,7 +44,7 @@ export const breadcrumbList: breadcrumbListType[] = [
 
 const MediaPage = () => {
     const queryClient = useQueryClient()
-    const [deleteType, setDeleteType] = useState<TypesOfDeleteType>("SD");
+    const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
     const [openDeleteAlertBox, setOpenDeleteAlertBox] = useState<boolean>(false);
     const [AlertDialogDescriptionMessage, setAlertDialogDescriptionMessage] = useState<string>("");
@@ -65,7 +65,7 @@ const MediaPage = () => {
         ?.flatMap((group) => group.data.mediaList)
         .filter((item) => item.secure_url);
 
-    function handleDeleteType(deleteTypeValue: TypesOfDeleteType) {
+    function handleDeleteType(deleteTypeValue: TypeOfDeleteType) {
         setDeleteType(deleteTypeValue);
         setSelectedMediaForDelete({
             selectedIdList: [],
@@ -75,7 +75,7 @@ const MediaPage = () => {
     }
 
 
-    function handleDelete(selectedMedia: string[], deleteType: TypesOfDeleteType) {
+    function handleDelete(selectedMedia: string[], deleteType: TypeOfDeleteType) {
         setSelectedMediaForDelete({ selectedIdList: selectedMedia, deleteType })
         let alertMessage = "";
         switch (deleteType) {
@@ -143,10 +143,10 @@ const MediaPage = () => {
     }
 
     return (
-        <div className="space-y-1.5">
+        <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
             <Card className="rounded-sm shadow-none py-3 gap-2.5">
-                <CardHeader>
+                <CardHeader className="px-1.5 md:px-6">
                     <div className="flex justify-between">
                         <h1 className="text-xl text-violet-700 font-semibold">
                             {deleteType === "SD" ? "Media" : "Trash Media"}
@@ -168,7 +168,7 @@ const MediaPage = () => {
                     </div>
                     <Separator />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-1.5 md:px-6">
                     <AlertDialog
                         open={openDeleteAlertBox}
                         onOpenChange={setOpenDeleteAlertBox}

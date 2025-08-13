@@ -18,7 +18,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
 
         const checkValidation = uploadMediaArrayZodSchema.safeParse(body);
         if (!checkValidation.success) {
-            throw new ApiError(400, "Invalid file data", { error: checkValidation.error });
+            throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
         const newMedia = await MediaModel.insertMany(checkValidation.data);
 

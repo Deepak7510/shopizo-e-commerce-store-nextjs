@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 import {
     useMutation,
     UseMutationResult,
@@ -9,14 +9,14 @@ import {
 
 export interface IDataForDelete {
     selectedIdList: string[];
-    deleteType: TypesOfDeleteType;
+    deleteType: TypeOfDeleteType;
 }
 
-export const useDeleteMutation = function (URL: string): UseMutationResult<TypesOfAxoisResponse, unknown, IDataForDelete> {
+export const useDeleteMutation = function (URL: string): UseMutationResult<TypeOfAxoisResponse, unknown, IDataForDelete> {
 
     const deleteHandler = async function (
         value: IDataForDelete,
-    ): Promise<TypesOfAxoisResponse> {
+    ): Promise<TypeOfAxoisResponse> {
         try {
             const response = await axiosInstance(URL, {
                 method: value.deleteType === "PD" ? "DELETE" : "PUT",

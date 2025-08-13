@@ -6,9 +6,6 @@ export interface IProduct extends Document {
     brand: mongoose.Types.ObjectId;
     category: mongoose.Types.ObjectId;
     subcategory: mongoose.Types.ObjectId;
-    mrp: number;
-    sellingPrice: number;
-    discountPercentage: number;
     media: mongoose.Types.ObjectId[];
     description?: string;
     deletedAt: Date | null;
@@ -44,18 +41,7 @@ const productSchema = new Schema<IProduct>({
         ref: "Subcategory",
         required: true,
     },
-    mrp: {
-        type: Number,
-        required: true,
-    },
-    sellingPrice: {
-        type: Number,
-        required: true,
-    },
-    discountPercentage: {
-        type: Number,
-        required: true,
-    },
+
     media: [
         {
             type: Schema.Types.ObjectId,

@@ -1,12 +1,12 @@
 import axiosInstance from "@/lib/client/axios"
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 import { useEffect, useState } from "react"
 
 const useFetch = function (url: string, option = {}, dependencies: any[] = []) {
-    const [data, setData] = useState<TypesOfAxoisResponse | null>(null);
+    const [data, setData] = useState<TypeOfAxoisResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(false)
     const [refetchIndex, setRefetchIndex] = useState<number>(0);
-    const [error, setError] = useState<TypesOfAxoisResponse | null>(null);
+    const [error, setError] = useState<TypeOfAxoisResponse | null>(null);
 
 
     useEffect(() => {

@@ -26,7 +26,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useDeleteMutation } from "@/hooks/useDeleteMutation";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -53,13 +53,13 @@ import {
     ArchiveRestore,
     DatabaseIcon,
     Recycle,
+    RotateCw,
     Trash,
-    Undo,
     Undo2,
 } from "lucide-react";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 import axiosInstance from "@/lib/client/axios";
 
 type CommonDataTableProps<TData, TValue> = {
@@ -68,14 +68,14 @@ type CommonDataTableProps<TData, TValue> = {
     deleteEndPoint: string;
     fetchDataURL: string;
     editEndPoint: (id: string) => string;
-    deleteType: TypesOfDeleteType;
-    setDeleteType: React.Dispatch<SetStateAction<TypesOfDeleteType>>;
+    deleteType: TypeOfDeleteType;
+    setDeleteType: React.Dispatch<SetStateAction<TypeOfDeleteType>>;
     actions: (
         editEndPoint: (id: string) => string,
         row: any,
-        deleteType: TypesOfDeleteType,
+        deleteType: TypeOfDeleteType,
         handleDeleteAlert: (
-            getDeleteType: TypesOfDeleteType,
+            getDeleteType: TypeOfDeleteType,
             getDeleteIdList?: string[]
         ) => void
     ) => React.ReactNode;
@@ -107,17 +107,17 @@ export function CommonDataTable<TData, TValue>({
     const [alertDecsMessage, setAlertDecsMessage] = useState<string>("");
 
     const [deleteActionType, setDeleteActionType] =
-        useState<TypesOfDeleteType | null>(null);
+        useState<TypeOfDeleteType | null>(null);
     const [deleteIdList, setDeleteIdList] = useState<string[]>([]);
 
     async function fetchData(
         fetchDataURL: string,
         page: number,
         limit: number,
-        deleteType: TypesOfDeleteType,
+        deleteType: TypeOfDeleteType,
         sortby: string,
         order: string
-    ): Promise<TypesOfAxoisResponse> {
+    ): Promise<TypeOfAxoisResponse> {
         try {
             const response = await axiosInstance.get(
                 `${fetchDataURL}?page=${page}&limit=${limit}&deleteType=${deleteType}&globalFilter=${globalFilter}&sortby=${sortby}&order=${order}`
@@ -186,7 +186,7 @@ export function CommonDataTable<TData, TValue>({
     }, [searchValue]);
 
     function handleDeleteAlert(
-        getDeleteType: TypesOfDeleteType,
+        getDeleteType: TypeOfDeleteType,
         getDeleteIdList?: string[]
     ) {
         let getDeleteIdListData: string[] = [];
@@ -242,7 +242,7 @@ export function CommonDataTable<TData, TValue>({
         setOpenDeleteAlert(false);
     }
 
-    function handleSetDeleteType(getDeletetype: TypesOfDeleteType) {
+    function handleSetDeleteType(getDeletetype: TypeOfDeleteType) {
         setRowSelection({});
         setDeleteType(getDeletetype);
         setPagination({
@@ -259,7 +259,6 @@ export function CommonDataTable<TData, TValue>({
     }
 
     if (error) {
-        console.error(error);
         return (
             <div className="text-red-700 font-medium text-lg text-center py-10">
                 Somthing went worng
@@ -298,84 +297,98 @@ export function CommonDataTable<TData, TValue>({
                 <>
                     {deleteType === "SD" ? (
                         <div className="flex justify-between gap-2">
-                            {rowSelection && Object.keys(rowSelection).length > 0 && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        disabled={Object.keys(rowSelection).length <= 0}
+                                        onClick={() => handleDeleteAlert("SD")}
+                                        variant={"secondary"}
+                                        size={"icon"}
+                                    >
+                                        <Trash />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                    <p className="font-medium">Move to Trash</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        disabled={sorting.length <= 0}
+                                        onClick={() => table.resetSorting()}
+                                        size={"icon"}
+                                        variant={"secondary"}
+                                    >
+                                        <RotateCw />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                    <p className="font-medium"> Reset Sorting</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => handleSetDeleteType("PD")}
+                                        variant={"secondary"}
+                                        size={"icon"}
+                                    >
+                                        <Recycle />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                    <p className="font-medium">View Trash</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                        </div>
+                    ) : (
+                        <div className="flex justify-between gap-3">
+                            <>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
-                                            variant={"destructive"}
-                                            onClick={() => handleDeleteAlert("SD")}
+                                            disabled={Object.keys(rowSelection).length <= 0}
+                                            onClick={() => handleDeleteAlert("PD")}
+                                            variant={"secondary"}
                                             size={"icon"}
-                                            className="size-8"
                                         >
                                             <Trash />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
-                                        <p className="font-medium">Move to Trash</p>
+                                        <p className="font-medium">Delete Permanently</p>
                                     </TooltipContent>
                                 </Tooltip>
-                            )}
-
-                            {sorting.length > 0 && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
-                                            onClick={() => table.resetSorting()}
+                                            disabled={Object.keys(rowSelection).length <= 0}
+                                            onClick={() => handleDeleteAlert("RSD")}
+                                            variant={"secondary"}
                                             size={"icon"}
-                                            className="size-8"
                                         >
-                                            <Undo2 />
+                                            <ArchiveRestore />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
-                                        <p className="font-medium"> Reset Sorting</p>
+                                        <p className="font-medium">Restore</p>
                                     </TooltipContent>
                                 </Tooltip>
-                            )}
-                            <Button onClick={() => handleSetDeleteType("PD")} size={"sm"}>
-                                <Recycle /> View Trash
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className="flex justify-between gap-3">
-                            {rowSelection && Object.keys(rowSelection).length > 0 && (
-                                <>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                variant={"destructive"}
-                                                onClick={() => handleDeleteAlert("PD")}
-                                                size={"icon"}
-                                                className="size-8"
-                                            >
-                                                <Trash />
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom">
-                                            <p className="font-medium">Delete Permanently</p>
-                                        </TooltipContent>
-                                    </Tooltip>
+                            </>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => handleSetDeleteType("SD")}
+                                        variant={"secondary"}
+                                        size={"icon"}                                    >
+                                        <DatabaseIcon />
 
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                className="bg-green-500 hover:bg-green-400"
-                                                onClick={() => handleDeleteAlert("RSD")}
-                                                size={"sm"}
-                                            >
-                                                <ArchiveRestore />
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom">
-                                            <p className="font-medium">Restore</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </>
-                            )}
-                            <Button onClick={() => handleSetDeleteType("SD")} size={"sm"}>
-                                <DatabaseIcon />
-                                Back to Records
-                            </Button>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                    <p className="font-medium"> Back to Records</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     )}
                 </>
@@ -435,13 +448,12 @@ export function CommonDataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-
             <div className="flex justify-between">
                 <div className="text-muted-foreground flex-1 text-sm">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}
                     {table.getFilteredRowModel().rows.length} rows selected.
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-2 md:gap-4">
                     <Select
                         value={String(table.getState().pagination.pageSize)}
                         onValueChange={(value) => {
@@ -449,8 +461,8 @@ export function CommonDataTable<TData, TValue>({
                             table.setPageIndex(0);
                         }}
                     >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Page Size" />
+                        <SelectTrigger className="!h-8 !min-h-[32px] px-2 text-sm">
+                            <SelectValue className="w-[180px]" placeholder="Page Size" />
                         </SelectTrigger>
                         <SelectContent>
                             {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -464,38 +476,44 @@ export function CommonDataTable<TData, TValue>({
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button
-                        size={"icon"}
-                        className="size-8"
-                        onClick={() => table.firstPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        {"<<"}
-                    </Button>
-                    <Button
-                        size={"icon"}
-                        className="size-8"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        {"<"}
-                    </Button>
-                    <Button
-                        size={"icon"}
-                        className="size-8"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        {">"}
-                    </Button>
-                    <Button
-                        size={"icon"}
-                        className="size-8"
-                        onClick={() => table.lastPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        {">>"}
-                    </Button>
+                    <div className="flex gap-1 md:gap-2">
+                        <Button
+                            size={"icon"}
+                            className="size-8"
+                            variant={"outline"}
+                            onClick={() => table.firstPage()}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            {"<<"}
+                        </Button>
+                        <Button
+                            size={"icon"}
+                            className="size-8"
+                            variant={"outline"}
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            {"<"}
+                        </Button>
+                        <Button
+                            size={"icon"}
+                            className="size-8"
+                            variant={"outline"}
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            {">"}
+                        </Button>
+                        <Button
+                            size={"icon"}
+                            className="size-8"
+                            variant={"outline"}
+                            onClick={() => table.lastPage()}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            {">>"}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

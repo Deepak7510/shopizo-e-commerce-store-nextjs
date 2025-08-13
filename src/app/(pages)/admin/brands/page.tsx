@@ -10,11 +10,11 @@ import { adminRoutes } from "@/lib/client/routes";
 import { ArrowUpDown, Plus } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
 import { tableAction } from "@/components/application/admin/tableAction";
 import { ColumnDef } from "@tanstack/react-table";
-import { TypesOfBrandData } from "@/types/admin.brands.types";
+import { TypeOfBrandData } from "@/types/admin.brands.types";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -27,7 +27,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const brandsColumns: ColumnDef<TypesOfBrandData, unknown>[] = [
+export const brandsColumns: ColumnDef<TypeOfBrandData, unknown>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -104,40 +104,36 @@ export const brandsColumns: ColumnDef<TypesOfBrandData, unknown>[] = [
 ];
 
 const BrandsPage = () => {
-    const [deleteType, setDeleteType] = useState<TypesOfDeleteType>("SD");
+    const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/brands/delete";
     const fetchDataURL = "/api/admin/brands";
     const queryKey = "brands";
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <Card className="rounded-sm shadow-none py-3 gap-2.5">
-                <CardHeader>
-                    <div className="flex justify-between">
-                        <h1 className="text-xl text-violet-700 font-semibold">Brands</h1>
-                        <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.brands.addBrands}>
-                                <Plus />
-                                Add Brand
-                            </Link>
-                        </Button>
-                    </div>
-                    <Separator />
-                </CardHeader>
-                <CardContent>
-                    <CommonDataTable<TypesOfBrandData, unknown>
-                        setDeleteType={setDeleteType}
-                        columns={brandsColumns}
-                        editEndPoint={adminRoutes.brands.editBrands}
-                        actions={tableAction}
-                        queryKey={queryKey}
-                        deleteEndPoint={deleteEndPoint}
-                        deleteType={deleteType}
-                        fetchDataURL={fetchDataURL}
-                    />
-                </CardContent>
-            </Card>
+            <div className=" border rounded p-2">
+                <div className="flex justify-between mb-2">
+                    <h1 className="text-xl text-violet-700 font-semibold">Brands</h1>
+                    <Button asChild size={"sm"}>
+                        <Link href={adminRoutes.brands.addBrands}>
+                            <Plus />
+                            Add Brand
+                        </Link>
+                    </Button>
+                </div>
+                <Separator />
+                <CommonDataTable<TypeOfBrandData, unknown>
+                    setDeleteType={setDeleteType}
+                    columns={brandsColumns}
+                    editEndPoint={adminRoutes.brands.editBrands}
+                    actions={tableAction}
+                    queryKey={queryKey}
+                    deleteEndPoint={deleteEndPoint}
+                    deleteType={deleteType}
+                    fetchDataURL={fetchDataURL}
+                />
+            </div>
         </div>
     );
 };

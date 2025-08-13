@@ -1,15 +1,15 @@
 import { addSubcategoryZodSchema, editSubcategoryZodSchema } from "@/zodSchema/admin.subcategories.schema";
 import { z } from "zod";
-import { TypesOfCategoryData } from "./admin.category.types";
+import { TypeOfCategoryData } from "./admin.category.types";
 
-export type TypesOfAddSubcategoryInput = z.infer<typeof addSubcategoryZodSchema>
-export type TypesOfEditSubcategoryInput = z.infer<typeof editSubcategoryZodSchema>
+export type TypeOfAddSubcategoryInput = z.infer<typeof addSubcategoryZodSchema>
+export type TypeOfEditSubcategoryInput = z.infer<typeof editSubcategoryZodSchema>
 
-export type TypesOfSubcategoryData = {
+export type TypeOfSubcategoryData = {
     _id: string;
     name: string;
     slug: string;
-    category: TypesOfCategoryData;
+    category: TypeOfCategoryData;
     createdAt: Date;
     updatedAt: Date;
 };

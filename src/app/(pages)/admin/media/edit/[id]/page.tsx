@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import useFetch from '@/hooks/useFetch'
 import { adminRoutes } from '@/lib/client/routes'
 import { updateMediaService } from '@/services/client/media/updateMediaService'
-import { TypesOfEditMedia } from '@/types/admin.media.types'
+import { TypeOfEditMedia } from '@/types/admin.media.types'
 import { editMediaZodSchema } from '@/zodSchema/admin.media.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
@@ -42,7 +42,7 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
     const paramsValue = use(params)
     const { data, error, loading, refetch } = useFetch(`/api/admin/media/details/${paramsValue.id}`, {}, [paramsValue.id]);
 
-    const form = useForm<TypesOfEditMedia>({
+    const form = useForm<TypeOfEditMedia>({
         resolver: zodResolver(editMediaZodSchema),
         defaultValues: {
             _id: "",
@@ -67,7 +67,7 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
         </div>
     }
 
-    async function onSubmit(data: TypesOfEditMedia) {
+    async function onSubmit(data: TypeOfEditMedia) {
         const result = await updateMediaService(data);
         if (!result.success) {
             toast.error(result.message);
@@ -84,10 +84,10 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
 
     paramsValue.id
     return (
-        <div className="space-y-2">
+        <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
             <Card className="rounded-sm shadow-none py-3">
-                <CardHeader>
+                <CardHeader className="px-1.5 md:px-6">
                     <div className="flex justify-between">
                         <h1 className="text-xl text-violet-700 font-semibold">
                             Edit Media
@@ -101,7 +101,7 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
                     </div>
                     <Separator />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-1.5 md:px-6">
                     {
                         loading ? <EditMediaSkeleton /> :
                             data?.data.mediaDetails ?
