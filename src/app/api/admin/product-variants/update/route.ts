@@ -3,7 +3,6 @@ import apiResponse from "@/lib/server/apiResponse"
 import { connectDB } from "@/lib/server/databaseConnection"
 import { errorHandler } from "@/lib/server/errorHandler"
 import { verifyRole } from "@/lib/server/verifyRole"
-import ProductModel, { IProduct } from "@/models/Product.model"
 import ProductVariantModel from "@/models/Productvariant.model"
 import { UserRole } from "@/models/User.model"
 import { TypeOfEditProductVarinatInput } from "@/types/admin.productvariants.types"
@@ -24,16 +23,20 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
             throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
-        const { _id, sku } = checkValidation.data;
+        const { _id, productId, sku, isDefault } = checkValidation.data;
 
         if (!isValidObjectId(_id)) {
             throw new ApiError(400, "Invalid data id",);
         }
 
-        const checkProduct = await ProductVariantModel.findOne({ sku, _id: { $ne: _id } });
+        const checkProductVariant = await ProductVariantModel.findOne({ sku, _id: { $ne: _id } });
 
-        if (checkProduct) {
+        if (checkProductVariant) {
             throw new ApiError(403, "sku already exist");
+        }
+
+        if (isDefault) {
+            await ProductVariantModel.updateMany({ productId: productId }, { $set: { isDefault: false } });
         }
 
         const updatedProductVariant = await ProductVariantModel.findByIdAndUpdate(_id, checkValidation.data, { new: true });

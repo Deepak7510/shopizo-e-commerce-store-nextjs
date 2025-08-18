@@ -66,7 +66,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
 
         pipeline.push({
             $lookup: {
-                from: "medias",
+                from: "media",
                 localField: "media",
                 foreignField: "_id",
                 as: "media"
@@ -102,6 +102,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                 material: 1,
                 sellingPrice: 1,
                 discountPercentage: 1,
+                isDefault: 1,
                 media: 1,
                 createdAt: 1,
                 updatedAt: 1,

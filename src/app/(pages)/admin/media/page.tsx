@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
 import { fetchMediaService } from "@/services/client/media/fetchMediaService";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { Trash, Undo } from "lucide-react";
+import { DatabaseIcon, Recycle, Trash, Undo } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -30,6 +30,7 @@ import {
 
 import { IDataForDelete, useDeleteMutation } from "@/hooks/useDeleteMutation";
 import { TypeOfDeleteType } from "@/types/global.types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const breadcrumbList: breadcrumbListType[] = [
     {
@@ -145,7 +146,7 @@ const MediaPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <Card className="rounded-sm shadow-none py-3 gap-2.5">
+            <Card className="rounded-sm shadow-none py-2 gap-2">
                 <CardHeader className="px-1.5 md:px-6">
                     <div className="flex justify-between">
                         <h1 className="text-xl text-violet-700 font-semibold">
@@ -155,14 +156,33 @@ const MediaPage = () => {
                             {deleteType === "SD" ? (
                                 <>
                                     <UploadMedia />
-                                    <Button size={"sm"} onClick={() => handleDeleteType("PD")}>
-                                        View Trash
-                                    </Button>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button size={"icon"}
+                                                onClick={() => handleDeleteType("PD")}>
+                                                <Recycle />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom">
+                                            <p className="font-medium">View Trash</p>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </>
                             ) : (
-                                <Button onClick={() => handleDeleteType("SD")} size={"sm"}>
-                                    Back to Records
-                                </Button>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button onClick={() => handleDeleteType("SD")}
+                                            size={"icon"}
+                                        >
+                                            <DatabaseIcon />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        <p className="font-medium"> Back to Records</p>
+                                    </TooltipContent>
+                                </Tooltip>
+
                             )}
                         </div>
                     </div>
@@ -207,13 +227,20 @@ const MediaPage = () => {
                                 </div>
 
                                 {deleteType === "SD" ? (
-                                    <Button
-                                        onClick={() => handleDelete(selectedMedia, deleteType)}
 
-                                        size={"sm"} variant={"destructive"}>
-                                        <Trash />
-                                        Move Into Trash
-                                    </Button>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                onClick={() => handleDelete(selectedMedia, deleteType)}
+                                                size={"icon"} variant={"secondary"}>
+                                                <Trash />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="bottom">
+                                            <p className="font-medium">Move to Trash</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+
                                 ) : (
                                     <div className="flex gap-2">
                                         <Button

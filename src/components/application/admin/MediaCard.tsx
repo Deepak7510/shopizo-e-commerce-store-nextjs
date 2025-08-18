@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Copy, Edit, EllipsisVertical, Trash, Undo } from "lucide-react";
+import { ArchiveRestore, Copy, Edit, EllipsisVertical, Trash, Undo } from "lucide-react";
 import { mediaType } from "@/types/admin.media.types";
 import Link from "next/link";
 import { adminRoutes } from "@/lib/client/routes";
@@ -73,13 +73,13 @@ const MediaCard: React.FC<MediaCardProps> = ({
                         )}
 
                         {deleteType === "PD" && (
-                            <DropdownMenuItem className="text-green-700 hover:text-green-700!" onClick={() => handleDelete([media._id], "RSD")}>
-                                <Undo className="text-green-700" />
+                            <DropdownMenuItem onClick={() => handleDelete([media._id], "RSD")}>
+                                <ArchiveRestore />
                                 Restore
                             </DropdownMenuItem>
                         )}
 
-                        <DropdownMenuItem className="text-red-700 hover:text-red-700!" onClick={() => handleDelete([media._id], deleteType)}>
+                        <DropdownMenuItem variant="destructive" className="text-red-700 hover:text-red-700!" onClick={() => handleDelete([media._id], deleteType)}>
                             <Trash className="text-red-700" />
                             {deleteType === "SD" ? "Move Into Trash" : "Delete Permanently"}
                         </DropdownMenuItem>

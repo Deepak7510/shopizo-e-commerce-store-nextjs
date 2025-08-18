@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 import useFetch from '@/hooks/useFetch'
 import { adminRoutes } from '@/lib/client/routes'
 import { updateMediaService } from '@/services/client/media/updateMediaService'
@@ -103,7 +104,22 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
                 </CardHeader>
                 <CardContent className="px-1.5 md:px-6">
                     {
-                        loading ? <EditMediaSkeleton /> :
+                        loading ? <div className="flex flex-col md:flex-row gap-4 w-full">
+                            <div className="w-[200px]">
+                                <Skeleton className="h-56 w-full rounded" />
+                            </div>
+                            <div className="flex-1 space-y-3">
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <Skeleton className="h-9 w-[150px] rounded" />
+                            </div>
+                        </div> :
                             data?.data.mediaDetails ?
                                 <div className='flex flex-col md:flex-row gap-4 w-full'>
                                     <div className='w-[200px]'>

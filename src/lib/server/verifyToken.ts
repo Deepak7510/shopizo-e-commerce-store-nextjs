@@ -1,7 +1,7 @@
 import { jwtVerify } from "jose";
 import { ApiError } from "./apiError";
 
-type typeOfVerifyTokenResult = {
+export type typeOfVerifyTokenResult = {
     userId: string;
     name?: string;
     email?: string;

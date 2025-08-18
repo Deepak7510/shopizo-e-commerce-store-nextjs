@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
-import { TypesOfDeleteType } from "@/types/global.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfDeleteType } from "@/types/global.types";
 
-export const fetchBrandsService = async function (deleteType: TypesOfDeleteType): Promise<TypesOfAxoisResponse> {
+export const fetchBrandsService = async function (deleteType: TypeOfDeleteType): Promise<TypeOfAxoisResponse> {
     try {
         const resposne = await axiosInstance.get(`/api/admin/brands?deleteType=${deleteType}`);
         return resposne.data

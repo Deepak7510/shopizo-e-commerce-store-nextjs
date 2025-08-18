@@ -1,7 +1,7 @@
 "use client"
 import BreadCrumb, { breadcrumbListType } from '@/components/application/common/BreadCrumb';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { adminRoutes } from '@/lib/client/routes';
 import React, { useEffect } from 'react'
@@ -14,8 +14,8 @@ import { Input } from '@/components/ui/input';
 import { ButtonLoading } from '@/components/application/common/ButtonLoading';
 import Link from 'next/link';
 import slugify from 'slugify'
-import { createCategoryService } from '@/services/client/category/createCategoryService';
 import { toast } from 'sonner';
+import { createCategoryService } from '@/services/client/categories/createCategoryService';
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -59,8 +59,8 @@ const AddCategoryPage = () => {
 
     return (<div className='space-y-2'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <div className='border rounded p-2'>
-            <div className="flex justify-between mb-2">
+        <div className='border rounded-md p-3'>
+            <div className="flex justify-between mb-1">
                 <h1 className="text-xl text-violet-700 font-semibold">
                     Add Category
                 </h1>

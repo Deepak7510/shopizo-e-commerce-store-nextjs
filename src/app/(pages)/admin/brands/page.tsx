@@ -2,8 +2,6 @@
 import BreadCrumb, {
     breadcrumbListType,
 } from "@/components/application/common/BreadCrumb";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
@@ -12,9 +10,17 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
-import { tableAction } from "@/components/application/admin/tableAction";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { TypeOfBrandData } from "@/types/admin.brands.types";
+import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
+import EditAction from "@/components/application/admin/EditAction";
+import DeleteAction from "@/components/application/admin/DeleteAction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -27,7 +33,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const brandsColumns: ColumnDef<TypeOfBrandData, unknown>[] = [
+const brandsColumns: ColumnDef<TypeOfBrandData, unknown>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -103,6 +109,32 @@ export const brandsColumns: ColumnDef<TypeOfBrandData, unknown>[] = [
     },
 ];
 
+const Action = React.memo<{
+    row: Row<TypeOfBrandData>;
+    deleteType: TypeOfDeleteType;
+    handleDeleteAlert: (
+        getDeleteType: TypeOfDeleteType,
+        getDeleteIdList?: string[]
+    ) => void;
+}>(({ row, deleteType, handleDeleteAlert }) => {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreVertical className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                {
+                    deleteType === "SD" && <EditAction row={row} editEndPoint={adminRoutes.brands.editBrands} />
+                }
+                <DeleteAction row={row} handleDeleteAlert={handleDeleteAlert} deleteType={deleteType} />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+});
+
 const BrandsPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/brands/delete";
@@ -112,8 +144,8 @@ const BrandsPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className=" border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">Brands</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.brands.addBrands}>
@@ -126,8 +158,7 @@ const BrandsPage = () => {
                 <CommonDataTable<TypeOfBrandData, unknown>
                     setDeleteType={setDeleteType}
                     columns={brandsColumns}
-                    editEndPoint={adminRoutes.brands.editBrands}
-                    actions={tableAction}
+                    Action={Action}
                     queryKey={queryKey}
                     deleteEndPoint={deleteEndPoint}
                     deleteType={deleteType}

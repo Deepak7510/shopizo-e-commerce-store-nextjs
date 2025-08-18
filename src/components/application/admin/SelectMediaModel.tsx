@@ -57,7 +57,7 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
     }
 
     return (
-        <Dialog open={openSelectMediaModel} onOpenChange={setOpenSelectMediaModel}  >
+        <Dialog open={openSelectMediaModel} onOpenChange={() => handleCloseMediaModel()}  >
             <DialogContent className="min-w-full md:min-w-[80%] max-h-screen gap-2">
                 <AlertDialogHeader className='h-10 border-b'>
                     <DialogTitle>Select Media</DialogTitle>

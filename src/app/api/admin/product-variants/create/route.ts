@@ -21,12 +21,16 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
             throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
-        const { sku } = checkValidation.data;
+        const { sku, productId, isDefault } = checkValidation.data;
 
-        const checkProductExisting = await ProductVariantModel.findOne({ sku });
+        const checkProductVariantExisting = await ProductVariantModel.findOne({ sku });
 
-        if (checkProductExisting) {
+        if (checkProductVariantExisting) {
             throw new ApiError(400, "Product sku already exist");
+        }
+
+        if (isDefault) {
+            await ProductVariantModel.updateMany({ productId: productId }, { $set: { isDefault: false } });
         }
 
         await ProductVariantModel.create(checkValidation.data);

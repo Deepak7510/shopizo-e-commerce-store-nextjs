@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfEmailInput } from "@/types/auth.types";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfEmailInput } from "@/types/auth.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 
-export const resendEmailVerifyLinkService = async function (value: TypesOfEmailInput): Promise<TypesOfAxoisResponse> {
+export const resendEmailVerifyLinkService = async function (value: TypeOfEmailInput): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.post('/api/auth/resend-email-verifylink', value);
         return response.data

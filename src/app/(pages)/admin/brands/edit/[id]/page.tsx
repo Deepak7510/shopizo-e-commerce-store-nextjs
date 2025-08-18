@@ -14,12 +14,12 @@ import Link from 'next/link';
 import slugify from 'slugify'
 import { toast } from 'sonner';
 import useFetch from '@/hooks/useFetch';
-import EditCategorySkeleton from '@/components/application/admin/EditCategorySkeleton';
 import { useRouter } from 'next/navigation';
 import { editBrandZodSchema } from '@/zodSchema/admin.brands.schema';
 import { TypeOfEditBrandInput } from '@/types/admin.brands.types';
 import { updateBrandService } from '@/services/client/brands/updateBrandService';
 import { TypeOfCategoryData } from '@/types/admin.category.types';
+import { Skeleton } from '@/components/ui/skeleton';
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -83,8 +83,8 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <div className=" border rounded p-2">
-            <div className="flex justify-between mb-2">
+        <div className="border rounded-md p-3">
+            <div className="flex justify-between mb-1">
                 <h1 className="text-xl text-violet-700 font-semibold"> Edit Brand</h1>
                 <Button asChild size={"sm"}>
                     <Link href={adminRoutes.brands.brands}>Back to Brands</Link>
@@ -94,7 +94,19 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <Card className="rounded-sm shadow-none py-3">
                 <CardContent>
                     {loading ?
-                        <EditCategorySkeleton />
+                        <div className="w-full">
+                            <div className="space-y-3">
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <Skeleton className="h-9 w-[150px] rounded" />
+                            </div>
+                        </div>
                         :
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">

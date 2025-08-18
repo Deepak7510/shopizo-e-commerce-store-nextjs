@@ -1,9 +1,9 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfVerifyOtpInput } from "@/types/auth.types";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfVerifyOtpInput } from "@/types/auth.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 
 
-export const optVerifyService = async function (value: TypesOfVerifyOtpInput): Promise<TypesOfAxoisResponse> {
+export const optVerifyService = async function (value: TypeOfVerifyOtpInput): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.post('/api/auth/verify-otp', value);
         return response.data

@@ -5,7 +5,7 @@ import { errorHandler } from "@/lib/server/errorHandler"
 import { verifyRole } from "@/lib/server/verifyRole"
 import ProductModel, { IProduct } from "@/models/Product.model"
 import { UserRole } from "@/models/User.model"
-import { TypeOfEditBrandInput } from "@/types/admin.brands.types"
+import { TypeOfAddProductInput, TypeOfEditProductInput } from "@/types/admin.products.types"
 import { editProductZodSchema } from "@/zodSchema/admin.products.schema"
 import { isValidObjectId } from "mongoose"
 import { NextRequest, NextResponse } from "next/server"
@@ -15,7 +15,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         await connectDB();
         await verifyRole(request, UserRole.ADMIN);
 
-        const body = await request.json() as TypeOfEditBrandInput;
+        const body = await request.json() as TypeOfEditProductInput;
 
         const checkValidation = editProductZodSchema.safeParse(body);
 

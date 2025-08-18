@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfResetPasswordInput } from "@/types/auth.types";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfResetPasswordInput } from "@/types/auth.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 
-export const resetPasswordService = async function (value: TypesOfResetPasswordInput): Promise<TypesOfAxoisResponse> {
+export const resetPasswordService = async function (value: TypeOfResetPasswordInput): Promise<TypeOfAxoisResponse> {
     try {
         const resposne = await axiosInstance.post('/api/auth/reset-password', value)
         return resposne.data

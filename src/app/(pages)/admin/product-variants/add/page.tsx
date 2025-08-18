@@ -20,7 +20,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { ButtonLoading } from "@/components/application/common/ButtonLoading";
 import Link from "next/link";
-import slugify from "slugify";
 import useFetch from "@/hooks/useFetch";
 import {
     Select,
@@ -30,14 +29,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { TypeOfBrandData } from "@/types/admin.brands.types";
-import { TypeOfCategoryData } from "@/types/admin.category.types";
-import { TypeOfSubcategoryData } from "@/types/admin.subcategories.types";
-
-import AddProductSkeleton from "@/components/application/admin/AddProductSkeleton";
-import { createProductService } from "@/services/client/productVariants/createProductVariantService";
+import { createproductVariantService } from "@/services/client/productVariants/createProductVariantService";
 import { toast } from "sonner";
 import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
@@ -45,6 +38,7 @@ import Image from "next/image";
 import { addProductVarinatZodSchema } from "@/zodSchema/admin.productvariants.schema";
 import { TypeOfAddProductVarinatInput } from "@/types/admin.productvariants.types";
 import { Switch } from "@/components/ui/switch";
+import AddProductVariantSkeleton from "@/components/application/admin/AddProductVariantSkeleton";
 
 const sizeData = [
     {
@@ -84,7 +78,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-const AddProductPage = () => {
+const AddProductVariantPage = () => {
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
@@ -143,7 +137,7 @@ const AddProductPage = () => {
 
     async function onSubmit(data: TypeOfAddProductVarinatInput) {
         console.log(data);
-        const result = await createProductService(data);
+        const result = await createproductVariantService(data);
         if (!result.success) {
             toast.error(result.message);
             return;
@@ -151,14 +145,13 @@ const AddProductPage = () => {
         form.reset();
         setSelectedMedia([]);
         toast.success(result.message);
-
     }
 
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Add Product Variant
                     </h1>
@@ -175,7 +168,7 @@ const AddProductPage = () => {
                     <CardContent>
                         {
                             productLoading ? (
-                                <AddProductSkeleton />
+                                <AddProductVariantSkeleton />
                             ) : (
                                 <Form {...form}>
                                     <form
@@ -272,13 +265,12 @@ const AddProductPage = () => {
                                             <div>
                                                 <FormField
                                                     control={form.control}
-                                                    name="size"
+                                                    name="color"
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>Color <span className="text-red-600">*</span> </FormLabel>
                                                             <FormControl>
                                                                 <Input
-                                                                    readOnly
                                                                     placeholder="Enter the color"
                                                                     {...field}
                                                                 />
@@ -297,7 +289,6 @@ const AddProductPage = () => {
                                                             <FormLabel>Material <span className="text-red-600">*</span> </FormLabel>
                                                             <FormControl>
                                                                 <Input
-                                                                    readOnly
                                                                     placeholder="Enter the material"
                                                                     {...field}
                                                                 />
@@ -472,4 +463,4 @@ const AddProductPage = () => {
     );
 };
 
-export default AddProductPage;
+export default AddProductVariantPage;

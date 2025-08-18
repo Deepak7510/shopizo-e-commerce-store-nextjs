@@ -3,19 +3,20 @@ import BreadCrumb, {
     breadcrumbListType,
 } from "@/components/application/common/BreadCrumb";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, Plus } from "lucide-react";
+import { ArrowUpDown, MoreVertical, Plus } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
-import { tableAction } from "@/components/application/admin/tableAction";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { TypeOfProductData } from "@/types/admin.products.types";
 import Image from "next/image";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import EditAction from "@/components/application/admin/EditAction";
+import DeleteAction from "@/components/application/admin/DeleteAction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -147,6 +148,34 @@ export const ProductsColumns: ColumnDef<
         },
     ];
 
+
+const Action = React.memo<{
+    row: Row<TypeOfProductData>;
+    deleteType: TypeOfDeleteType;
+    handleDeleteAlert: (
+        getDeleteType: TypeOfDeleteType,
+        getDeleteIdList?: string[]
+    ) => void;
+}>(({ row, deleteType, handleDeleteAlert }) => {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreVertical className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                {
+                    deleteType === "SD" && <EditAction row={row} editEndPoint={adminRoutes.products.editProduct} />
+                }
+                <DeleteAction row={row} handleDeleteAlert={handleDeleteAlert} deleteType={deleteType} />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+});
+
+
 const ProductPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/products/delete";
@@ -156,8 +185,8 @@ const ProductPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">Products</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.products.addProduct}>
@@ -170,12 +199,11 @@ const ProductPage = () => {
                 <CommonDataTable<TypeOfProductData, unknown>
                     setDeleteType={setDeleteType}
                     columns={ProductsColumns}
-                    editEndPoint={adminRoutes.products.editProduct}
-                    actions={tableAction}
                     queryKey={queryKey}
                     deleteEndPoint={deleteEndPoint}
                     deleteType={deleteType}
                     fetchDataURL={fetchDataURL}
+                    Action={Action}
                 />
             </div>
         </div>

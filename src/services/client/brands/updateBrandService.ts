@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/client/axios"
-import { TypesOfEditBrandInput } from "@/types/admin.brands.types"
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types"
+import { TypeOfEditBrandInput } from "@/types/admin.brands.types"
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types"
 
-export const updateBrandService = async function (value: TypesOfEditBrandInput): Promise<TypesOfAxoisResponse> {
+export const updateBrandService = async function (value: TypeOfEditBrandInput): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.put('/api/admin/brands/update', value)
         return response.data

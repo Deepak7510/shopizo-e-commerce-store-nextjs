@@ -68,8 +68,8 @@ const AddBrandsPage = () => {
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className=" border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold"> Add Brand</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.brands.brands}>Back to Brands</Link>

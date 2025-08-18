@@ -11,7 +11,7 @@ const AdminLayout = ({ children }: Readonly<{
         <AppSidebar />
         <main className='min-h-screen w-full md:w-[calc(100vw-16rem)] relative'>
             <Header />
-            <div className='p-1 md:px-6 md:py-2'>
+            <div className='p-1 md:px-4 md:py-2'>
                 {children}
             </div>
             <Footer />

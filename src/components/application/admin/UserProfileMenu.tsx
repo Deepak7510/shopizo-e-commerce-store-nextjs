@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserInfo } from '@/redux/authSlice';
 import Link from 'next/link';
 import LogoutHandlerButton from '../common/LogoutHandlerButton';
+import { adminRoutes } from '@/lib/client/routes';
 
 interface UserProfileMenuProps {
     userInfo: UserInfo;
@@ -32,7 +33,7 @@ const UserProfileMenu = ({ userInfo }: UserProfileMenuProps) => {
                 <DropdownMenuLabel>{userInfo.name.split(" ")[0]}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <Link href={""}>
+                    <Link href={adminRoutes.products.products}>
                         Add Product
                     </Link>
                 </DropdownMenuItem>
@@ -43,7 +44,7 @@ const UserProfileMenu = ({ userInfo }: UserProfileMenuProps) => {
                 </DropdownMenuItem>
                 <LogoutHandlerButton />
             </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu >
     )
 }
 

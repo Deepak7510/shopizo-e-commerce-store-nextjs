@@ -46,6 +46,7 @@ import {
     getCoreRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    Row,
     SortingState,
     useReactTable,
 } from "@tanstack/react-table";
@@ -55,41 +56,38 @@ import {
     Recycle,
     RotateCw,
     Trash,
-    Undo2,
 } from "lucide-react";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 import axiosInstance from "@/lib/client/axios";
+import TableDataSkeleton from "./TableDataSkeleton";
 
 type CommonDataTableProps<TData, TValue> = {
     columns: ColumnDef<TData, TValue>[];
     queryKey: string;
     deleteEndPoint: string;
     fetchDataURL: string;
-    editEndPoint: (id: string) => string;
     deleteType: TypeOfDeleteType;
     setDeleteType: React.Dispatch<SetStateAction<TypeOfDeleteType>>;
-    actions: (
-        editEndPoint: (id: string) => string,
-        row: any,
-        deleteType: TypeOfDeleteType,
+    Action: React.FC<{
+        row: Row<TData>;
+        deleteType: TypeOfDeleteType;
         handleDeleteAlert: (
             getDeleteType: TypeOfDeleteType,
             getDeleteIdList?: string[]
-        ) => void
-    ) => React.ReactNode;
+        ) => void;
+    }>;
 };
 
 export function CommonDataTable<TData, TValue>({
     queryKey,
     deleteEndPoint,
     fetchDataURL,
-    editEndPoint,
     deleteType,
     setDeleteType,
     columns,
-    actions,
+    Action,
 }: CommonDataTableProps<TData, TValue>) {
     const queryClient = useQueryClient();
     const deleteMutation = useDeleteMutation(deleteEndPoint);
@@ -109,6 +107,16 @@ export function CommonDataTable<TData, TValue>({
     const [deleteActionType, setDeleteActionType] =
         useState<TypeOfDeleteType | null>(null);
     const [deleteIdList, setDeleteIdList] = useState<string[]>([]);
+
+    useEffect(() => {
+        const debounce = setTimeout(() => {
+            setGlobalFilter(searchValue);
+        }, 1000);
+
+        return () => clearTimeout(debounce);
+    }, [searchValue]);
+
+
 
     async function fetchData(
         fetchDataURL: string,
@@ -152,7 +160,7 @@ export function CommonDataTable<TData, TValue>({
         placeholderData: keepPreviousData,
     });
 
-    const table = useReactTable({
+    const table = useReactTable<TData>({
         data: data?.data.dataList,
         columns,
         getCoreRowModel: getCoreRowModel(),
@@ -173,17 +181,22 @@ export function CommonDataTable<TData, TValue>({
         },
     });
 
+    if (status === "pending") {
+        return <TableDataSkeleton />
+    }
+
+    if (error) {
+        return (
+            <div className="text-red-700 font-medium text-lg text-center py-10">
+                Somthing went worng
+            </div>
+        );
+    }
+
+
     function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchValue(event.target.value);
     }
-
-    useEffect(() => {
-        const debounce = setTimeout(() => {
-            setGlobalFilter(searchValue);
-        }, 1000);
-
-        return () => clearTimeout(debounce);
-    }, [searchValue]);
 
     function handleDeleteAlert(
         getDeleteType: TypeOfDeleteType,
@@ -252,18 +265,6 @@ export function CommonDataTable<TData, TValue>({
         setGlobalFilter("");
         setSorting([]);
         setSearchValue("");
-    }
-
-    if (status === "pending") {
-        return <div>Loading....</div>;
-    }
-
-    if (error) {
-        return (
-            <div className="text-red-700 font-medium text-lg text-center py-10">
-                Somthing went worng
-            </div>
-        );
     }
 
     return (
@@ -431,7 +432,7 @@ export function CommonDataTable<TData, TValue>({
                                         </TableCell>
                                     ))}
                                     <TableCell>
-                                        {actions(editEndPoint, row, deleteType, handleDeleteAlert)}
+                                        <Action deleteType={deleteType} row={row} handleDeleteAlert={handleDeleteAlert} />
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -448,12 +449,12 @@ export function CommonDataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between px-2">
                 <div className="text-muted-foreground flex-1 text-sm">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}
                     {table.getFilteredRowModel().rows.length} rows selected.
                 </div>
-                <div className="flex gap-2 md:gap-4">
+                <div className="flex gap-2 md:gap-6">
                     <Select
                         value={String(table.getState().pagination.pageSize)}
                         onValueChange={(value) => {
@@ -476,7 +477,7 @@ export function CommonDataTable<TData, TValue>({
                             ))}
                         </SelectContent>
                     </Select>
-                    <div className="flex gap-1 md:gap-2">
+                    <div className="flex gap-1">
                         <Button
                             size={"icon"}
                             className="size-8"

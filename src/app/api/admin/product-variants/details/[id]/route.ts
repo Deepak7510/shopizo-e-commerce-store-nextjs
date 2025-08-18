@@ -19,8 +19,8 @@ export const GET = async function (request: NextRequest, { params }: { params: P
         }
 
         const productVariantDetails = await ProductVariantModel.findById(id).populate({
-            path: "productId",
-            select: "name"
+            path: "media",
+            select: "secure_url"
         });
 
         if (!productVariantDetails) {

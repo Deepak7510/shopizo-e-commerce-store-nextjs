@@ -16,9 +16,10 @@ import slugify from 'slugify'
 import { toast } from 'sonner';
 import useFetch from '@/hooks/useFetch';
 import { editCatgeoryZodSchema } from '@/zodSchema/admin.category.schema';
-import EditCategorySkeleton from '@/components/application/admin/EditCategorySkeleton';
 import { useRouter } from 'next/navigation';
 import { updateCategoryService } from '@/services/client/categories/updateCategoryService';
+import { Skeleton } from '@/components/ui/skeleton';
+
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -37,7 +38,6 @@ const breadcrumbList: breadcrumbListType[] = [
 const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = use(params);
     const router = useRouter()
-
     const { data: categoryData, loading, error } = useFetch(`/api/admin/categories/details/${id}`, {}, [id]);
     const categoryDetails = categoryData?.data.categoryDetails as TypeOfCategoryData
 
@@ -81,12 +81,10 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return <div className='text-xl text-red-700 font-medium'>{error.message}</div>
     }
 
-
-
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <div className='border rounded p-2'>
-            <div className="flex justify-between mb-2">
+        <div className='border rounded-md p-3'>
+            <div className="flex justify-between mb-1">
                 <h1 className="text-xl text-violet-700 font-semibold">
                     Edit Category
                 </h1>
@@ -103,7 +101,19 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <Card className="rounded-sm shadow-none py-3">
                 <CardContent>
                     {loading ?
-                        <EditCategorySkeleton />
+                        <div className="w-full">
+                            <div className="space-y-3">
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <Skeleton className="h-9 w-[150px] rounded" />
+                            </div>
+                        </div>
                         :
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">

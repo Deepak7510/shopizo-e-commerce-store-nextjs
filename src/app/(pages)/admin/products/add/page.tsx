@@ -3,7 +3,7 @@ import BreadCrumb, {
     breadcrumbListType,
 } from "@/components/application/common/BreadCrumb";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
 import React, { useEffect, useState } from "react";
@@ -39,11 +39,11 @@ import { TypeOfCategoryData } from "@/types/admin.category.types";
 import { TypeOfSubcategoryData } from "@/types/admin.subcategories.types";
 
 import AddProductSkeleton from "@/components/application/admin/AddProductSkeleton";
-import { createProductService } from "@/services/client/productVariants/createProductVariantService";
 import { toast } from "sonner";
 import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
 import Image from "next/image";
+import { createProductService } from "@/services/client/products/createProductService";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -139,8 +139,8 @@ const AddProductPage = () => {
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Add Product
                     </h1>
@@ -157,8 +157,7 @@ const AddProductPage = () => {
                     <CardContent>
                         {categoryLoading ||
                             brandLoading ||
-                            subcategoryLoading ||
-                            status === "pending" ? (
+                            subcategoryLoading ? (
                             <AddProductSkeleton />
                         ) : (
                             <Form {...form}>

@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfRegisterInput } from "@/types/auth.types";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfRegisterInput } from "@/types/auth.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 
-const registerService = async function (value: TypesOfRegisterInput): Promise<TypesOfAxoisResponse> {
+const registerService = async function (value: TypeOfRegisterInput): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.post('/api/auth/register', value);
         return response.data

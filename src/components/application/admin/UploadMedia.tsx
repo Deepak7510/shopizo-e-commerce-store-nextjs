@@ -67,7 +67,7 @@ const UploadMedia = () => {
                 return (
                     <Button size={'sm'} onClick={() => open()}>
                         <Plus />
-                        Upload
+                        Upload Media
                     </Button>
                 );
             }}

@@ -106,7 +106,20 @@ const commonZodSchema = z.object({
             .min(0, "Discount can't be negative")
             .max(100, "Discount can't be more than 100%")
     ),
-    isDefault: z.boolean({ required_error: "Deafult is required." })
+    isDefault: z.boolean({ required_error: "Deafult is required." }),
+    code: z
+        .string().nonempty("Code is required.")
+        .min(3, "Code must be at least 3 characters long."),
+    minShoppingAmount: z.preprocess(
+        toNumber,
+        z
+            .number({
+                required_error: "Min shopping amount is required",
+                invalid_type_error: "Min shopping amount must be a valid number",
+            })
+            .positive("Min shopping amount must be greater than 0")
+    ),
+    validity: z.coerce.date()
 });
 
 export default commonZodSchema;

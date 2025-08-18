@@ -1,7 +1,7 @@
 "use client"
 import BreadCrumb, { breadcrumbListType } from '@/components/application/common/BreadCrumb';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { adminRoutes } from '@/lib/client/routes';
 import React, { use, useEffect } from 'react'
@@ -20,7 +20,7 @@ import { TypeOfEditSubcategoryInput } from '@/types/admin.subcategories.types';
 import { editSubcategoryZodSchema } from '@/zodSchema/admin.subcategories.schema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TypeOfCategoryData } from '@/types/admin.category.types';
-import EditSubcategorySkeleton from '@/components/application/admin/EditSubcategorySkeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -100,8 +100,8 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <div className='rounded border p-2'>
-            <div className="flex justify-between mb-2">
+        <div className='rounded-md border p-3'>
+            <div className="flex justify-between mb-1">
                 <h1 className="text-xl text-violet-700 font-semibold">
                     Edit Subcategory
                 </h1>
@@ -118,7 +118,23 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <Card className="rounded-sm shadow-none py-3">
                 <CardContent>
                     {loading || categoryLoading ?
-                        <EditSubcategorySkeleton />
+                        <div className="w-full">
+                            <div className="space-y-3">
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[60px]" />
+                                    <Skeleton className="h-10 w-full rounded" />
+                                </div>
+                                <Skeleton className="h-9 w-[150px] rounded" />
+                            </div>
+                        </div>
                         :
                         <Form {...form} key={form.watch("_id") || "edit-subcategory-form"}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">

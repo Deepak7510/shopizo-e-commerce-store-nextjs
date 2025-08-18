@@ -6,15 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, Plus } from "lucide-react";
+import { ArrowUpDown, MoreVertical, Plus } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
-import { tableAction } from "@/components/application/admin/tableAction";
-import { ColumnDef } from "@tanstack/react-table";
-import { TypeOfProductData } from "@/types/admin.products.types";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import Image from "next/image";
+import { TypeOfProductVariantData } from "@/types/admin.productvariants.types";
+import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import EditAction from "@/components/application/admin/EditAction";
+import DeleteAction from "@/components/application/admin/DeleteAction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -28,7 +31,7 @@ const breadcrumbList: breadcrumbListType[] = [
 ];
 
 export const ProductVariatsColumn: ColumnDef<
-    TypeOfProductData,
+    TypeOfProductVariantData,
     unknown
 >[] = [
         {
@@ -54,38 +57,37 @@ export const ProductVariatsColumn: ColumnDef<
             enableHiding: false,
         },
         {
-            accessorKey: "title",
+            accessorKey: "productId",
             header: ({ column }) => {
                 return (
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        Title
+                        Product
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 );
             },
-        },
-        {
-            accessorKey: "slug",
-            header: "Slug",
-        },
-        {
-            accessorKey: "brand.name",
-            header: "Brand",
-            cell: ({ row }) => row.original.brand?.name || "-",
+            cell: ({ row }) => row.original.productId.title || "-",
+
         },
 
         {
-            accessorKey: "category.name",
-            header: "Category",
-            cell: ({ row }) => row.original.category?.name || "-",
+            accessorKey: "size",
+            header: "Size",
         },
         {
-            accessorKey: "subcategory.name",
-            header: "Subcategory",
-            cell: ({ row }) => row.original.subcategory?.name || "-",
+            accessorKey: "color",
+            header: "Color",
+        },
+        {
+            accessorKey: "material",
+            header: "Material",
+        },
+        {
+            accessorKey: "stock",
+            header: "Stock",
         },
         {
             accessorKey: "mrp",
@@ -102,12 +104,25 @@ export const ProductVariatsColumn: ColumnDef<
                 return <span>{row.original.discountPercentage} %</span>
             }
         },
+        {
+            accessorKey: "isDefault",
+            header: "Default",
+            cell: ({ row }) => {
+                const value = row.original.isDefault;
+                return <div>
+                    < Badge
+                        className="px-4"
+                    >
+                        {value ? "Yes" : "No"}
+                    </Badge >
+                </div >
+            }
+        },
 
         {
             accessorKey: "media",
             header: "Media",
             cell: ({ row }) => {
-
                 const media = row.original.media
                 return <div className="flex gap-1">
                     {
@@ -162,6 +177,34 @@ export const ProductVariatsColumn: ColumnDef<
         },
     ];
 
+const Action = React.memo<{
+    row: Row<TypeOfProductVariantData>;
+    deleteType: TypeOfDeleteType;
+    handleDeleteAlert: (
+        getDeleteType: TypeOfDeleteType,
+        getDeleteIdList?: string[]
+    ) => void;
+}>(({ row, deleteType, handleDeleteAlert }) => {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreVertical className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                {
+                    deleteType === "SD" && <EditAction row={row} editEndPoint={adminRoutes.productVariants.editProductVariants} />
+                }
+                <DeleteAction row={row} handleDeleteAlert={handleDeleteAlert} deleteType={deleteType} />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+});
+
+
+
 const ProductVariatsPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/product-variants/delete";
@@ -171,8 +214,8 @@ const ProductVariatsPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">Product Variants</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.productVariants.addProductVariants}>
@@ -182,15 +225,14 @@ const ProductVariatsPage = () => {
                     </Button>
                 </div>
                 <Separator />
-                <CommonDataTable<TypeOfProductData, unknown>
+                <CommonDataTable<TypeOfProductVariantData, unknown>
                     setDeleteType={setDeleteType}
                     columns={ProductVariatsColumn}
-                    editEndPoint={adminRoutes.productVariants.editProductVariants}
-                    actions={tableAction}
                     queryKey={queryKey}
                     deleteEndPoint={deleteEndPoint}
                     deleteType={deleteType}
                     fetchDataURL={fetchDataURL}
+                    Action={Action}
                 />
             </div>
         </div>

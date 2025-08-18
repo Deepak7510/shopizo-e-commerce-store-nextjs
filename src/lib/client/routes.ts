@@ -65,7 +65,14 @@ export const adminRoutes = {
         editMedia: function (id: string) {
             return `/admin/media/edit/${id}`
         }
-    }
+    },
+    coupons: {
+        coupons: `/admin/coupons`,
+        addCoupons: `/admin/coupons/add`,
+        editCoupons: (id: string) => {
+            return `/admin/coupons/edit/${id}`
+        },
+    },
 }
 
 

@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 
-const emailVerifylinkService = async function (token: string): Promise<TypesOfAxoisResponse> {
+const emailVerifylinkService = async function (token: string): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.post(`/api/auth/email-verifylink/${token}`);
         return response.data

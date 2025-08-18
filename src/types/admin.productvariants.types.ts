@@ -8,15 +8,17 @@ export type TypeOfEditProductVarinatInput = z.infer<typeof editProductVarinatZod
 export type TypeOfProductVariantData = {
     _id: string;
     productId: any;
-    sku: string,
-    color: string,
-    size: string,
-    mrp: number,
-    stock: number,
+    sku: string;
+    color: string;
+    size: string;
+    mrp: number;
+    stock: number;
     sellingPrice: number;
     discountPercentage: number;
-    media: mediaType[]
-    deletedAt: Date | null
+    isDefault: boolean;
+    material: string;
+    media: mediaType[];
+    deletedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
 };

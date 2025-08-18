@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/client/axios";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 
-export const logoutService = async function (): Promise<TypesOfAxoisResponse> {
+export const logoutService = async function (): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.post('/api/auth/logout');
         return response.data

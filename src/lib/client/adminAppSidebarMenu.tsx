@@ -47,7 +47,7 @@ export const adminAppSidebarMenu = [
     },
     {
         title: "Coupons",
-        url: "#",
+        url: adminRoutes.coupons.coupons,
         icon: <Tag />,
     },
     {

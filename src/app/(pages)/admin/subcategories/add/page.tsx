@@ -3,7 +3,7 @@ import BreadCrumb, {
     breadcrumbListType,
 } from "@/components/application/common/BreadCrumb";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
 import React, { useEffect } from "react";
@@ -34,7 +34,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { TypeOfCategoryData } from "@/types/admin.category.types";
-import EditSubcategorySkeleton from "@/components/application/admin/EditSubcategorySkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -90,8 +90,8 @@ const AddSubcategoryPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Add Subcategory
                     </h1>
@@ -108,7 +108,24 @@ const AddSubcategoryPage = () => {
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
                         {
-                            loading ? <EditSubcategorySkeleton /> :
+                            loading ?
+                                <div className="w-full">
+                                    <div className="space-y-3">
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-[60px]" />
+                                            <Skeleton className="h-10 w-full rounded" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-[60px]" />
+                                            <Skeleton className="h-10 w-full rounded" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-[60px]" />
+                                            <Skeleton className="h-10 w-full rounded" />
+                                        </div>
+                                        <Skeleton className="h-9 w-[150px] rounded" />
+                                    </div>
+                                </div> :
                                 <Form {...form}>
                                     <form
                                         onSubmit={form.handleSubmit(onSubmit)}

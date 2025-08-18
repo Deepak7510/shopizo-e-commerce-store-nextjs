@@ -20,7 +20,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { ButtonLoading } from "@/components/application/common/ButtonLoading";
 import Link from "next/link";
-import slugify from "slugify";
 import useFetch from "@/hooks/useFetch";
 import {
     Select,
@@ -29,22 +28,40 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { editProductZodSchema } from "@/zodSchema/admin.products.schema";
-
-import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { TypeOfBrandData } from "@/types/admin.brands.types";
-import { TypeOfCategoryData } from "@/types/admin.category.types";
-import { TypeOfSubcategoryData } from "@/types/admin.subcategories.types";
-
-import AddProductSkeleton from "@/components/application/admin/AddProductSkeleton";
 import { toast } from "sonner";
 import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
 import Image from "next/image";
-import { updateProductService } from "@/services/client/productVariants/updateProductVariantService";
-import { TypeOfEditProductInput } from "@/types/admin.products.types";
+import { editProductVarinatZodSchema } from "@/zodSchema/admin.productvariants.schema";
+import { TypeOfEditProductVarinatInput, TypeOfProductVariantData } from "@/types/admin.productvariants.types";
+import { Switch } from "@/components/ui/switch";
+import { updateProductVariantService } from "@/services/client/productVariants/updateProductVariantService";
 import { useRouter } from "next/navigation";
+import AddProductVariantSkeleton from "@/components/application/admin/AddProductVariantSkeleton";
+
+const sizeData = [
+    {
+        label: "S",
+        value: "S"
+    },
+    {
+        label: "M",
+        value: "M"
+    },
+    {
+        label: "L",
+        value: "L"
+    },
+    {
+        label: "XL",
+        value: "XL"
+    },
+    {
+        label: "XXL",
+        value: "XXL"
+    },
+]
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -57,83 +74,81 @@ const breadcrumbList: breadcrumbListType[] = [
     },
     {
         href: "",
-        title: "Edit Product",
+        title: "Edit Product Variant",
     },
 ];
 
-const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const router = useRouter()
-    const { id } = use(params)
+const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> }) => {
+    const router = useRouter();
+    const { id } = use(params);
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
 
     const {
-        data: brandData,
-        loading: brandLoading,
-        error: brandError,
-    } = useFetch(`/api/admin/brands/fetch-all`, {}, []);
-    const {
-        data: categoryData,
-        loading: categoryLoading,
-        error: categoryError,
-    } = useFetch(`/api/admin/categories/fetch-all`, {}, []);
-    const {
-        data: subcategoryData,
-        loading: subcategoryLoading,
-        error: subcategoryError,
-    } = useFetch(`/api/admin/subcategories/fetch-all`, {}, []);
-
-
-    const {
         data: productData,
-        loading: productDataLoading,
-        error: productDataError,
-    } = useFetch(`/api/admin/products/details/${id}`, {}, [id]);
+        loading: productLoading,
+        error: productError,
+    } = useFetch(`/api/admin/products/fetch-all`, {}, []);
 
-    if (brandError || categoryError || subcategoryError || productDataError) {
+    const {
+        data: productVariantData,
+        loading: productVariantLoading,
+        error: productVariantError,
+    } = useFetch(`/api/admin/product-variants/details/${id}`, {}, [id]);
+
+
+    if (productError || productVariantError) {
         return (
             <div className="text-xl text-red-700 font-medium">
-                {brandError?.message ||
-                    categoryError?.message ||
-                    subcategoryError?.message ||
-                    productDataError?.message ||
+                {productError?.message ||
+                    productVariantError?.message ||
                     "Something went worng."}
             </div>
         );
     }
 
-    const brandList = brandData?.data?.allDataList as TypeOfBrandData[];
-    const categoryList = categoryData?.data?.allDataList as TypeOfCategoryData[];
-    const subcategoryList = subcategoryData?.data
-        ?.allDataList as TypeOfSubcategoryData[];
-    const productDetails = productData?.data?.productDetails;
+    const productList = productData?.data?.allDataList;
 
-    const form = useForm<TypeOfEditProductInput>({
-        resolver: zodResolver(editProductZodSchema),
+    const form = useForm<TypeOfEditProductVarinatInput>({
+        resolver: zodResolver(editProductVarinatZodSchema),
         defaultValues: {
             _id: "",
-            title: "",
-            slug: "",
-            brand: "",
-            category: "",
-            subcategory: "",
+            productId: "",
+            sku: "",
+            size: "",
+            color: "",
+            material: "",
+            stock: 0,
             mrp: 0,
             sellingPrice: 0,
             discountPercentage: 0,
             media: [],
-            description: "",
+            isDefault: false
         },
     });
 
 
-
-
     useEffect(() => {
-        const title = form.watch("title");
-        const slugValue = slugify(title.toLowerCase());
-        form.setValue("slug", slugValue);
-    }, [form.watch("title")]);
+        if (productVariantData && !productVariantLoading) {
+            const productVariantDetails = productVariantData.data.productVariantDetails as TypeOfProductVariantData
+            form.reset({
+                _id: productVariantDetails._id,
+                productId: productVariantDetails.productId,
+                sku: productVariantDetails.sku,
+                size: productVariantDetails.size,
+                color: productVariantDetails.color,
+                material: productVariantDetails.material,
+                mrp: productVariantDetails.mrp,
+                sellingPrice: productVariantDetails.sellingPrice,
+                stock: productVariantDetails.stock,
+                discountPercentage: productVariantDetails.discountPercentage,
+                media: productVariantDetails.media.map((m: any) => m._id),
+                isDefault: productVariantDetails.isDefault
+            })
+            setSelectedMedia(productVariantDetails.media);
+        }
+    }, [productVariantData]);
 
     useEffect(() => {
         const mrp = form.watch("mrp");
@@ -151,28 +166,9 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         }
     }, [selectedMedia]);
 
-    useEffect(() => {
-        if (productDetails && !productDataLoading) {
-            form.reset({
-                _id: productDetails._id || "",
-                title: productDetails.title || "",
-                category: productDetails.category || "",
-                subcategory: productDetails.subcategory,
-                brand: productDetails.brand,
-                mrp: productDetails.mrp || "",
-                sellingPrice: productDetails.sellingPrice || "",
-                description: productDetails.description || "",
-                discountPercentage: productDetails.discountPercentage || "",
-            })
-            setSelectedMedia(productDetails.media)
-        }
 
-    }, [productDetails])
-
-
-    async function onSubmit(data: TypeOfEditProductInput) {
-        console.log(data);
-        const result = await updateProductService(data);
+    async function onSubmit(data: TypeOfEditProductVarinatInput) {
+        const result = await updateProductVariantService(data);
         if (!result.success) {
             toast.error(result.message);
             return;
@@ -180,266 +176,261 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         form.reset();
         setSelectedMedia([]);
         toast.success(result.message);
-        return router.push(adminRoutes.products.products)
-
+        return router.push(adminRoutes.productVariants.productVariants);
     }
 
     return (
-        <div className="space-y-1">
+        <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
-                        Edit Product
+                        Edit Product Variant
                     </h1>
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.products.products}>
-                                Back to Products
+                            <Link href={adminRoutes.productVariants.productVariants}>
+                                Back to Product Variants
                             </Link>
                         </Button>
                     </div>
                 </div>
                 <Separator className="mb-2" />
-
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
-                        {categoryLoading ||
-                            brandLoading ||
-                            subcategoryLoading ||
-                            productDataLoading ? (
-                            <AddProductSkeleton />
-                        ) : (
-                            <Form {...form} key={form.watch("_id") || "Edit Product"}>
-                                <form
-                                    onSubmit={form.handleSubmit(onSubmit)}
-                                    className="space-y-3"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="title"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Title</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="Enter the Title"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="slug"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Slug</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                readOnly
-                                                                placeholder="Enter the slug"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                        {
+                            productLoading || productVariantLoading ? (
+                                <AddProductVariantSkeleton />
+                            ) : (
+                                <Form {...form} key={form.watch("_id") || "Edit Product Variant"}>
+                                    <form
+                                        onSubmit={form.handleSubmit(onSubmit)}
+                                        className="space-y-3"
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
 
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="brand"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Brand</FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            defaultValue={field.value}
-                                                        >
-                                                            <FormControl className="w-full">
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {brandList &&
-                                                                    brandList.length > 0 &&
-                                                                    brandList?.map((item: TypeOfBrandData) => (
-                                                                        <SelectItem
-                                                                            key={item._id}
-                                                                            value={item._id}
-                                                                        >
-                                                                            {item.name}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="category"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Category</FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            defaultValue={field.value}
-                                                        >
-                                                            <FormControl className="w-full">
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {categoryList &&
-                                                                    categoryList.length > 0 &&
-                                                                    categoryList?.map(
-                                                                        (item: TypeOfCategoryData) => (
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="productId"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Product <span className="text-red-600">*</span> </FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
+                                                            >
+                                                                <FormControl className="w-full">
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a Product" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {productList &&
+                                                                        productList.length > 0 &&
+                                                                        productList?.map((item: any) => (
                                                                             <SelectItem
                                                                                 key={item._id}
                                                                                 value={item._id}
                                                                             >
-                                                                                {item.name}
+                                                                                {item.title}
                                                                             </SelectItem>
-                                                                        )
-                                                                    )}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="subcategory"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Subcategory</FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            defaultValue={field.value}
-                                                        >
-                                                            <FormControl className="w-full">
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {subcategoryList &&
-                                                                    subcategoryList.length > 0 &&
-                                                                    subcategoryList?.map(
-                                                                        (item: TypeOfSubcategoryData) => (
-                                                                            <SelectItem
-                                                                                key={item._id}
-                                                                                value={item._id}
-                                                                            >
-                                                                                {item.name}
-                                                                            </SelectItem>
-                                                                        )
-                                                                    )}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                                                        ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
 
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="mrp"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>MRP</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Enter the MRP"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="sellingPrice"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Selling Price</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Enter the Selling Price"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="discountPercentage"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Discount Percentage</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                readOnly
-                                                                type="number"
-                                                                placeholder="Enter the Discount Percentage"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <FormField
-                                                control={form.control}
-                                                name="description"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Discount Percentage</FormLabel>
-                                                        <FormControl>
-                                                            <div>
-                                                                <ReactQuill
-                                                                    className="w-full"
-                                                                    theme="snow"
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="sku"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Sku <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Enter the Sku"
                                                                     {...field}
                                                                 />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="size"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Size <span className="text-red-600">*</span> </FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
+                                                            >
+                                                                <FormControl className="w-full">
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select Size" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {sizeData.map((item: any) => (
+                                                                        <SelectItem
+                                                                            key={item.label}
+                                                                            value={item.value}
+                                                                        >
+                                                                            {item.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="color"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Color <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Enter the color"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="material"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Material <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Enter the material"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="stock"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Stock</FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Enter the Stock"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="mrp"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>MRP <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Enter the MRP"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="sellingPrice"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Selling Price <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Enter the Selling Price"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="discountPercentage"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Discount Percentage <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    readOnly
+                                                                    type="number"
+                                                                    placeholder="Enter the Discount Percentage"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="isDefault"
+                                                    render={({ field }) => (
+                                                        <FormItem >
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel>Default Variant </FormLabel>
                                                             </div>
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
+                                                            <div className="flex flex-row items-center justify-between rounded-lg border p-2">
+                                                                <FormControl>
+                                                                    <Switch
+                                                                        checked={field.value}
+                                                                        onCheckedChange={field.onChange}
+                                                                    />
+                                                                </FormControl>
+                                                            </div>
+
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
                                         </div>
 
                                         <div className="md:col-span-2">
@@ -454,7 +445,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="media"
                                                 render={({ field }) => (
                                                     <FormItem className="flex flex-col justify-center items-center">
-                                                        <FormLabel>Media</FormLabel>
+                                                        <FormLabel>Media <span className="text-red-600">*</span> </FormLabel>
                                                         <FormControl>
                                                             <Button
                                                                 type="button"
@@ -485,16 +476,18 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 }
 
                                             </div>
+
                                         </div>
-                                    </div>
-                                    <ButtonLoading
-                                        type="submit"
-                                        loading={form.formState.isSubmitting}
-                                        text={"Update Product"}
-                                    />
-                                </form>
-                            </Form>
-                        )}
+
+
+                                        <ButtonLoading
+                                            type="submit"
+                                            loading={form.formState.isSubmitting}
+                                            text={"Update Product Variant"}
+                                        />
+                                    </form>
+                                </Form>
+                            )}
                     </CardContent>
                 </Card>
             </div>
@@ -502,5 +495,4 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     );
 };
 
-export default EditProductPage;
-
+export default EditProductVariantPage;

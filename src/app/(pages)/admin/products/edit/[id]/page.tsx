@@ -42,9 +42,9 @@ import { toast } from "sonner";
 import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
 import Image from "next/image";
-import { updateProductService } from "@/services/client/productVariants/updateProductVariantService";
 import { TypeOfEditProductInput } from "@/types/admin.products.types";
 import { useRouter } from "next/navigation";
+import { updateProductService } from "@/services/client/products/updateProductService";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -169,8 +169,8 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded p-2">
-                <div className="flex justify-between mb-2">
+            <div className="border rounded-md p-3">
+                <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Edit Product
                     </h1>

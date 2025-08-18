@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/client/axios";
 import { TypedOfUploadMediaArray } from "@/types/admin.media.types";
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types";
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 
-export const createmediaService = async function (value: TypedOfUploadMediaArray): Promise<TypesOfAxoisResponse> {
+export const createmediaService = async function (value: TypedOfUploadMediaArray): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.post('/api/admin/media/create', value);
         return response.data

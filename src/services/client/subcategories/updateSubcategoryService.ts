@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/client/axios"
-import { TypesOfEditSubcategoryInput } from "@/types/admin.subcategories.types"
-import { TypesOfAxoisResponse } from "@/types/axoisInstance.types"
+import { TypeOfEditSubcategoryInput } from "@/types/admin.subcategories.types"
+import { TypeOfAxoisResponse } from "@/types/axoisInstance.types"
 
-export const updateSubcategoryService = async function (value: TypesOfEditSubcategoryInput): Promise<TypesOfAxoisResponse> {
+export const updateSubcategoryService = async function (value: TypeOfEditSubcategoryInput): Promise<TypeOfAxoisResponse> {
     try {
         const response = await axiosInstance.put('/api/admin/subcategories/update', value)
         return response.data
