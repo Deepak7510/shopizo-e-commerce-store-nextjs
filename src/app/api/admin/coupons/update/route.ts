@@ -32,7 +32,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         const checkCoupon = await CouponModel.findOne<ICoupon>({ code, _id: { $ne: _id } });
 
         if (checkCoupon) {
-            throw new ApiError(403, "Coupon already exist");
+            throw new ApiError(403, "Already exist");
         }
 
         const updatedCoupon = await CouponModel.findByIdAndUpdate<ICoupon>(_id, checkValidation.data, { new: true });
@@ -41,7 +41,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
             throw new ApiError(404, "Coupon not found");
         }
 
-        return apiResponse(200, "Coupon updated successfully");
+        return apiResponse(200, "Updated successfully");
     } catch (error) {
         return errorHandler(error)
 

@@ -29,7 +29,7 @@ export const PUT = async function (req: NextRequest): Promise<NextResponse> {
 
         }
 
-        return apiResponse(200, "Media updated successfully.", { updatedMedia: media });
+        return apiResponse(200, "Updated successfully.", { updatedMedia: media });
 
     } catch (error) {
         return errorHandler(error as Error)

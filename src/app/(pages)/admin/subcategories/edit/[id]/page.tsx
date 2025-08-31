@@ -15,12 +15,14 @@ import slugify from 'slugify'
 import { toast } from 'sonner';
 import useFetch from '@/hooks/useFetch';
 import { useRouter } from 'next/navigation';
-import { updateSubcategoryService } from '@/services/client/subcategories/updateSubcategoryService';
+import { updateSubcategoryService } from '@/services/client/admin/subcategories/updateSubcategoryService';
 import { TypeOfEditSubcategoryInput } from '@/types/admin.subcategories.types';
 import { editSubcategoryZodSchema } from '@/zodSchema/admin.subcategories.schema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TypeOfCategoryData } from '@/types/admin.category.types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import SubcategoryFormSkeleton from '@/components/application/admin/SubcategoryFormSkeleton';
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -37,18 +39,18 @@ const breadcrumbList: breadcrumbListType[] = [
     }
 ]
 
-const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
+const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const { id } = use(params);
     const router = useRouter()
-    const { data: SubcategoryDetails, loading, error } = useFetch(`/api/admin/subcategories/details/${id}`, {}, [id]);
+    const { data: subcatgory, loading, error } = useFetch(`/api/admin/subcategories/details/${id}`, {}, [id]);
 
-    const { data: categoryData, loading: categoryLoading, error: categoryError } = useFetch(
-        `/api/admin/categories/fetch-all`,
+    const { data: categoriesData, loading: categoryLoading, error: categoryError } = useFetch(
+        `/api/admin/categories/get-all`,
         {},
         []
     );
-    const categoryList = categoryData?.data.allDataList as TypeOfCategoryData[]
+    const categories = categoriesData?.data.categories as TypeOfCategoryData[]
 
     const form = useForm<TypeOfEditSubcategoryInput>({
         resolver: zodResolver(editSubcategoryZodSchema),
@@ -67,15 +69,16 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }, [categoryName]);
 
     useEffect(() => {
-        if (SubcategoryDetails && !loading) {
+        if (subcatgory && !loading) {
             form.reset({
-                _id: SubcategoryDetails.data.subcategoryDetails._id || "",
-                name: SubcategoryDetails.data.subcategoryDetails.name || "",
-                slug: SubcategoryDetails.data.subcategoryDetails.slug || "",
-                category: SubcategoryDetails.data.subcategoryDetails.category || "",
+                _id: subcatgory.data.subcategory._id || "",
+                name: subcatgory.data.subcategory.name || "",
+                slug: subcatgory.data.subcategory.slug || "",
+                category: subcatgory.data.subcategory.category._id || "",
+                description: subcatgory.data.subcategory.description || "",
             })
         }
-    }, [SubcategoryDetails]);
+    }, [subcatgory]);
 
 
     async function onSubmit(data: TypeOfEditSubcategoryInput) {
@@ -100,7 +103,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <div className='rounded-md border p-3'>
+        <Card className='rounded-md px-3 py-2 gap-0 shadow-none'>
             <div className="flex justify-between mb-1">
                 <h1 className="text-xl text-violet-700 font-semibold">
                     Edit Subcategory
@@ -109,7 +112,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.subcategories.subcategories}>
-                            Back to Subcategories
+                            Show Subcategories
                         </Link>
                     </Button>
                 </div>
@@ -118,23 +121,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <Card className="rounded-sm shadow-none py-3">
                 <CardContent>
                     {loading || categoryLoading ?
-                        <div className="w-full">
-                            <div className="space-y-3">
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-[60px]" />
-                                    <Skeleton className="h-10 w-full rounded" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-[60px]" />
-                                    <Skeleton className="h-10 w-full rounded" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-[60px]" />
-                                    <Skeleton className="h-10 w-full rounded" />
-                                </div>
-                                <Skeleton className="h-9 w-[150px] rounded" />
-                            </div>
-                        </div>
+                        <SubcategoryFormSkeleton />
                         :
                         <Form {...form} key={form.watch("_id") || "edit-subcategory-form"}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">
@@ -143,7 +130,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Category Name <span className="text-red-600">*</span></FormLabel>
+                                            <FormLabel>Subcategory Name <span className="text-red-600">*</span></FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Enter the category name" {...field} />
                                             </FormControl>
@@ -184,9 +171,9 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                     {categoryLoading ? (
                                                         <div className="text-sm">Loading...</div>
                                                     ) : (
-                                                        categoryList &&
-                                                        categoryList.length > 0 &&
-                                                        categoryList.map(
+                                                        categories &&
+                                                        categories.length > 0 &&
+                                                        categories.map(
                                                             (item: TypeOfCategoryData) => (
                                                                 <SelectItem key={item._id} value={item._id}>
                                                                     {item.name}
@@ -200,7 +187,24 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                         </FormItem>
                                     )}
                                 />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Write the description"
+                                                    className="resize-none"
+                                                    {...field}
+                                                />
+                                            </FormControl>
 
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <ButtonLoading
                                     type="submit"
                                     loading={form.formState.isSubmitting}
@@ -211,9 +215,9 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     }
                 </CardContent>
             </Card>
-        </div>
+        </Card>
     </div >
     )
 }
 
-export default EditCategoryPage
+export default EditSubCategoryPage

@@ -3,7 +3,8 @@ import commonZodSchema from "./common.schema";
 export const addSubcategoryZodSchema = commonZodSchema.pick({
     name: true,
     slug: true,
-    category: true
+    category: true,
+    description: true
 });
 
 
@@ -11,5 +12,6 @@ export const editSubcategoryZodSchema = commonZodSchema.pick({
     _id: true,
     name: true,
     slug: true,
-    category: true
+    category: true,
+    description: true
 });

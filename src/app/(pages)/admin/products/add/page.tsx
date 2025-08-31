@@ -38,12 +38,13 @@ import { TypeOfBrandData } from "@/types/admin.brands.types";
 import { TypeOfCategoryData } from "@/types/admin.category.types";
 import { TypeOfSubcategoryData } from "@/types/admin.subcategories.types";
 
-import AddProductSkeleton from "@/components/application/admin/AddProductSkeleton";
 import { toast } from "sonner";
 import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
 import Image from "next/image";
-import { createProductService } from "@/services/client/products/createProductService";
+import { createProductService } from "@/services/client/admin/products/createProductService";
+import axiosInstance from "@/lib/client/axios";
+import ProductFormSkeleton from "@/components/application/admin/ProductFormSkeleton";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -64,38 +65,7 @@ const AddProductPage = () => {
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
-
-    const {
-        data: brandData,
-        loading: brandLoading,
-        error: brandError,
-    } = useFetch(`/api/admin/brands/fetch-all`, {}, []);
-    const {
-        data: categoryData,
-        loading: categoryLoading,
-        error: categoryError,
-    } = useFetch(`/api/admin/categories/fetch-all`, {}, []);
-    const {
-        data: subcategoryData,
-        loading: subcategoryLoading,
-        error: subcategoryError,
-    } = useFetch(`/api/admin/subcategories/fetch-all`, {}, []);
-
-    if (brandError || categoryError || subcategoryError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {brandError?.message ||
-                    categoryError?.message ||
-                    subcategoryError?.message ||
-                    "Something went worng."}
-            </div>
-        );
-    }
-
-    const brandList = brandData?.data?.allDataList as TypeOfBrandData[];
-    const categoryList = categoryData?.data?.allDataList as TypeOfCategoryData[];
-    const subcategoryList = subcategoryData?.data
-        ?.allDataList as TypeOfSubcategoryData[];
+    const [subcategories, setSubcategories] = useState<TypeOfSubcategoryData[] | []>([])
 
     const form = useForm<TypeOfAddProductInput>({
         resolver: zodResolver(addProductZodSchema),
@@ -110,6 +80,7 @@ const AddProductPage = () => {
         },
     });
 
+
     useEffect(() => {
         const title = form.watch("title");
         const slugValue = slugify(title.toLowerCase());
@@ -123,8 +94,50 @@ const AddProductPage = () => {
         }
     }, [selectedMedia]);
 
+
+    const {
+        data: brandData,
+        loading: brandLoading,
+        error: brandError,
+    } = useFetch(`/api/admin/brands/get-all`, {}, []);
+    const {
+        data: categoryData,
+        loading: categoryLoading,
+        error: categoryError,
+    } = useFetch(`/api/admin/categories/get-all`, {}, []);
+
+    const brands = brandData?.data?.brands as TypeOfBrandData[];
+    const categories = categoryData?.data?.categories as TypeOfCategoryData[];
+
+    useEffect(() => {
+        if (form.watch("category")) {
+            async function fetchSubcategories() {
+                try {
+                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${form.watch("category")}`);
+                    const subcategories = response.data.data.subcategories;
+                    setSubcategories(subcategories);
+                } catch (error: any) {
+                    console.error(error);
+                }
+            }
+
+            fetchSubcategories();
+        }
+    }, [form.watch("category")]);
+
+
+
+    if (brandError || categoryError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {brandError?.message ||
+                    categoryError?.message ||
+                    "Something went worng."}
+            </div>
+        );
+    }
+
     async function onSubmit(data: TypeOfAddProductInput) {
-        console.log(data);
         const result = await createProductService(data);
         if (!result.success) {
             toast.error(result.message);
@@ -133,13 +146,12 @@ const AddProductPage = () => {
         form.reset();
         setSelectedMedia([]);
         toast.success(result.message);
-
     }
 
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Add Product
@@ -147,7 +159,7 @@ const AddProductPage = () => {
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
                             <Link href={adminRoutes.products.products}>
-                                Back to Products
+                                Show Products
                             </Link>
                         </Button>
                     </div>
@@ -156,238 +168,238 @@ const AddProductPage = () => {
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
                         {categoryLoading ||
-                            brandLoading ||
-                            subcategoryLoading ? (
-                            <AddProductSkeleton />
-                        ) : (
-                            <Form {...form}>
-                                <form
-                                    onSubmit={form.handleSubmit(onSubmit)}
-                                    className="space-y-3"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
-                                        <div className="md:col-span-2">
-                                            <FormField
-                                                control={form.control}
-                                                name="title"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Title <span className="text-red-600">*</span></FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="Enter the Title"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="slug"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Slug <span className="text-red-600">*</span></FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                readOnly
-                                                                placeholder="Enter the slug"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="brand"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Brand <span className="text-red-600">*</span></FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                        >
-                                                            <FormControl className="w-full">
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {brandList &&
-                                                                    brandList.length > 0 &&
-                                                                    brandList?.map((item: TypeOfBrandData) => (
-                                                                        <SelectItem
-                                                                            key={item._id}
-                                                                            value={item._id}
-                                                                        >
-                                                                            {item.name}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="category"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Category <span className="text-red-600">*</span></FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                        >
-                                                            <FormControl className="w-full">
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {categoryList &&
-                                                                    categoryList.length > 0 &&
-                                                                    categoryList?.map(
-                                                                        (item: TypeOfCategoryData) => (
-                                                                            <SelectItem
-                                                                                key={item._id}
-                                                                                value={item._id}
-                                                                            >
-                                                                                {item.name}
-                                                                            </SelectItem>
-                                                                        )
-                                                                    )}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="subcategory"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Subcategory <span className="text-red-600">*</span></FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                        >
-                                                            <FormControl className="w-full">
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {subcategoryList &&
-                                                                    subcategoryList.length > 0 &&
-                                                                    subcategoryList?.map(
-                                                                        (item: TypeOfSubcategoryData) => (
-                                                                            <SelectItem
-                                                                                key={item._id}
-                                                                                value={item._id}
-                                                                            >
-                                                                                {item.name}
-                                                                            </SelectItem>
-                                                                        )
-                                                                    )}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <FormField
-                                                control={form.control}
-                                                name="description"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Discount Percentage <span className="text-red-600">*</span></FormLabel>
-                                                        <FormControl>
-                                                            <div>
-                                                                <ReactQuill
-                                                                    className="w-full"
-                                                                    theme="snow"
+                            brandLoading
+                            ? (
+                                <ProductFormSkeleton />
+                            ) : (
+                                <Form {...form}>
+                                    <form
+                                        onSubmit={form.handleSubmit(onSubmit)}
+                                        className="space-y-3"
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
+                                            <div className="md:col-span-2">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="title"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Title <span className="text-red-600">*</span></FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Enter the title"
                                                                     {...field}
                                                                 />
-                                                            </div>
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="slug"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Slug <span className="text-red-600">*</span></FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    readOnly
+                                                                    placeholder="Enter the slug"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
 
-                                        <div className="md:col-span-2">
-                                            <SelectMediaModel
-                                                selectedMedia={selectedMedia}
-                                                setSelectedMedia={setSelectedMedia}
-                                                setOpenSelectMediaModel={setOpenSelectMediaModel}
-                                                openSelectMediaModel={openSelectMediaModel}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="media"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col justify-center items-center">
-                                                        <FormLabel>Media <span className="text-red-600">*</span></FormLabel>
-                                                        <FormControl>
-                                                            <Button
-                                                                type="button"
-                                                                onClick={() => setOpenSelectMediaModel(true)}
-                                                                className="w-full md:min-w-md"
-                                                                variant={"outline"}
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="brand"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Brand <span className="text-red-600">*</span></FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
                                                             >
-                                                                Choese Media
-                                                            </Button>
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <div className="flex gap-2 justify-center mt-4 flex-wrap">
-                                                {
-                                                    selectedMedia && selectedMedia.length > 0 && selectedMedia.map((mediaItem, index) =>
-                                                        < div key={index} className="h-20 relative rounded overflow-hidden">
-                                                            <Image
-                                                                src={mediaItem.secure_url}
-                                                                alt={mediaItem.alt || "Media Image"}
-                                                                className="object-cover w-full h-full"
-                                                                width={50}
-                                                                height={50}
-                                                            />
-                                                        </div>
-                                                    )
-                                                }
+                                                                <FormControl className="w-full">
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a brand" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {brands &&
+                                                                        brands.length > 0 &&
+                                                                        brands?.map((item: TypeOfBrandData) => (
+                                                                            <SelectItem
+                                                                                key={item._id}
+                                                                                value={item._id}
+                                                                            >
+                                                                                {item.name}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="category"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Category <span className="text-red-600">*</span></FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
+                                                            >
+                                                                <FormControl className="w-full">
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a category" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {categories &&
+                                                                        categories.length > 0 &&
+                                                                        categories?.map(
+                                                                            (item: TypeOfCategoryData) => (
+                                                                                <SelectItem
+                                                                                    key={item._id}
+                                                                                    value={item._id}
+                                                                                >
+                                                                                    {item.name}
+                                                                                </SelectItem>
+                                                                            )
+                                                                        )}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="subcategory"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Subcategory <span className="text-red-600">*</span></FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
+                                                            >
+                                                                <FormControl className="w-full">
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a subcategory" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {subcategories &&
+                                                                        subcategories.length > 0 &&
+                                                                        subcategories?.map(
+                                                                            (item: TypeOfSubcategoryData) => (
+                                                                                <SelectItem
+                                                                                    key={item._id}
+                                                                                    value={item._id}
+                                                                                >
+                                                                                    {item.name}
+                                                                                </SelectItem>
+                                                                            )
+                                                                        )}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="description"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Description <span className="text-red-600">*</span></FormLabel>
+                                                            <FormControl>
+                                                                <div>
+                                                                    <ReactQuill
+                                                                        className="w-full"
+                                                                        theme="snow"
+                                                                        {...field}
+                                                                    />
+                                                                </div>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
 
+                                            <div className="md:col-span-2">
+                                                <SelectMediaModel
+                                                    selectedMedia={selectedMedia}
+                                                    setSelectedMedia={setSelectedMedia}
+                                                    setOpenSelectMediaModel={setOpenSelectMediaModel}
+                                                    openSelectMediaModel={openSelectMediaModel}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="media"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col justify-center items-center">
+                                                            <FormLabel>Media <span className="text-red-600">*</span></FormLabel>
+                                                            <FormControl>
+                                                                <Button
+                                                                    type="button"
+                                                                    onClick={() => setOpenSelectMediaModel(true)}
+                                                                    className="w-full md:min-w-md"
+                                                                    variant={"outline"}
+                                                                >
+                                                                    Choese Media
+                                                                </Button>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <div className="flex gap-2 justify-center mt-4 flex-wrap">
+                                                    {
+                                                        selectedMedia && selectedMedia.length > 0 && selectedMedia.map((mediaItem, index) =>
+                                                            < div key={index} className="h-20 relative rounded overflow-hidden">
+                                                                <Image
+                                                                    src={mediaItem.secure_url}
+                                                                    alt={mediaItem.alt || "Media Image"}
+                                                                    className="object-cover w-full h-full"
+                                                                    width={50}
+                                                                    height={50}
+                                                                />
+                                                            </div>
+                                                        )
+                                                    }
+
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <ButtonLoading
-                                        type="submit"
-                                        loading={form.formState.isSubmitting}
-                                        text={"Save Product"}
-                                    />
-                                </form>
-                            </Form>
-                        )}
+                                        <ButtonLoading
+                                            type="submit"
+                                            loading={form.formState.isSubmitting}
+                                            text={"Save Product"}
+                                        />
+                                    </form>
+                                </Form>
+                            )}
                     </CardContent>
                 </Card>
-            </div>
+            </Card>
         </div>
     );
 };

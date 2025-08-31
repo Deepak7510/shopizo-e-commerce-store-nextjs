@@ -18,16 +18,16 @@ export const GET = async function (request: NextRequest, { params }: { params: P
             throw new ApiError(400, "Invalid data id");
         }
 
-        const productDetails = await ProductModel.findById(id).populate({
+        const product = await ProductModel.findById(id).populate({
             path: "media",
             select: "secure_url"
         });
 
-        if (!productDetails) {
+        if (!product) {
             throw new ApiError(404, "Product not found");
         }
 
-        return apiResponse(200, "Product details fetched successfully", { productDetails })
+        return apiResponse(200, "Product fetched successfully", { product })
     } catch (error) {
         return errorHandler(error);
     }

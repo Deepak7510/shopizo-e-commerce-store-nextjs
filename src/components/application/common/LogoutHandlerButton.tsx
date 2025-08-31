@@ -28,14 +28,14 @@ const LogoutHandlerButton = () => {
         try {
             const result = await logoutService();
             if (result.success) {
-                toast.success(result.message || "Logged out successfully.");
+                toast.success(result.message || "Logged out successfully");
                 sessionStorage.removeItem("accessToken");
                 router.push(authRoutes.login);
             } else {
-                toast.error(result.message || "Logout failed.");
+                toast.error(result.message || "Logout failed");
             }
         } catch (error) {
-            toast.error("Something went wrong during logout.");
+            toast.error("Something went wrong during logout");
         } finally {
             setLoading(false);
         }

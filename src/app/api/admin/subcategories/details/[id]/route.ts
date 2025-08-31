@@ -8,7 +8,6 @@ import { UserRole } from "@/models/User.model";
 import { isValidObjectId } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-
 export const GET = async function (request: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> {
     try {
         await connectDB();
@@ -18,13 +17,16 @@ export const GET = async function (request: NextRequest, { params }: { params: P
         if (!isValidObjectId(id)) {
             throw new ApiError(400, "Invalid data id");
         }
-        const subcategoryDetails = await SubcategoryModel.findById(id);
+        const subcategory = await SubcategoryModel.findById(id).populate({
+            path: "category",
+            select: "name slug"
+        });
 
-        if (!subcategoryDetails) {
+        if (!subcategory) {
             throw new ApiError(404, "Subcategory not found");
         }
 
-        return apiResponse(200, "Subcategory details fetched successfully", { subcategoryDetails });
+        return apiResponse(200, "Subcategory fetched successfully", { subcategory });
 
     } catch (error) {
         return errorHandler(error);

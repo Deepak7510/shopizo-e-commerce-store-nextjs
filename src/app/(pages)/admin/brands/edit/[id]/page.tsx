@@ -1,7 +1,7 @@
 "use client"
 import BreadCrumb, { breadcrumbListType } from '@/components/application/common/BreadCrumb';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { adminRoutes } from '@/lib/client/routes';
 import React, { use, useEffect } from 'react'
@@ -16,10 +16,12 @@ import { toast } from 'sonner';
 import useFetch from '@/hooks/useFetch';
 import { useRouter } from 'next/navigation';
 import { editBrandZodSchema } from '@/zodSchema/admin.brands.schema';
-import { TypeOfEditBrandInput } from '@/types/admin.brands.types';
-import { updateBrandService } from '@/services/client/brands/updateBrandService';
+import { TypeOfBrandData, TypeOfEditBrandInput } from '@/types/admin.brands.types';
+import { updateBrandService } from '@/services/client/admin/brands/updateBrandService';
 import { TypeOfCategoryData } from '@/types/admin.category.types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import BrandFormSkeleton from '@/components/application/admin/BrandFormSkeleton';
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -35,36 +37,45 @@ const breadcrumbList: breadcrumbListType[] = [
     }
 ]
 
-const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
+const EditBrandPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { id } = use(params);
     const router = useRouter()
-    const { data, error, loading } = useFetch(`/api/admin/brands/details/${id}`, {}, [id]);
-    const brandDetails = data?.data.brandDetails as TypeOfCategoryData
-
-    useEffect(() => {
-        if (data && !loading) {
-            form.reset({
-                _id: brandDetails._id || "",
-                name: brandDetails.name || "",
-                slug: brandDetails.slug || "",
-            })
-        }
-    }, [data])
-
     const form = useForm<TypeOfEditBrandInput>({
         resolver: zodResolver(editBrandZodSchema),
         defaultValues: {
             _id: "",
             name: "",
-            slug: ""
+            slug: "",
+            description: "",
+            website: ""
         }
     })
+
+    const { data, error, loading } = useFetch(`/api/admin/brands/details/${id}`, {}, [id]);
+    const brand = data?.data.brand as TypeOfBrandData
+    if (error) {
+        return <div className='text-base text-red-700 font-medium'>{error.message}</div>
+    }
+
+    useEffect(() => {
+        if (data && !loading) {
+            form.reset({
+                _id: brand._id || "",
+                name: brand.name || "",
+                slug: brand.slug || "",
+                description: brand.description || "",
+                website: brand.website || "",
+            })
+        }
+    }, [data])
+
+
     const brandName = form.watch("name");
 
     useEffect(() => {
         const slugValue = slugify(brandName.toLowerCase())
         form.setValue("slug", slugValue)
-    }, [brandName])
+    }, [brandName]);
 
     async function onSubmit(data: TypeOfEditBrandInput) {
         const result = await updateBrandService(data);
@@ -77,36 +88,22 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return router.push(adminRoutes.brands.brands);
     }
 
-    if (error) {
-        return <div className='text-base text-red-700 font-medium'>{error.message}</div>
-    }
+
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <div className="border rounded-md p-3">
+        <Card className="rounded-md p-3 gap-0 shadow-none">
             <div className="flex justify-between mb-1">
                 <h1 className="text-xl text-violet-700 font-semibold"> Edit Brand</h1>
                 <Button asChild size={"sm"}>
-                    <Link href={adminRoutes.brands.brands}>Back to Brands</Link>
+                    <Link href={adminRoutes.brands.brands}>Show Brands</Link>
                 </Button>
             </div>
             <Separator className="mb-2" />
             <Card className="rounded-sm shadow-none py-3">
                 <CardContent>
                     {loading ?
-                        <div className="w-full">
-                            <div className="space-y-3">
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-[60px]" />
-                                    <Skeleton className="h-10 w-full rounded" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-[60px]" />
-                                    <Skeleton className="h-10 w-full rounded" />
-                                </div>
-                                <Skeleton className="h-9 w-[150px] rounded" />
-                            </div>
-                        </div>
+                        <BrandFormSkeleton />
                         :
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 flex-1/4">
@@ -137,6 +134,40 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                     )}
                                 />
 
+                                <FormField
+                                    control={form.control}
+                                    name="website"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Website</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Enter the website url"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Write the description"
+                                                    className="resize-none"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <ButtonLoading
                                     type="submit"
                                     loading={form.formState.isSubmitting}
@@ -147,9 +178,9 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     }
                 </CardContent>
             </Card>
-        </div>
-    </div>
+        </Card>
+    </div >
     )
 }
 
-export default EditCategoryPage
+export default EditBrandPage

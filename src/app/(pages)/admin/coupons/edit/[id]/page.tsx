@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect } from "react";
 import {
     Form,
     FormControl,
@@ -30,9 +30,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import useFetch from "@/hooks/useFetch";
-import { updateCouponService } from "@/services/client/coupons/updateCouponService";
+import { updateCouponService } from "@/services/client/admin/coupons/updateCouponService";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import CouponFormSkeleton from "@/components/application/admin/CouponFormSkeleton";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -52,7 +53,7 @@ const breadcrumbList: breadcrumbListType[] = [
 const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const router = useRouter()
     const { id } = use(params)
-    const { data: couponData, error: couponError, loading: couponLoading } = useFetch(`/api/admin/coupons/details/${id}`, {}, [id])
+    const { data, error: couponError, loading: couponLoading } = useFetch(`/api/admin/coupons/details/${id}`, {}, [id])
 
     if (couponError) {
         return <div>{couponError.message || "Somthing went worng"}</div>
@@ -70,17 +71,17 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
     });
 
     useEffect(() => {
-        if (couponData && !couponLoading) {
-            const couponsDetails = couponData?.data.couponDetails;
+        if (data && !couponLoading) {
+            const coupon = data?.data.coupon;
             form.reset({
-                _id: couponsDetails?._id,
-                code: couponsDetails?.code || "",
-                discountPercentage: couponsDetails?.discountPercentage || 0,
-                minShoppingAmount: couponsDetails?.minShoppingAmount || 0,
-                validity: couponsDetails?.validity || undefined,
+                _id: coupon?._id,
+                code: coupon?.code || "",
+                discountPercentage: coupon?.discountPercentage || 0,
+                minShoppingAmount: coupon?.minShoppingAmount || 0,
+                validity: coupon?.validity || undefined,
             });
         }
-    }, [couponData])
+    }, [data])
 
     async function onSubmit(data: TypeOfEditCouponInput) {
         const result = await updateCouponService(data);
@@ -96,7 +97,7 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Edit Coupon
@@ -104,7 +105,7 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
                             <Link href={adminRoutes.coupons.coupons}>
-                                Back to Coupons
+                                Show Coupons
                             </Link>
                         </Button>
                     </div>
@@ -114,137 +115,107 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     <CardContent>
 
                         {couponLoading ?
-                            <div className="w-full">
-                                <div className="grid md:grid-cols-2 gap-3">
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-[60px]" />
-                                        <Skeleton className="h-10 w-full rounded" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-[60px]" />
-                                        <Skeleton className="h-10 w-full rounded" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-[60px]" />
-                                        <Skeleton className="h-10 w-full rounded" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-[60px]" />
-                                        <Skeleton className="h-10 w-full rounded" />
-                                    </div>
-                                </div>
-                                <Skeleton className="h-9 w-[150px] rounded mt-3" />
-                            </div>
+                            <CouponFormSkeleton />
                             :
                             <Form {...form}>
                                 <form
                                     onSubmit={form.handleSubmit(onSubmit)}
                                     className="space-y-3"
                                 >
-                                    <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="code"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Code <span className="text-red-600">*</span></FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="Enter the Title"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="code"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Code <span className="text-red-600">*</span></FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="Enter the Title"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="discountPercentage"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Discount percentage <span className="text-red-600">*</span></FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Enter the Title"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="discountPercentage"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Discount percentage <span className="text-red-600">*</span></FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Enter the Title"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="minShoppingAmount"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Min Shopping Amount <span className="text-red-600">*</span></FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Enter the min shopping amount"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="minShoppingAmount"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Min Shopping Amount <span className="text-red-600">*</span></FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Enter the min shopping amount"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                        <div>
-                                            <FormField
-                                                control={form.control}
-                                                name="validity"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>Validity <span className="text-red-600">*</span></FormLabel>
-                                                        <Popover>
-                                                            <PopoverTrigger asChild>
-                                                                <FormControl>
-                                                                    <Button
-                                                                        variant={"outline"}
-                                                                        className={cn(
-                                                                            "w-full pl-3 text-left font-normal",
-                                                                            !field.value && "text-muted-foreground"
-                                                                        )}
-                                                                    >
-                                                                        {field.value ? (
-                                                                            format(field.value, "PPP")
-                                                                        ) : (
-                                                                            <span>Pick a date</span>
-                                                                        )}
-                                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                                    </Button>
-                                                                </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-auto p-0" align="start">
-                                                                <Calendar
-                                                                    mode="single"
-                                                                    selected={field.value}
-                                                                    onSelect={field.onChange}
-                                                                    disabled={(date) =>
-                                                                        date < new Date()
-                                                                    }
-                                                                    captionLayout="dropdown"
-                                                                />
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                    </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="validity"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Validity <span className="text-red-600">*</span></FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                                variant={"outline"}
+                                                                className={cn(
+                                                                    "w-full pl-3 text-left font-normal",
+                                                                    !field.value && "text-muted-foreground"
+                                                                )}
+                                                            >
+                                                                {field.value ? (
+                                                                    format(field.value, "PPP")
+                                                                ) : (
+                                                                    <span>Pick a date</span>
+                                                                )}
+                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={field.value}
+                                                            onSelect={field.onChange}
+                                                            disabled={(date) =>
+                                                                date < new Date()
+                                                            }
+                                                            captionLayout="dropdown"
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                     <ButtonLoading
                                         type="submit"
                                         loading={form.formState.isSubmitting}
@@ -255,8 +226,8 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         }
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+            </Card>
+        </div >
     );
 };
 

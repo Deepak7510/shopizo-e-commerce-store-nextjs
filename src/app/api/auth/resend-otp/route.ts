@@ -31,7 +31,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
 
         const user = await User.findOne<IUser>({ email });
         if (!user) {
-            throw new ApiError(404, "User not found.");
+            throw new ApiError(404, "User not found");
         }
 
         const existingOTP = await OTPModel.findOne<IOtp>({ email });
@@ -57,12 +57,12 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
         );
 
         if (!result.success) {
-            throw new ApiError(500, "Email send failed.");
+            throw new ApiError(500, "Email send failed");
         }
 
         await OTPModel.create<IOtp>({ email, otp: newOtp });
 
-        return apiResponse(200, "OTP sent successfully.");
+        return apiResponse(200, "OTP sent successfully");
     } catch (error) {
         return errorHandler(error);
     }

@@ -7,7 +7,7 @@ export const resendEmailVerifyLinkService = async function (value: TypeOfEmailIn
         const response = await axiosInstance.post('/api/auth/resend-email-verifylink', value);
         return response.data
     } catch (error: any) {
-        console.log("Error from API:", error);
+        console.error("Error from API:", error);
         return error.response.data
     }
 }

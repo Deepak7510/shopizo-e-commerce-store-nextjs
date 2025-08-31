@@ -4,7 +4,7 @@ export interface IProductVariant extends Document {
     productId: mongoose.Types.ObjectId;
     sku: string;
     size: string;
-    color: string;
+    color: mongoose.Types.ObjectId;
     material: string;
     mrp: number;
     sellingPrice: number;
@@ -33,7 +33,8 @@ const productVariantSchema = new mongoose.Schema<IProductVariant>({
         required: true,
     },
     color: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Color",
         required: true,
     },
     material: {
@@ -73,5 +74,5 @@ const productVariantSchema = new mongoose.Schema<IProductVariant>({
 }, { timestamps: true });
 
 
-const ProductVariantModel = mongoose.models.ProductVariantModel || mongoose.model("ProductVariantModel", productVariantSchema);
+const ProductVariantModel = mongoose.models.ProductVariant || mongoose.model("ProductVariant", productVariantSchema);
 export default ProductVariantModel;

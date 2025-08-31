@@ -6,7 +6,7 @@ export const checkAuthService = async function (): Promise<TypeOfAxoisResponse> 
         const response = await axiosInstance.get('/api/auth/check-auth');
         return response.data;
     } catch (error: any) {
-        console.log("Error from API:", error);
+        console.error("Error from API:", error);
         return error?.response?.data;
     }
 }

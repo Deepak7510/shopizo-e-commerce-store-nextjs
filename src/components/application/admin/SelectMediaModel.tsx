@@ -2,7 +2,7 @@
 import { AlertDialogFooter, AlertDialogHeader } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { fetchMediaService } from '@/services/client/media/fetchMediaService';
+import { fetchMediaService } from '@/services/client/admin/media/fetchMediaService';
 import { mediaType } from '@/types/admin.media.types'
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
@@ -50,6 +50,10 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
         setSelectedMedia(selecteMediaList);
         setOpenSelectMediaModel(false);
     }
+
+    useEffect(() => {
+        setSelectMediaList(selectedMedia);
+    }, [selectedMedia])
 
     function handleCloseMediaModel() {
         setSelectMediaList(selectedMedia);

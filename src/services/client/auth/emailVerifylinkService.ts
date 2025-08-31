@@ -6,7 +6,7 @@ const emailVerifylinkService = async function (token: string): Promise<TypeOfAxo
         const response = await axiosInstance.post(`/api/auth/email-verifylink/${token}`);
         return response.data
     } catch (error: any) {
-        console.log("Error from API:", error);
+        console.error("Error from API:", error);
         return error.response.data
     }
 }

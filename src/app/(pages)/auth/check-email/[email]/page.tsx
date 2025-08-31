@@ -24,7 +24,7 @@ const CheckEmailPage: React.FC<CheckEmailPageProps> = ({ params }) => {
 
     useEffect(() => {
         try {
-            const stored = sessionStorage.getItem("resendverifylinkcooldownSec");
+            const stored = sessionStorage.getItem("resendVerifylinkCoolDownSec");
             if (stored) {
                 const parsed = JSON.parse(stored);
                 if (!isNaN(parsed)) {
@@ -42,13 +42,16 @@ const CheckEmailPage: React.FC<CheckEmailPageProps> = ({ params }) => {
                 setCooldown((prev) => {
                     const updated = prev - 1;
                     try {
-                        sessionStorage.setItem("resendverifylinkcooldownSec", JSON.stringify(updated));
+                        sessionStorage.setItem("resendVerifylinkCoolDownSec", JSON.stringify(updated));
                     } catch (error) {
                         console.error("SessionStorage error:", error);
                     }
                     return updated;
                 });
             }, 1000);
+        } else {
+            if (intervalId.current) clearInterval(intervalId.current)
+            sessionStorage.removeItem("resendVerifylinkCoolDownSec")
         }
 
         return () => {
@@ -65,7 +68,6 @@ const CheckEmailPage: React.FC<CheckEmailPageProps> = ({ params }) => {
             toast.error(checkValidation.error.formErrors.fieldErrors.email)
             return;
         }
-
         setLoading(true);
         const result = await resendEmailVerifyLinkService({ email: checkValidation.data.email });
         if (!result.success) {

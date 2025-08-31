@@ -1,0 +1,173 @@
+"use client";
+import BreadCrumb, {
+    breadcrumbListType,
+} from "@/components/application/common/BreadCrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { adminRoutes } from "@/lib/client/routes";
+import React, { useEffect } from "react";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { ButtonLoading } from "@/components/application/common/ButtonLoading";
+import Link from "next/link";
+import slugify from "slugify";
+import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { addColorZodSchema } from "@/zodSchema/admin.color.schema";
+import { TypeOfAddColorInput } from "@/types/admin.colors.types";
+import { createColorService } from "@/services/client/admin/colors/createColorService";
+
+
+
+const breadcrumbList: breadcrumbListType[] = [
+    {
+        href: adminRoutes.dashboard,
+        title: "Home",
+    },
+    {
+        href: adminRoutes.brands.brands,
+        title: "Colors",
+    },
+    {
+        href: "",
+        title: "Add Color",
+    },
+];
+
+const AddColorPage = () => {
+    const form = useForm<TypeOfAddColorInput>({
+        resolver: zodResolver(addColorZodSchema),
+        defaultValues: {
+            name: "",
+            slug: "",
+            hexCode: "",
+            description: "",
+        },
+    });
+
+    const colorName = form.watch("name");
+    useEffect(() => {
+        const slugValue = slugify(colorName.toLowerCase());
+        form.setValue("slug", slugValue);
+    }, [colorName]);
+
+    async function onSubmit(data: TypeOfAddColorInput) {
+        const result = await createColorService(data);
+        if (!result.success) {
+            toast.error(result.message);
+            return;
+        }
+        form.reset();
+        toast.success(result.message);
+    }
+
+    return (
+        <div className="space-y-2">
+            <BreadCrumb breadcrumbList={breadcrumbList} />
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
+                <div className="flex justify-between mb-1">
+                    <h1 className="text-xl text-violet-700 font-semibold"> Add Color</h1>
+                    <Button asChild size={"sm"}>
+                        <Link href={adminRoutes.colors.colors}>Show Colors</Link>
+                    </Button>
+                </div>
+                <Separator className="mb-2" />
+                <Card className="rounded-sm shadow-none py-3">
+                    <CardContent>
+                        <Form {...form}>
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit)}
+                                className="space-y-3 flex-1/4"
+                            >
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Color Name <span className="text-red-600">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter the brand name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="slug"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Slug <span className="text-red-600">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    readOnly
+                                                    placeholder="Enter the slug"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="hexCode"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Hex Code <span className="text-red-600">*</span></FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Input
+                                                        placeholder="Enter the hex code"
+                                                        {...field}
+                                                    />
+                                                    <div style={{ backgroundColor: form.watch("hexCode") }} className="w-10 h-full rounded-r-md absolute top-0 right-0"></div>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Write the description"
+                                                    className="resize-none"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <ButtonLoading
+                                    type="submit"
+                                    loading={form.formState.isSubmitting}
+                                    text={"Save Color"}
+                                />
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+            </Card>
+        </div>
+    );
+};
+
+export default AddColorPage;

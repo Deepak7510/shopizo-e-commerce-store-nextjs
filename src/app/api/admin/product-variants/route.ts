@@ -22,7 +22,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
         const globalFilter = searchParams.get("globalFilter") || "";
 
         if (!["SD", "PD"].includes(deleteType)) {
-            throw new ApiError(403, "Invalid delete type.");
+            throw new ApiError(403, "Invalid delete type");
         }
 
         const pipeline: any[] = [];
@@ -35,18 +35,6 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
             filter = { deletedAt: { $ne: null } };
             pipeline.push({ $match: { deletedAt: { $ne: null } } });
         }
-
-        pipeline.push({
-            $sort: {
-                [sortby]: order === "asc" ? 1 : -1,
-            },
-        });
-
-        pipeline.push(
-            { $skip: page * limit },
-            { $limit: limit }
-        );
-
 
         pipeline.push({
             $lookup: {
@@ -64,6 +52,23 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
             }
         });
 
+
+        pipeline.push({
+            $lookup: {
+                from: "colors",
+                localField: "color",
+                foreignField: "_id",
+                as: "color"
+            }
+        })
+
+        pipeline.push({
+            $unwind: {
+                preserveNullAndEmptyArrays: true,
+                path: "$color",
+            }
+        })
+
         pipeline.push({
             $lookup: {
                 from: "media",
@@ -79,12 +84,23 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                 $match: {
                     $or: [
                         { sku: { $regex: globalFilter, $options: "i" } },
-                        { color: { $regex: globalFilter, $options: "i" } },
+                        { 'color.name': { $regex: globalFilter, $options: "i" } },
                         { size: { $regex: globalFilter, $options: "i" } },
                     ],
                 }
             });
         }
+
+        pipeline.push({
+            $sort: {
+                [sortby]: order === "asc" ? 1 : -1,
+            },
+        });
+
+        pipeline.push(
+            { $skip: page * limit },
+            { $limit: limit }
+        );
 
         pipeline.push({
             $project: {
@@ -94,8 +110,12 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                     title: "$product.title",
                     slug: "$product.slug"
                 },
+                color: {
+                    _id: "$color._id",
+                    name: "$color.name",
+                    hexCode: "$color.hexCode"
+                },
                 sku: 1,
-                color: 1,
                 size: 1,
                 stock: 1,
                 mrp: 1,
@@ -109,7 +129,6 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                 deletedAt: 1
             },
         });
-
 
         const dataList = await ProductVariantModel.aggregate(pipeline);
         const totalRow = await ProductVariantModel.find(filter).countDocuments();

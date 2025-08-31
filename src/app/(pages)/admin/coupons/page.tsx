@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, MoreVertical, Plus } from "lucide-react";
+import { ArrowUpDown, MoreVertical, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EditAction from "@/components/application/admin/EditAction";
 import DeleteAction from "@/components/application/admin/DeleteAction";
+import { Card } from "@/components/ui/card";
+import { dateResolver } from "@/lib/client/helperFunction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -71,15 +73,14 @@ export const CouponsColumns: ColumnDef<
         },
         {
             accessorKey: "discountPercentage",
-            header: "Discount Percentage",
+            header: "Discount percentage",
             cell: ({ row }) => {
-                const discountPercentage = row.original.discountPercentage;
-                return <span>{discountPercentage} %</span>
+                return <span>{row.original.discountPercentage} %</span>
             }
         },
         {
             accessorKey: "minShoppingAmount",
-            header: "Min Shopping Amount",
+            header: "Min shopping amount",
         },
         {
             accessorKey: "validity",
@@ -104,11 +105,7 @@ export const CouponsColumns: ColumnDef<
                 const date = new Date(row.getValue("createdAt"));
                 return (
                     <span>
-                        {date.toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                        })}
+                        {dateResolver(date)}
                     </span>
                 );
             },
@@ -120,18 +117,12 @@ export const CouponsColumns: ColumnDef<
                 const date = new Date(row.getValue("updatedAt"));
                 return (
                     <span>
-                        {date.toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                        })}
+                        {dateResolver(date)}
                     </span>
                 );
             },
         },
     ];
-
-
 
 const Action = React.memo<{
     row: Row<TypeOfCouponData>;
@@ -168,12 +159,12 @@ const CouponPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">Coupons</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.coupons.addCoupons}>
-                            <Plus />
+                            <PlusCircle />
                             Add Coupon
                         </Link>
                     </Button>
@@ -188,7 +179,7 @@ const CouponPage = () => {
                     fetchDataURL={fetchDataURL}
                     Action={Action}
                 />
-            </div>
+            </Card>
         </div>
     );
 };

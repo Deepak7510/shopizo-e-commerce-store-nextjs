@@ -1,5 +1,5 @@
 "use client"
-import { Card, CardContent, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
@@ -40,7 +40,6 @@ const ForgetPasswordVerifyOtpPage: React.FC<ForgetPasswordVerifyOtpPageProps> = 
             }
         } catch (error) {
             console.error("Failed to read cooldown from sessionStorage:", error);
-
         }
     }, []);
 
@@ -58,10 +57,15 @@ const ForgetPasswordVerifyOtpPage: React.FC<ForgetPasswordVerifyOtpPageProps> = 
                 })
             }, 1000)
         } else {
-            if (intervalId.current) clearInterval(intervalId.current)
+            if (intervalId.current) clearInterval(intervalId.current);
+            sessionStorage.removeItem("forgetPasswordVerifyOtpCoolDownSec");
         }
+
         return () => {
-            if (intervalId.current) clearInterval(intervalId.current)
+            if (intervalId.current) {
+                clearInterval(intervalId.current)
+                intervalId.current = null;
+            }
         }
     }, [cooldown])
 

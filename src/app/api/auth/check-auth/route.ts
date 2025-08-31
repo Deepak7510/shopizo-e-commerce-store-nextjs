@@ -14,10 +14,10 @@ export const GET = async function (request: NextRequest): Promise<NextResponse> 
         const userInfo = await User.findById<IUser>(userId).select("name email role avatar");
 
         if (!userInfo) {
-            throw new ApiError(404, "User not found.");
+            throw new ApiError(404, "User not found");
         }
 
-        return apiResponse(200, "User authenticated successfully.", { userInfo });
+        return apiResponse(200, "User authenticated successfully", { userInfo });
 
     } catch (error) {
         return errorHandler(error);

@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { fetchMediaService } from "@/services/client/media/fetchMediaService";
+import { fetchMediaService } from "@/services/client/admin/media/fetchMediaService";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { DatabaseIcon, Recycle, Trash, Undo } from "lucide-react";
 import React, { useState } from "react";
@@ -112,7 +112,7 @@ const MediaPage = () => {
             },
             onError: (error: any) => {
                 toast.error(error.message)
-                console.log("Delete media error", error)
+                console.error("Delete media error", error)
             },
         });
     }
@@ -140,13 +140,13 @@ const MediaPage = () => {
 
     function handleCopy(secure_url: string) {
         navigator.clipboard.writeText(secure_url);
-        toast.success("Link copied.");
+        toast.success("Link copied");
     }
 
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <Card className="rounded-sm shadow-none py-2 gap-2">
+            <Card className="rounded-md shadow-none py-2 gap-2">
                 <CardHeader className="px-1.5 md:px-6">
                     <div className="flex justify-between">
                         <h1 className="text-xl text-violet-700 font-semibold">
@@ -179,7 +179,7 @@ const MediaPage = () => {
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
-                                        <p className="font-medium"> Back to Records</p>
+                                        <p className="font-medium">Show Media</p>
                                     </TooltipContent>
                                 </Tooltip>
 

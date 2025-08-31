@@ -35,7 +35,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
         const existingOtp = await OTPModel.findOne<IOtp>({ email, otp });
 
         if (!existingOtp) {
-            throw new ApiError(410, "Invalid or expired OTP.");
+            throw new ApiError(410, "Invalid or expired OTP");
         }
 
         const token = await generateToken({ userId: String(user._id) }, "15m");
@@ -46,7 +46,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
 
         await OTPModel.deleteMany({ email });
 
-        return apiResponse(200, "Account verified successfully.", { token });
+        return apiResponse(200, "Account verified successfully", { token });
     } catch (error: any) {
         return errorHandler(error)
     }

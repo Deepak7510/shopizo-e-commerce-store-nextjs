@@ -24,7 +24,7 @@ export const useDeleteMutation = function (URL: string): UseMutationResult<TypeO
             });
             return response.data;
         } catch (error: any) {
-            console.log("API Error:", error);
+            console.error("API Error:", error);
             throw error.response?.data || error.message || "Unknown error";
         }
     };

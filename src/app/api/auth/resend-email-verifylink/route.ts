@@ -30,11 +30,11 @@ export const POST = async (request: NextRequest) => {
         const user = await User.findOne<IUser>({ email });
 
         if (!user) {
-            throw new ApiError(404, "User not found.");
+            throw new ApiError(404, "User not found");
         }
 
         if (user.isEmailVerified) {
-            throw new ApiError(400, "Email already verified.");
+            throw new ApiError(400, "Email already verified");
         }
 
         const existingToken = await VerifyTokenModel.findOne<IVerifyToken>({ email });
@@ -66,12 +66,12 @@ export const POST = async (request: NextRequest) => {
         );
 
         if (!emailSent.success) {
-            throw new ApiError(500, "Failed to send verification link.");
+            throw new ApiError(500, "Failed to send verification link");
         }
 
         await VerifyTokenModel.create<IVerifyToken>({ email, token });
 
-        return apiResponse(200, "Verification link resent successfully.");
+        return apiResponse(200, "Verification link resent successfully");
     } catch (error: any) {
         return errorHandler(error);
     }

@@ -22,7 +22,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
         const globalFilter = searchParams.get("globalFilter") || "";
 
         if (!["SD", "PD"].includes(deleteType)) {
-            throw new ApiError(403, "Invalid delete type.");
+            throw new ApiError(403, "Invalid delete type");
         }
 
         const pipeline: any[] = [];
@@ -38,16 +38,6 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
             $match: filter
         })
 
-        pipeline.push({
-            $sort: {
-                [sortby]: order === "asc" ? 1 : -1,
-            },
-        });
-
-        pipeline.push(
-            { $skip: page * limit },
-            { $limit: limit }
-        );
 
         pipeline.push({
             $lookup: {
@@ -77,6 +67,17 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
             });
         }
 
+        pipeline.push({
+            $sort: {
+                [sortby]: order === "asc" ? 1 : -1,
+            },
+        });
+
+        pipeline.push(
+            { $skip: page * limit },
+            { $limit: limit }
+        );
+
 
         pipeline.push({
             $project: {
@@ -88,6 +89,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                     name: "$category.name",
                     slug: "$category.slug"
                 },
+                description: 1,
                 createdAt: 1,
                 updatedAt: 1,
                 deletedAt: 1
@@ -99,8 +101,6 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
         const dataList = await SubcategoryModel.aggregate(pipeline);
         const totalRow = await SubcategoryModel.find(filter).countDocuments();
         const totalPage = Math.ceil(totalRow / limit);
-
-        console.log(dataList)
 
         return apiResponse(200, "Subcategories fetched successfully", { dataList, totalRow, totalPage });
     } catch (error) {

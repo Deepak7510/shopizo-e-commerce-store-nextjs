@@ -23,7 +23,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
             throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
-        const { _id, name, slug } = checkValidation.data;
+        const { _id, name, slug, description, website } = checkValidation.data;
 
         if (!isValidObjectId(_id)) {
             throw new ApiError(400, "Invalid data id",);
@@ -32,16 +32,16 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         const checkBrand = await BrandModel.findOne<IBrand>({ slug, _id: { $ne: _id } });
 
         if (checkBrand) {
-            throw new ApiError(403, "Brand already exist");
+            throw new ApiError(403, "Already exist");
         }
 
-        const updatedBrand = await BrandModel.findByIdAndUpdate<IBrand>(_id, { name, slug }, { new: true });
+        const updatedBrand = await BrandModel.findByIdAndUpdate<IBrand>(_id, { name, slug, description, website }, { new: true });
 
         if (!updatedBrand) {
             throw new ApiError(404, "Brand not found");
         }
 
-        return apiResponse(200, "Brand updated successfully");
+        return apiResponse(200, "Updated successfully");
     } catch (error) {
         return errorHandler(error)
 

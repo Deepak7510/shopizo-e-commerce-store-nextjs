@@ -22,7 +22,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
         }
         const newMedia = await MediaModel.insertMany(checkValidation.data);
 
-        return apiResponse(200, "Media upload successfully.", { newMedia });
+        return apiResponse(200, "Upload successfully.", { newMedia });
 
     } catch (error) {
         return errorHandler(error)

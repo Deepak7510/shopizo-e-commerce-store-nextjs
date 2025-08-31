@@ -62,6 +62,7 @@ import { toast } from "sonner";
 import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
 import axiosInstance from "@/lib/client/axios";
 import TableDataSkeleton from "./TableDataSkeleton";
+import { Card } from "@/components/ui/card";
 
 type CommonDataTableProps<TData, TValue> = {
     columns: ColumnDef<TData, TValue>[];
@@ -111,8 +112,7 @@ export function CommonDataTable<TData, TValue>({
     useEffect(() => {
         const debounce = setTimeout(() => {
             setGlobalFilter(searchValue);
-        }, 1000);
-
+        }, 500);
         return () => clearTimeout(debounce);
     }, [searchValue]);
 
@@ -192,7 +192,6 @@ export function CommonDataTable<TData, TValue>({
             </div>
         );
     }
-
 
     function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchValue(event.target.value);
@@ -287,12 +286,12 @@ export function CommonDataTable<TData, TValue>({
                 </AlertDialogContent>
             </AlertDialog>
             <div className="flex justify-between my-2 gap-2">
-                <div className="md:w-1/2">
+                <div>
                     <Input
                         placeholder="Search..."
                         value={searchValue}
                         onChange={handleSearch}
-                        className="max-w-sm rounded-full"
+                        className="md:w-[350px] shadow-none rounded-full"
                     />
                 </div>
                 <>
@@ -387,15 +386,14 @@ export function CommonDataTable<TData, TValue>({
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom">
-                                    <p className="font-medium"> Back to Records</p>
+                                    <p className="font-medium"> Show Records</p>
                                 </TooltipContent>
                             </Tooltip>
                         </div>
                     )}
                 </>
             </div>
-
-            <div className="rounded-md border overflow-hidden">
+            <Card className="rounded-md p-0 shadow-none overflow-hidden">
                 <Table>
                     <TableHeader className="bg-muted">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -448,7 +446,7 @@ export function CommonDataTable<TData, TValue>({
                         )}
                     </TableBody>
                 </Table>
-            </div>
+            </Card>
             <div className="flex justify-between px-2">
                 <div className="text-muted-foreground flex-1 text-sm">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}

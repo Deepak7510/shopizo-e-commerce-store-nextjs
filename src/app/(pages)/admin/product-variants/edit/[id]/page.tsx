@@ -36,9 +36,11 @@ import Image from "next/image";
 import { editProductVarinatZodSchema } from "@/zodSchema/admin.productvariants.schema";
 import { TypeOfEditProductVarinatInput, TypeOfProductVariantData } from "@/types/admin.productvariants.types";
 import { Switch } from "@/components/ui/switch";
-import { updateProductVariantService } from "@/services/client/productVariants/updateProductVariantService";
+import { updateProductVariantService } from "@/services/client/admin/productVariants/updateProductVariantService";
 import { useRouter } from "next/navigation";
-import AddProductVariantSkeleton from "@/components/application/admin/AddProductVariantSkeleton";
+import { TypeOfColorData } from "@/types/admin.colors.types";
+import { Badge } from "@/components/ui/badge";
+import ProductFormVariantSkeleton from "@/components/application/admin/ProductFormVariantSkeleton";
 
 const sizeData = [
     {
@@ -89,7 +91,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
         data: productData,
         loading: productLoading,
         error: productError,
-    } = useFetch(`/api/admin/products/fetch-all`, {}, []);
+    } = useFetch(`/api/admin/products/get-all`, {}, []);
 
     const {
         data: productVariantData,
@@ -97,18 +99,24 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
         error: productVariantError,
     } = useFetch(`/api/admin/product-variants/details/${id}`, {}, [id]);
 
+    const {
+        data: colorData,
+        loading: colorLoading,
+        error: colorError,
+    } = useFetch(`/api/admin/colors/get-all`, {}, []);
 
-    if (productError || productVariantError) {
+    if (productError || productVariantError || colorError) {
         return (
             <div className="text-xl text-red-700 font-medium">
                 {productError?.message ||
-                    productVariantError?.message ||
+                    productVariantError?.message || colorError?.message ||
                     "Something went worng."}
             </div>
         );
     }
 
-    const productList = productData?.data?.allDataList;
+    const products = productData?.data?.products;
+    const colors = colorData?.data?.colors
 
     const form = useForm<TypeOfEditProductVarinatInput>({
         resolver: zodResolver(editProductVarinatZodSchema),
@@ -131,22 +139,22 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
 
     useEffect(() => {
         if (productVariantData && !productVariantLoading) {
-            const productVariantDetails = productVariantData.data.productVariantDetails as TypeOfProductVariantData
+            const productVariant = productVariantData.data.productVariant as TypeOfProductVariantData;
             form.reset({
-                _id: productVariantDetails._id,
-                productId: productVariantDetails.productId,
-                sku: productVariantDetails.sku,
-                size: productVariantDetails.size,
-                color: productVariantDetails.color,
-                material: productVariantDetails.material,
-                mrp: productVariantDetails.mrp,
-                sellingPrice: productVariantDetails.sellingPrice,
-                stock: productVariantDetails.stock,
-                discountPercentage: productVariantDetails.discountPercentage,
-                media: productVariantDetails.media.map((m: any) => m._id),
-                isDefault: productVariantDetails.isDefault
+                _id: productVariant._id,
+                productId: productVariant.productId,
+                sku: productVariant.sku,
+                size: productVariant.size,
+                color: productVariant.color._id,
+                material: productVariant.material,
+                mrp: productVariant.mrp,
+                sellingPrice: productVariant.sellingPrice,
+                stock: productVariant.stock,
+                discountPercentage: productVariant.discountPercentage,
+                media: productVariant.media.map((m: any) => m._id),
+                isDefault: productVariant.isDefault
             })
-            setSelectedMedia(productVariantDetails.media);
+            setSelectedMedia(productVariant.media);
         }
     }, [productVariantData]);
 
@@ -182,7 +190,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Edit Product Variant
@@ -190,7 +198,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
                             <Link href={adminRoutes.productVariants.productVariants}>
-                                Back to Product Variants
+                                Show Product Variants
                             </Link>
                         </Button>
                     </div>
@@ -199,8 +207,8 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
                         {
-                            productLoading || productVariantLoading ? (
-                                <AddProductVariantSkeleton />
+                            productLoading || productVariantLoading || colorLoading ? (
+                                <ProductFormVariantSkeleton />
                             ) : (
                                 <Form {...form} key={form.watch("_id") || "Edit Product Variant"}>
                                     <form
@@ -208,7 +216,6 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                         className="space-y-3"
                                     >
                                         <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
-
                                             <div>
                                                 <FormField
                                                     control={form.control}
@@ -222,13 +229,13 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                             >
                                                                 <FormControl className="w-full">
                                                                     <SelectTrigger>
-                                                                        <SelectValue placeholder="Select a Product" />
+                                                                        <SelectValue placeholder="Select a product" />
                                                                     </SelectTrigger>
                                                                 </FormControl>
                                                                 <SelectContent>
-                                                                    {productList &&
-                                                                        productList.length > 0 &&
-                                                                        productList?.map((item: any) => (
+                                                                    {products &&
+                                                                        products.length > 0 &&
+                                                                        products?.map((item: any) => (
                                                                             <SelectItem
                                                                                 key={item._id}
                                                                                 value={item._id}
@@ -243,7 +250,6 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                     )}
                                                 />
                                             </div>
-
                                             <div>
                                                 <FormField
                                                     control={form.control}
@@ -300,13 +306,31 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                     name="color"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Color <span className="text-red-600">*</span> </FormLabel>
-                                                            <FormControl>
-                                                                <Input
-                                                                    placeholder="Enter the color"
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
+                                                            <FormLabel>Color <span className="text-red-600">*</span></FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
+                                                            >
+                                                                <FormControl className="w-full" >
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a color" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent >
+                                                                    {
+                                                                        colors &&
+                                                                        colors?.map(
+                                                                            (item: TypeOfColorData) => (
+                                                                                <SelectItem key={item._id} value={item._id}>
+                                                                                    <Badge className="text-muted border border-black" style={{ backgroundColor: item.hexCode }}>
+                                                                                        {item.name}
+                                                                                    </Badge>
+                                                                                </SelectItem>
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                </SelectContent>
+                                                            </Select>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
@@ -368,14 +392,13 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                     )}
                                                 />
                                             </div>
-
                                             <div>
                                                 <FormField
                                                     control={form.control}
                                                     name="sellingPrice"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Selling Price <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormLabel>Selling price <span className="text-red-600">*</span> </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     type="number"
@@ -394,7 +417,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                     name="discountPercentage"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Discount Percentage <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormLabel>Discount percentage <span className="text-red-600">*</span> </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     readOnly
@@ -408,7 +431,6 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                     )}
                                                 />
                                             </div>
-
                                             <div>
                                                 <FormField
                                                     control={form.control}
@@ -416,7 +438,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                     render={({ field }) => (
                                                         <FormItem >
                                                             <div className="space-y-0.5">
-                                                                <FormLabel>Default Variant </FormLabel>
+                                                                <FormLabel>Default variant </FormLabel>
                                                             </div>
                                                             <div className="flex flex-row items-center justify-between rounded-lg border p-2">
                                                                 <FormControl>
@@ -426,13 +448,11 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                                     />
                                                                 </FormControl>
                                                             </div>
-
                                                         </FormItem>
                                                     )}
                                                 />
                                             </div>
                                         </div>
-
                                         <div className="md:col-span-2">
                                             <SelectMediaModel
                                                 selectedMedia={selectedMedia}
@@ -474,11 +494,8 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                                         </div>
                                                     )
                                                 }
-
                                             </div>
-
                                         </div>
-
 
                                         <ButtonLoading
                                             type="submit"
@@ -490,7 +507,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                             )}
                     </CardContent>
                 </Card>
-            </div>
+            </Card>
         </div>
     );
 };

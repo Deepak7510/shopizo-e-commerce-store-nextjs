@@ -45,7 +45,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
             throw new ApiError(404, "Product Variant not found");
         }
 
-        return apiResponse(200, "Product Variant updated successfully");
+        return apiResponse(200, "Updated successfully");
     } catch (error) {
         return errorHandler(error)
 

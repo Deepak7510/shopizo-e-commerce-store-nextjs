@@ -7,6 +7,7 @@ export type TypeOfCategoryData = {
     _id: string;
     name: string;
     slug: string;
+    description: string;
     deletedAt: Date | null
     createdAt?: Date;
     updatedAt?: Date;

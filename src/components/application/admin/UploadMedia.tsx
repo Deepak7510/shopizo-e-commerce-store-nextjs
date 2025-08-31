@@ -2,9 +2,9 @@
 import React from 'react'
 import { CldUploadWidget, CloudinaryUploadWidgetError, } from 'next-cloudinary';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, PlusCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { createmediaService } from '@/services/client/media/createMediaService';
+import { createmediaService } from '@/services/client/admin/media/createMediaService';
 import { useQueryClient } from '@tanstack/react-query';
 import { TypedOfUploadMediaArray } from '@/types/admin.media.types';
 import { uploadMediaArrayZodSchema } from '@/zodSchema/admin.media.schema';
@@ -14,7 +14,7 @@ const UploadMedia = () => {
     const queryClient = useQueryClient()
 
     function handleError(error: CloudinaryUploadWidgetError) {
-        console.log(error)
+        console.error(error)
     }
 
     async function handleOnQueuesEnd(result: any) {
@@ -66,7 +66,7 @@ const UploadMedia = () => {
             {({ open }) => {
                 return (
                     <Button size={'sm'} onClick={() => open()}>
-                        <Plus />
+                        <PlusCircle />
                         Upload Media
                     </Button>
                 );

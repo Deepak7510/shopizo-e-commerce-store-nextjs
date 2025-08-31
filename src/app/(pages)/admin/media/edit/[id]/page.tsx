@@ -1,5 +1,4 @@
 "use client"
-import EditMediaSkeleton from '@/components/application/admin/EditMediaSkeleton'
 import BreadCrumb, { breadcrumbListType } from '@/components/application/common/BreadCrumb'
 import { ButtonLoading } from '@/components/application/common/ButtonLoading'
 import { Button } from '@/components/ui/button'
@@ -10,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import useFetch from '@/hooks/useFetch'
 import { adminRoutes } from '@/lib/client/routes'
-import { updateMediaService } from '@/services/client/media/updateMediaService'
+import { updateMediaService } from '@/services/client/admin/media/updateMediaService'
 import { TypeOfEditMedia } from '@/types/admin.media.types'
 import { editMediaZodSchema } from '@/zodSchema/admin.media.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -55,9 +54,9 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
     useEffect(() => {
         if (data && !loading) {
             form.reset({
-                _id: data.data.mediaDetails._id || "",
-                alt: data.data.mediaDetails.alt || "",
-                title: data.data.mediaDetails.title || "",
+                _id: data.data.media._id || "",
+                alt: data.data.media.alt || "",
+                title: data.data.media.title || "",
             })
         }
     }, [data])
@@ -95,7 +94,7 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
                         </h1>
                         <Button size={'sm'} asChild>
                             <Link href={adminRoutes.medias.media}>
-                                Back to Media
+                                Show Media
                             </Link>
                         </Button>
 
@@ -120,12 +119,12 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
                                 <Skeleton className="h-9 w-[150px] rounded" />
                             </div>
                         </div> :
-                            data?.data.mediaDetails ?
+                            data?.data.media ?
                                 <div className='flex flex-col md:flex-row gap-4 w-full'>
                                     <div className='w-[200px]'>
                                         <Image
-                                            src={data?.data.mediaDetails.secure_url}
-                                            alt={data?.data.mediaDetails.alt || "Media Image"}
+                                            src={data?.data.media.secure_url}
+                                            alt={data?.data.media.alt || "Media Image"}
                                             className="object-cover h-56 rounded"
                                             width={200}
                                             height={200}

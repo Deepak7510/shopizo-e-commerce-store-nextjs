@@ -27,12 +27,12 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
         const checkProductExisting = await ProductModel.findOne({ slug });
 
         if (checkProductExisting) {
-            throw new ApiError(400, "Product already exist");
+            throw new ApiError(400, "Already exist");
         }
 
         await ProductModel.create<IProduct>(checkValidation.data);
 
-        return apiResponse(201, "Product added successfully");
+        return apiResponse(201, "Added successfully");
     } catch (error) {
         return errorHandler(error);
     }

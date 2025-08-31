@@ -3,22 +3,30 @@ import mongoose, { Document } from "mongoose";
 export interface IBrand extends Document {
     name: string;
     slug: string;
-    deletedAt: Date;
+    description: string,
+    website: string,
     createdAt: Date;
     updatedAt: Date;
+    deletedAt: Date;
 }
 
 const brandSchema = new mongoose.Schema<IBrand>({
     name: {
         type: String,
         required: true,
-        unique: true
     },
     slug: {
         type: String,
         required: true,
         unique: true,
-        trim: true
+        lowercase: true,
+        trim: true,
+    },
+    description: {
+        type: String,
+    },
+    website: {
+        type: String,
     },
     deletedAt: {
         type: Date,
@@ -29,5 +37,5 @@ const brandSchema = new mongoose.Schema<IBrand>({
 }, { timestamps: true });
 
 
-const BrandModel = mongoose.models.Brand || mongoose.model("Brand", brandSchema);
+const BrandModel = mongoose.models.Brand || mongoose.model<IBrand>("Brand", brandSchema);
 export default BrandModel;

@@ -7,7 +7,7 @@ export const resendOtpService = async function (value: TypeOfEmailInput): Promis
         const response = await axiosInstance.post('/api/auth/resend-otp', value);
         return response.data
     } catch (error: any) {
-        console.log("Error from API:", error);
+        console.error("Error from API:", error);
         return error.response.data
     }
 }

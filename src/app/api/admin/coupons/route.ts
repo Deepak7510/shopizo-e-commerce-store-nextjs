@@ -22,7 +22,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
         const globalFilter = searchParams.get("globalFilter") || "";
 
         if (!["SD", "PD"].includes(deleteType)) {
-            throw new ApiError(403, "Invalid delete type.");
+            throw new ApiError(403, "Invalid delete type");
         }
 
         const pipeline: any[] = [];
@@ -38,6 +38,16 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
             $match: filter
         })
 
+        if (globalFilter) {
+            pipeline.push({
+                $match: {
+                    $or: [
+                        { code: { $regex: globalFilter, $options: "i" } },
+                    ],
+                }
+            });
+        }
+
         pipeline.push({
             $sort: {
                 [sortby]: order === "asc" ? 1 : -1,
@@ -48,18 +58,6 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
             { $skip: page * limit },
             { $limit: limit }
         );
-
-
-
-        if (globalFilter) {
-            pipeline.push({
-                $match: {
-                    $or: [
-                        { code: { $regex: globalFilter, $options: "i" } },
-                    ],
-                }
-            });
-        }
 
         pipeline.push({
             $project: {

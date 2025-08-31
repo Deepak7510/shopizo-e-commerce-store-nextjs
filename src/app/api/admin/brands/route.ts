@@ -11,7 +11,6 @@ import { TypeOfDeleteType } from "@/types/global.types";
 import { NextRequest, NextResponse } from "next/server";
 
 
-
 export const GET = async function (request: NextRequest): Promise<NextResponse> {
     try {
         await connectDB();
@@ -26,7 +25,7 @@ export const GET = async function (request: NextRequest): Promise<NextResponse> 
         const globalFilter = searchParams.get("globalFilter") || "";
 
         if (!["SD", "PD"].includes(deleteType)) {
-            throw new ApiError(403, "Invalid delete type.");
+            throw new ApiError(403, "Invalid delete type");
         }
 
         let filter = {};
@@ -42,12 +41,6 @@ export const GET = async function (request: NextRequest): Promise<NextResponse> 
             $match: filter,
         });
 
-        pipeline.push({ $limit: limit }, { $skip: (limit * page), });
-
-        pipeline.push({
-            $sort: { [sortby]: order === "asc" ? 1 : -1 },
-        })
-
         if (globalFilter) {
             pipeline.push({
                 $match: {
@@ -60,22 +53,29 @@ export const GET = async function (request: NextRequest): Promise<NextResponse> 
         }
 
         pipeline.push({
+            $sort: { [sortby]: order === "asc" ? 1 : -1 },
+        })
+
+        pipeline.push({ $limit: limit }, { $skip: (limit * page), });
+
+        pipeline.push({
             $project: {
                 _id: 1,
                 name: 1,
                 slug: 1,
+                description: 1,
+                website: 1,
                 createdAt: 1,
                 updatedAt: 1,
                 deletedAt: 1
             }
-
         })
 
-        const dataList = await BrandModel.aggregate(pipeline);
-        const totalRow = await BrandModel.find(filter).countDocuments();
+        const dataList = await BrandModel.aggregate<IBrand>(pipeline);
+        const totalRow = await BrandModel.find<IBrand>(filter).countDocuments();
         const totalPage = Math.ceil(totalRow / limit);
 
-        return apiResponse(200, "Brands fetched successfully.", {
+        return apiResponse(200, "Brands fetched successfully", {
             dataList,
             totalRow,
             totalPage

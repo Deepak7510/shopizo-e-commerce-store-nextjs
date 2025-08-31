@@ -30,21 +30,20 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { editProductZodSchema } from "@/zodSchema/admin.products.schema";
-
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { TypeOfBrandData } from "@/types/admin.brands.types";
 import { TypeOfCategoryData } from "@/types/admin.category.types";
 import { TypeOfSubcategoryData } from "@/types/admin.subcategories.types";
-
-import AddProductSkeleton from "@/components/application/admin/AddProductSkeleton";
 import { toast } from "sonner";
 import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
 import Image from "next/image";
 import { TypeOfEditProductInput } from "@/types/admin.products.types";
 import { useRouter } from "next/navigation";
-import { updateProductService } from "@/services/client/products/updateProductService";
+import { updateProductService } from "@/services/client/admin/products/updateProductService";
+import axiosInstance from "@/lib/client/axios";
+import ProductFormSkeleton from "@/components/application/admin/ProductFormSkeleton";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -67,22 +66,19 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
+    const [subcategories, setSubcategories] = useState<TypeOfSubcategoryData[] | []>([])
 
     const {
         data: brandData,
         loading: brandLoading,
         error: brandError,
-    } = useFetch(`/api/admin/brands/fetch-all`, {}, []);
+    } = useFetch(`/api/admin/brands/get-all`, {}, []);
     const {
         data: categoryData,
         loading: categoryLoading,
         error: categoryError,
-    } = useFetch(`/api/admin/categories/fetch-all`, {}, []);
-    const {
-        data: subcategoryData,
-        loading: subcategoryLoading,
-        error: subcategoryError,
-    } = useFetch(`/api/admin/subcategories/fetch-all`, {}, []);
+    } = useFetch(`/api/admin/categories/get-all`, {}, []);
+
 
     const {
         data: productData,
@@ -90,23 +86,20 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         error: productDataError,
     } = useFetch(`/api/admin/products/details/${id}`, {}, [id]);
 
-    if (brandError || categoryError || subcategoryError || productDataError) {
+    if (brandError || categoryError || productDataError) {
         return (
             <div className="text-xl text-red-700 font-medium">
                 {brandError?.message ||
                     categoryError?.message ||
-                    subcategoryError?.message ||
                     productDataError?.message ||
                     "Something went worng."}
             </div>
         );
     }
 
-    const brandList = brandData?.data?.allDataList as TypeOfBrandData[];
-    const categoryList = categoryData?.data?.allDataList as TypeOfCategoryData[];
-    const subcategoryList = subcategoryData?.data
-        ?.allDataList as TypeOfSubcategoryData[];
-    const productDetails = productData?.data?.productDetails;
+    const brands = brandData?.data?.brands as TypeOfBrandData[];
+    const categories = categoryData?.data?.categories as TypeOfCategoryData[];
+    const product = productData?.data?.product;
 
     const form = useForm<TypeOfEditProductInput>({
         resolver: zodResolver(editProductZodSchema),
@@ -122,24 +115,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         },
     });
 
-
-    useEffect(() => {
-        if (productDetails && !productDataLoading) {
-            form.reset({
-                _id: productDetails._id || "",
-                title: productDetails.title || "",
-                slug: productDetails.slug || "",
-                category: productDetails.category || "",
-                subcategory: productDetails.subcategory || "",
-                media: productDetails?.media?.map((m: any) => m._id) || [],
-                brand: productDetails.brand || "",
-                description: productDetails.description || "",
-            })
-            setSelectedMedia(productDetails.media)
-        }
-
-    }, [productDetails])
-
     useEffect(() => {
         const title = form.watch("title");
         const slugValue = slugify(title.toLowerCase());
@@ -153,8 +128,42 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         }
     }, [selectedMedia]);
 
+
+    useEffect(() => {
+        if (product && !productDataLoading) {
+            form.reset({
+                _id: product._id || "",
+                title: product.title || "",
+                slug: product.slug || "",
+                category: product.category || "",
+                subcategory: product.subcategory || "",
+                media: product?.media?.map((m: any) => m._id) || [],
+                brand: product.brand || "",
+                description: product.description || "",
+            })
+            setSelectedMedia(product.media)
+        }
+    }, [product])
+
+
+    useEffect(() => {
+        if (form.watch("category")) {
+            async function fetchSubcategories() {
+                try {
+                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${form.watch("category")}`);
+                    const subcategories = response.data.data.subcategories;
+                    setSubcategories(subcategories);
+                } catch (error: any) {
+                    console.error(error);
+                }
+            }
+            fetchSubcategories();
+        }
+    }, [form.watch("category")]);
+
+
+
     async function onSubmit(data: TypeOfEditProductInput) {
-        console.log(data);
         const result = await updateProductService(data);
         if (!result.success) {
             toast.error(result.message);
@@ -169,7 +178,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Edit Product
@@ -177,7 +186,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
                             <Link href={adminRoutes.products.products}>
-                                Back to Products
+                                Show Products
                             </Link>
                         </Button>
                     </div>
@@ -188,9 +197,8 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     <CardContent>
                         {categoryLoading ||
                             brandLoading ||
-                            subcategoryLoading ||
                             productDataLoading ? (
-                            <AddProductSkeleton />
+                            <ProductFormSkeleton />
                         ) : (
                             <Form {...form} key={form.watch("_id") || "Edit Product"}>
                                 <form
@@ -207,7 +215,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                         <FormLabel>Title <span className="text-red-600">*</span></FormLabel>
                                                         <FormControl>
                                                             <Input
-                                                                placeholder="Enter the Title"
+                                                                placeholder="Enter the title"
                                                                 {...field}
                                                             />
                                                         </FormControl>
@@ -248,13 +256,13 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                         >
                                                             <FormControl className="w-full">
                                                                 <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
+                                                                    <SelectValue placeholder="Select a brand" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {brandList &&
-                                                                    brandList.length > 0 &&
-                                                                    brandList?.map((item: TypeOfBrandData) => (
+                                                                {brands &&
+                                                                    brands.length > 0 &&
+                                                                    brands?.map((item: TypeOfBrandData) => (
                                                                         <SelectItem
                                                                             key={item._id}
                                                                             value={item._id}
@@ -282,13 +290,13 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                         >
                                                             <FormControl className="w-full">
                                                                 <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
+                                                                    <SelectValue placeholder="Select a category" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {categoryList &&
-                                                                    categoryList.length > 0 &&
-                                                                    categoryList?.map(
+                                                                {categories &&
+                                                                    categories.length > 0 &&
+                                                                    categories?.map(
                                                                         (item: TypeOfCategoryData) => (
                                                                             <SelectItem
                                                                                 key={item._id}
@@ -318,13 +326,13 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                         >
                                                             <FormControl className="w-full">
                                                                 <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a Category" />
+                                                                    <SelectValue placeholder="Select a subcategory" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {subcategoryList &&
-                                                                    subcategoryList.length > 0 &&
-                                                                    subcategoryList?.map(
+                                                                {subcategories &&
+                                                                    subcategories.length > 0 &&
+                                                                    subcategories?.map(
                                                                         (item: TypeOfSubcategoryData) => (
                                                                             <SelectItem
                                                                                 key={item._id}
@@ -418,8 +426,8 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         )}
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+            </Card>
+        </div >
     );
 };
 

@@ -21,13 +21,13 @@ export const GET = async function (req: NextRequest, { params }: { params: Promi
 
         const filter = { deletedAt: null }
 
-        const categoryDetails = await CategoryModel.findOne({ _id: id, ...filter });
+        const category = await CategoryModel.findOne({ _id: id, ...filter });
 
-        if (!categoryDetails) {
-            throw new ApiError(404, "Category not found.");
+        if (!category) {
+            throw new ApiError(404, "Category not found");
         }
 
-        return apiResponse(200, "Category details fetched successfully", { categoryDetails });
+        return apiResponse(200, "Category fetched successfully", { category });
 
     } catch (error) {
         return errorHandler(error as Error)

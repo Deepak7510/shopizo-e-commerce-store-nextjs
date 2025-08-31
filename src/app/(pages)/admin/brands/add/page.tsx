@@ -3,7 +3,7 @@ import BreadCrumb, {
     breadcrumbListType,
 } from "@/components/application/common/BreadCrumb";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
 import React, { useEffect } from "react";
@@ -24,7 +24,8 @@ import slugify from "slugify";
 import { toast } from "sonner";
 import { TypeOfAddBrandInput } from "@/types/admin.brands.types";
 import { addBrandZodSchema } from "@/zodSchema/admin.brands.schema";
-import { createBrandService } from "@/services/client/brands/crateBrandService";
+import { createBrandService } from "@/services/client/admin/brands/crateBrandService";
+import { Textarea } from "@/components/ui/textarea";
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -46,6 +47,8 @@ const AddBrandsPage = () => {
         defaultValues: {
             name: "",
             slug: "",
+            description: "",
+            website: ""
         },
     });
 
@@ -68,11 +71,11 @@ const AddBrandsPage = () => {
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold"> Add Brand</h1>
                     <Button asChild size={"sm"}>
-                        <Link href={adminRoutes.brands.brands}>Back to Brands</Link>
+                        <Link href={adminRoutes.brands.brands}>Show brands</Link>
                     </Button>
                 </div>
                 <Separator className="mb-2" />
@@ -113,6 +116,40 @@ const AddBrandsPage = () => {
                                         </FormItem>
                                     )}
                                 />
+                                <FormField
+                                    control={form.control}
+                                    name="website"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Website</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Enter the website url"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Write the description"
+                                                    className="resize-none"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <ButtonLoading
                                     type="submit"
                                     loading={form.formState.isSubmitting}
@@ -122,8 +159,8 @@ const AddBrandsPage = () => {
                         </Form>
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+            </Card>
+        </div >
     );
 };
 

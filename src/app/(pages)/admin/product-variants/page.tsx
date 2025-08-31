@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, MoreVertical, Plus } from "lucide-react";
+import { ArrowUpDown, MoreVertical, Plus, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
@@ -18,6 +18,8 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EditAction from "@/components/application/admin/EditAction";
 import DeleteAction from "@/components/application/admin/DeleteAction";
+import { Card } from "@/components/ui/card";
+import { dateResolver } from "@/lib/client/helperFunction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -78,8 +80,9 @@ export const ProductVariatsColumn: ColumnDef<
             header: "Size",
         },
         {
-            accessorKey: "color",
+            accessorKey: "color.namer",
             header: "Color",
+            cell: ({ row }) => row.original.color.name || "-",
         },
         {
             accessorKey: "material",
@@ -95,7 +98,7 @@ export const ProductVariatsColumn: ColumnDef<
         },
         {
             accessorKey: "sellingPrice",
-            header: "Selling Price",
+            header: "Selling price",
         },
         {
             accessorKey: "discountPercentage",
@@ -138,7 +141,6 @@ export const ProductVariatsColumn: ColumnDef<
                             </div>
                         )
                     }
-
                 </div>
             }
         },
@@ -150,11 +152,7 @@ export const ProductVariatsColumn: ColumnDef<
                 const date = new Date(row.getValue("createdAt"));
                 return (
                     <span>
-                        {date.toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                        })}
+                        {dateResolver(date)}
                     </span>
                 );
             },
@@ -166,11 +164,7 @@ export const ProductVariatsColumn: ColumnDef<
                 const date = new Date(row.getValue("updatedAt"));
                 return (
                     <span>
-                        {date.toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                        })}
+                        {dateResolver(date)}
                     </span>
                 );
             },
@@ -214,12 +208,12 @@ const ProductVariatsPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">Product Variants</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.productVariants.addProductVariants}>
-                            <Plus />
+                            <PlusCircle />
                             Add Product Variant
                         </Link>
                     </Button>
@@ -234,7 +228,7 @@ const ProductVariatsPage = () => {
                     fetchDataURL={fetchDataURL}
                     Action={Action}
                 />
-            </div>
+            </Card>
         </div>
     );
 };

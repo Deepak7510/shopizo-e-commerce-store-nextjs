@@ -18,13 +18,13 @@ export const GET = async function (request: NextRequest, { params }: { params: P
             throw new ApiError(400, "Invalid data id");
         }
 
-        const couponDetails = await CouponModel.findById(id)
+        const coupon = await CouponModel.findById(id)
 
-        if (!couponDetails) {
+        if (!coupon) {
             throw new ApiError(404, "Coupon not found");
         }
 
-        return apiResponse(200, "Coupon details fetched successfully", { couponDetails })
+        return apiResponse(200, "Coupon fetched successfully", { coupon })
     } catch (error) {
         return errorHandler(error);
     }

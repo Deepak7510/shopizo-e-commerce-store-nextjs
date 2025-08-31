@@ -7,7 +7,7 @@ export const resetPasswordService = async function (value: TypeOfResetPasswordIn
         const resposne = await axiosInstance.post('/api/auth/reset-password', value)
         return resposne.data
     } catch (error: any) {
-        console.log("Error from API:", error);
+        console.error("Error from API:", error);
         return error.response.data
     }
 }

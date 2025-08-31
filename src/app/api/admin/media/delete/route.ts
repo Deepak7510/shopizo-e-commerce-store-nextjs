@@ -19,7 +19,7 @@ export const PUT = async function (req: NextRequest): Promise<NextResponse> {
         const { selectedIdList, deleteType } = body
 
         if (!["SD", "RSD"].includes(deleteType)) {
-            throw new ApiError(401, "Invalid delete type.");
+            throw new ApiError(401, "Invalid delete type");
         }
 
         if (deleteType === "SD") {
@@ -29,8 +29,8 @@ export const PUT = async function (req: NextRequest): Promise<NextResponse> {
         }
 
         const message = deleteType === "SD"
-            ? "Media moved to trash successfully."
-            : "Media restored successfully.";
+            ? "Moved to trash"
+            : "Restored successfully";
 
         return apiResponse(200, message);
 
@@ -48,12 +48,12 @@ export const DELETE = async function (req: NextRequest): Promise<NextResponse> {
         const { selectedIdList, deleteType } = body
 
         if (deleteType !== "PD") {
-            throw new ApiError(401, "Invalid delete type.");
+            throw new ApiError(401, "Invalid delete type");
         }
         const mediaList = await MediaModel.find<IMedia>({ _id: { $in: selectedIdList } });
 
         if (!mediaList.length) {
-            throw new ApiError(404, "No media found for deletion.");
+            throw new ApiError(404, "No media found");
         }
 
         const mediaPublicIdList = mediaList.map(media => media.public_id);
@@ -61,12 +61,12 @@ export const DELETE = async function (req: NextRequest): Promise<NextResponse> {
         const cloudRes = await cloudinary.api.delete_resources(mediaPublicIdList);
 
         if (!cloudRes || !cloudRes.deleted || Object.keys(cloudRes.deleted).length === 0) {
-            throw new ApiError(500, "Cloudinary deletion failed.");
+            throw new ApiError(500, "Cloudinary deletion failed");
         }
 
         await MediaModel.deleteMany({ _id: { $in: selectedIdList } });
 
-        return apiResponse(200, "Media deeleted successfully.");
+        return apiResponse(200, "Deleted successfully");
 
     } catch (error) {
         return errorHandler(error)

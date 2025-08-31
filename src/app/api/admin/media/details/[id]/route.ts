@@ -9,7 +9,6 @@ import { isValidObjectId } from "mongoose";
 import { NextRequest } from "next/server";
 
 
-
 export const GET = async function (req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
 
@@ -18,18 +17,18 @@ export const GET = async function (req: NextRequest, { params }: { params: Promi
         const id = (await params).id
 
         if (!isValidObjectId(id)) {
-            throw new ApiError(403, "Media id is Invalid")
+            throw new ApiError(403, "Invalid media id")
         }
 
         const filter = { deletedAt: null }
 
-        const mediaDetails = await MediaModel.findOne({ _id: id, ...filter });
+        const media = await MediaModel.findOne({ _id: id, ...filter });
 
-        if (!mediaDetails) {
+        if (!media) {
             throw new ApiError(404, "Media not found.")
         }
 
-        return apiResponse(200, "Media details fetch successfully", { mediaDetails })
+        return apiResponse(200, "Media fetch successfully", { media })
 
     } catch (error) {
         return errorHandler(error as Error)

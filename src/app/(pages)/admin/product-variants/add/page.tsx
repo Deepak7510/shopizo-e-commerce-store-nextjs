@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/select";
 
 import "react-quill-new/dist/quill.snow.css";
-import { createproductVariantService } from "@/services/client/productVariants/createProductVariantService";
+import { createproductVariantService } from "@/services/client/admin/productVariants/createProductVariantService";
 import { toast } from "sonner";
 import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
@@ -38,7 +38,9 @@ import Image from "next/image";
 import { addProductVarinatZodSchema } from "@/zodSchema/admin.productvariants.schema";
 import { TypeOfAddProductVarinatInput } from "@/types/admin.productvariants.types";
 import { Switch } from "@/components/ui/switch";
-import AddProductVariantSkeleton from "@/components/application/admin/AddProductVariantSkeleton";
+import { TypeOfColorData } from "@/types/admin.colors.types";
+import { Badge } from "@/components/ui/badge";
+import ProductFormVariantSkeleton from "@/components/application/admin/ProductFormVariantSkeleton";
 
 const sizeData = [
     {
@@ -87,19 +89,25 @@ const AddProductVariantPage = () => {
         data: productData,
         loading: productLoading,
         error: productError,
-    } = useFetch(`/api/admin/products/fetch-all`, {}, []);
+    } = useFetch(`/api/admin/products/get-all`, {}, []);
 
+    const {
+        data: colorData,
+        loading: colorLoading,
+        error: colorError,
+    } = useFetch(`/api/admin/colors/get-all`, {}, []);
 
-    if (productError) {
+    if (productError || colorError) {
         return (
             <div className="text-xl text-red-700 font-medium">
-                {productError?.message ||
+                {productError?.message || colorError?.message ||
                     "Something went worng."}
             </div>
         );
     }
 
-    const productList = productData?.data?.allDataList;
+    const products = productData?.data?.products;
+    const colors = colorData?.data?.colors;
 
 
     const form = useForm<TypeOfAddProductVarinatInput>({
@@ -136,7 +144,6 @@ const AddProductVariantPage = () => {
     }, [selectedMedia]);
 
     async function onSubmit(data: TypeOfAddProductVarinatInput) {
-        console.log(data);
         const result = await createproductVariantService(data);
         if (!result.success) {
             toast.error(result.message);
@@ -150,7 +157,7 @@ const AddProductVariantPage = () => {
     return (
         <div className="space-y-2">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Add Product Variant
@@ -158,7 +165,7 @@ const AddProductVariantPage = () => {
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
                             <Link href={adminRoutes.productVariants.productVariants}>
-                                Back to Product Variants
+                                Show Product Variants
                             </Link>
                         </Button>
                     </div>
@@ -167,8 +174,8 @@ const AddProductVariantPage = () => {
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
                         {
-                            productLoading ? (
-                                <AddProductVariantSkeleton />
+                            productLoading || colorLoading ? (
+                                <ProductFormVariantSkeleton />
                             ) : (
                                 <Form {...form}>
                                     <form
@@ -176,7 +183,6 @@ const AddProductVariantPage = () => {
                                         className="space-y-3"
                                     >
                                         <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
-
                                             <div>
                                                 <FormField
                                                     control={form.control}
@@ -190,13 +196,13 @@ const AddProductVariantPage = () => {
                                                             >
                                                                 <FormControl className="w-full">
                                                                     <SelectTrigger>
-                                                                        <SelectValue placeholder="Select a Product" />
+                                                                        <SelectValue placeholder="Select a product" />
                                                                     </SelectTrigger>
                                                                 </FormControl>
                                                                 <SelectContent>
-                                                                    {productList &&
-                                                                        productList.length > 0 &&
-                                                                        productList?.map((item: any) => (
+                                                                    {products &&
+                                                                        products.length > 0 &&
+                                                                        products?.map((item: any) => (
                                                                             <SelectItem
                                                                                 key={item._id}
                                                                                 value={item._id}
@@ -211,7 +217,6 @@ const AddProductVariantPage = () => {
                                                     )}
                                                 />
                                             </div>
-
                                             <div>
                                                 <FormField
                                                     control={form.control}
@@ -268,17 +273,36 @@ const AddProductVariantPage = () => {
                                                     name="color"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Color <span className="text-red-600">*</span> </FormLabel>
-                                                            <FormControl>
-                                                                <Input
-                                                                    placeholder="Enter the color"
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
+                                                            <FormLabel>Color <span className="text-red-600">*</span></FormLabel>
+                                                            <Select
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
+                                                            >
+                                                                <FormControl className="w-full" >
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a color" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent >
+                                                                    {
+                                                                        colors &&
+                                                                        colors?.map(
+                                                                            (item: TypeOfColorData) => (
+                                                                                <SelectItem key={item._id} value={item._id}>
+                                                                                    <Badge className="text-muted border border-black" style={{ backgroundColor: item.hexCode }}>
+                                                                                        {item.name}
+                                                                                    </Badge>
+                                                                                </SelectItem>
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                </SelectContent>
+                                                            </Select>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
                                                 />
+
                                             </div>
                                             <div>
                                                 <FormField
@@ -343,7 +367,7 @@ const AddProductVariantPage = () => {
                                                     name="sellingPrice"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Selling Price <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormLabel>Selling price <span className="text-red-600">*</span> </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     type="number"
@@ -362,7 +386,7 @@ const AddProductVariantPage = () => {
                                                     name="discountPercentage"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Discount Percentage <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormLabel>Discount percentage <span className="text-red-600">*</span> </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     readOnly
@@ -384,7 +408,7 @@ const AddProductVariantPage = () => {
                                                     render={({ field }) => (
                                                         <FormItem >
                                                             <div className="space-y-0.5">
-                                                                <FormLabel>Default Variant </FormLabel>
+                                                                <FormLabel>Default variant </FormLabel>
                                                             </div>
                                                             <div className="flex flex-row items-center justify-between rounded-lg border p-2">
                                                                 <FormControl>
@@ -442,11 +466,8 @@ const AddProductVariantPage = () => {
                                                         </div>
                                                     )
                                                 }
-
                                             </div>
-
                                         </div>
-
 
                                         <ButtonLoading
                                             type="submit"
@@ -458,8 +479,8 @@ const AddProductVariantPage = () => {
                             )}
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+            </Card>
+        </div >
     );
 };
 

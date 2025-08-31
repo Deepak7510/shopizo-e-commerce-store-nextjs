@@ -25,6 +25,13 @@ export const authRoutes = {
 
 export const adminRoutes = {
     dashboard: '/admin/dashboard',
+    banners: {
+        Banners: `/admin/banners`,
+        addBanner: `/admin/banners/add`,
+        editBanner: (id: string) => {
+            return `/admin/banners/edit/${id}`
+        },
+    },
     brands: {
         brands: `/admin/brands`,
         addBrands: `/admin/brands/add`,
@@ -44,6 +51,13 @@ export const adminRoutes = {
         addSubcategory: `/admin/subcategories/add`,
         editSubcategory: (id: string) => {
             return `/admin/subcategories/edit/${id}`
+        },
+    },
+    colors: {
+        colors: `/admin/colors`,
+        addColor: `/admin/colors/add`,
+        editColor: (id: string) => {
+            return `/admin/colors/edit/${id}`
         },
     },
     products: {
@@ -72,6 +86,15 @@ export const adminRoutes = {
         editCoupons: (id: string) => {
             return `/admin/coupons/edit/${id}`
         },
+    },
+    orders: {
+        orders: `/admin/orders`,
+    },
+    customers: {
+        customers: `/admin/customers`,
+    },
+    reviews: {
+        reviews: `/admin/reviews`,
     },
 }
 

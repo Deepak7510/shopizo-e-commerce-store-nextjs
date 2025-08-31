@@ -17,29 +17,29 @@ export const POST = async function (
         const token = (await params).token;
 
         if (!token) {
-            throw new ApiError(400, "token not found.");
+            throw new ApiError(400, "token not found");
         }
 
         const { userId } = await verifyToken(token);
 
         if (!userId) {
-            throw new ApiError(401, "Invalid or expired token.");
+            throw new ApiError(401, "Invalid or expired token");
         }
 
         const user = await User.findById<IUser>(userId).select("name email role isEmailVerified");
 
         if (!user) {
-            throw new ApiError(404, "User not found.");
+            throw new ApiError(404, "User not found");
         }
 
         if (user.isEmailVerified) {
-            throw new ApiError(409, "Email already verified.");
+            throw new ApiError(409, "Email already verified");
         }
 
         const checkToken = await VerifyTokenModel.findOne<IVerifyToken>({ email: user.email, token });
 
         if (!checkToken) {
-            throw new ApiError(410, "Invalid or expired token.");
+            throw new ApiError(410, "Invalid or expired token");
         }
 
         user.isEmailVerified = true;
@@ -59,7 +59,7 @@ export const POST = async function (
             },
         });
 
-        response.cookies.set("token", accessToken, {
+        response.cookies.set("accessToken", accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 60 * 60 * 24 * 7,

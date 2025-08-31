@@ -24,7 +24,7 @@ import slugify from "slugify";
 import { toast } from "sonner";
 import { TypeOfAddSubcategoryInput } from "@/types/admin.subcategories.types";
 import { addSubcategoryZodSchema } from "@/zodSchema/admin.subcategories.schema";
-import { createSubcategoryService } from "@/services/client/subcategories/createSubcategoryService";
+import { createSubcategoryService } from "@/services/client/admin/subcategories/createSubcategoryService";
 import useFetch from "@/hooks/useFetch";
 import {
     Select,
@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/select";
 import { TypeOfCategoryData } from "@/types/admin.category.types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import SubcategoryFormSkeleton from "@/components/application/admin/SubcategoryFormSkeleton";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -53,7 +55,7 @@ const breadcrumbList: breadcrumbListType[] = [
 
 const AddSubcategoryPage = () => {
     const { data, loading, error } = useFetch(
-        `/api/admin/categories/fetch-all`,
+        `/api/admin/categories/get-all`,
         {},
         []
     );
@@ -64,6 +66,7 @@ const AddSubcategoryPage = () => {
             name: "",
             slug: "",
             category: "",
+            description: ""
         },
     });
     const categoryName = form.watch("name");
@@ -90,7 +93,7 @@ const AddSubcategoryPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">
                         Add Subcategory
@@ -98,7 +101,7 @@ const AddSubcategoryPage = () => {
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
                             <Link href={adminRoutes.subcategories.subcategories}>
-                                Back to Subcategories
+                                Show Subcategories
                             </Link>
                         </Button>
                     </div>
@@ -109,23 +112,7 @@ const AddSubcategoryPage = () => {
                     <CardContent>
                         {
                             loading ?
-                                <div className="w-full">
-                                    <div className="space-y-3">
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-4 w-[60px]" />
-                                            <Skeleton className="h-10 w-full rounded" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-4 w-[60px]" />
-                                            <Skeleton className="h-10 w-full rounded" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-4 w-[60px]" />
-                                            <Skeleton className="h-10 w-full rounded" />
-                                        </div>
-                                        <Skeleton className="h-9 w-[150px] rounded" />
-                                    </div>
-                                </div> :
+                                <SubcategoryFormSkeleton /> :
                                 <Form {...form}>
                                     <form
                                         onSubmit={form.handleSubmit(onSubmit)}
@@ -173,7 +160,7 @@ const AddSubcategoryPage = () => {
                                                     <FormLabel>Category <span className="text-red-600">*</span></FormLabel>
                                                     <Select
                                                         onValueChange={field.onChange}
-                                                        defaultValue={field.value}
+                                                        value={field.value}
                                                     >
                                                         <FormControl className="w-full" >
                                                             <SelectTrigger>
@@ -184,7 +171,7 @@ const AddSubcategoryPage = () => {
                                                             {
                                                                 data &&
                                                                 data.data &&
-                                                                data.data?.allDataList?.map(
+                                                                data.data?.categories?.map(
                                                                     (item: TypeOfCategoryData) => (
                                                                         <SelectItem key={item._id} value={item._id}>
                                                                             {item.name}
@@ -194,6 +181,25 @@ const AddSubcategoryPage = () => {
                                                             }
                                                         </SelectContent>
                                                     </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="description"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Description</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea
+                                                            placeholder="Write the description"
+                                                            className="resize-none"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -208,8 +214,8 @@ const AddSubcategoryPage = () => {
                         }
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+            </Card>
+        </div >
     );
 };
 

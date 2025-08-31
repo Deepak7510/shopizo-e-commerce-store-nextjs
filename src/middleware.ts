@@ -27,6 +27,10 @@ export async function middleware(request: NextRequest) {
             }
         }
 
+        if (token && pathName.startsWith('/admin') && user?.role === "user") {
+            return NextResponse.redirect(new URL(userRoutes.home, request.url));
+        }
+
         if (token && pathName === "/admin") {
             return NextResponse.redirect(new URL(adminRoutes.dashboard, request.url));
         }

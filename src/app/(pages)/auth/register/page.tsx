@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import ApplicationLogo from "@/components/application/common/ApplicationLogo";
 import { ButtonLoading } from "@/components/application/common/ButtonLoading";
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const RegisterPage = () => {
-    const router = useRouter()
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState<boolean>(false);
+
+
     const form = useForm<TypeOfRegisterInput>({
         resolver: zodResolver(registerZodSchema),
         defaultValues: {
@@ -36,10 +38,11 @@ const RegisterPage = () => {
         }
     });
 
+
     async function onSubmit(data: TypeOfRegisterInput) {
         const result = await registerService(data);
         if (!result.success) {
-            toast.error(result.message)
+            toast.error(result.message);
             return;
         }
         form.reset();
@@ -47,7 +50,7 @@ const RegisterPage = () => {
     }
 
     return (
-        <Card className="shadow-none w-sm">
+        <Card className="shadow-none max-w-sm w-full">
             <CardContent className="space-y-3">
                 <div className="flex justify-center items-center gap-1 flex-col">
                     <ApplicationLogo />
@@ -100,15 +103,12 @@ const RegisterPage = () => {
                                         </FormControl>
                                         <Button
                                             type="button"
+                                            variant="ghost"
+                                            size="icon"
                                             onClick={() => setShowPassword((pre) => !pre)}
-                                            variant={"icon" as any}
-                                            className="absolute top-[50%] right-2 translate-y-[-50%]"
+                                            className="absolute top-1/2 right-2 -translate-y-1/2"
                                         >
-                                            {showPassword ? (
-                                                <EyeClosed className="w-5 h-5" />
-                                            ) : (
-                                                <Eye className="w-5 h-5" />
-                                            )}
+                                            {showPassword ? <EyeClosed className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                         </Button>
                                     </div>
                                     <FormMessage />
@@ -125,10 +125,7 @@ const RegisterPage = () => {
                 </Form>
                 <div className="flex justify-center items-center gap-1">
                     <p>Already have an account ? </p>
-                    <Link
-                        className="text-violet-700 underline"
-                        href={authRoutes.login}
-                    >
+                    <Link className="text-violet-700 underline" href={authRoutes.login}>
                         Login
                     </Link>
                 </div>

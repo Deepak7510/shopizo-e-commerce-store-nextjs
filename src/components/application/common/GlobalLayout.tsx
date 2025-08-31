@@ -1,17 +1,15 @@
 "use client"
 import { setLogin } from '@/redux/authSlice';
 import { checkAuthService } from '@/services/client/auth/checkAuthService';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import LoaderOne from './LoaderOne';
-import { RootState } from '@/redux/store';
-import RouteProtectGaurd from './RouteProtectGaurd';
 const GlobalLayout = ({
     children,
-}: Readonly<{
+}: {
     children: React.ReactNode;
-}>) => {
+}) => {
     const [loading, setLoading] = useState(true)
     const dispatch = useDispatch();
     const pathName = usePathname();
@@ -20,7 +18,6 @@ const GlobalLayout = ({
         async function checkAuthHandler() {
             setLoading(true);
             const result = await checkAuthService();
-            console.log(result)
             if (!result.success) {
                 dispatch(setLogin({
                     userInfo: null,
@@ -38,6 +35,7 @@ const GlobalLayout = ({
 
         checkAuthHandler();
     }, [pathName]);
+
 
     if (loading) return <LoaderOne />
 

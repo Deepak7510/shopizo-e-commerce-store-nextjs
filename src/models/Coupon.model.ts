@@ -8,7 +8,6 @@ export interface ICoupon extends Document {
     deletedAt: Date | null
 }
 
-
 const couponSchema = new mongoose.Schema<ICoupon>({
     code: {
         type: String,
@@ -23,13 +22,11 @@ const couponSchema = new mongoose.Schema<ICoupon>({
     minShoppingAmount: {
         type: Number,
         required: true,
-        trim: true
     },
     validity: {
         type: Date,
         required: true
     },
-
     deletedAt: {
         type: Date,
         default: null,

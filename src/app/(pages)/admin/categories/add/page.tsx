@@ -15,7 +15,8 @@ import { ButtonLoading } from '@/components/application/common/ButtonLoading';
 import Link from 'next/link';
 import slugify from 'slugify'
 import { toast } from 'sonner';
-import { createCategoryService } from '@/services/client/categories/createCategoryService';
+import { createCategoryService } from '@/services/client/admin/categories/createCategoryService';
+import { Textarea } from '@/components/ui/textarea';
 const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
@@ -37,7 +38,8 @@ const AddCategoryPage = () => {
         resolver: zodResolver(addCategoryZodSchema),
         defaultValues: {
             name: "",
-            slug: ""
+            slug: "",
+            description: ""
         }
     })
     const categoryName = form.watch("name");
@@ -59,7 +61,7 @@ const AddCategoryPage = () => {
 
     return (<div className='space-y-2'>
         <BreadCrumb breadcrumbList={breadcrumbList} />
-        <div className='border rounded-md p-3'>
+        <Card className='rounded-md px-3 py-2 gap-0 shadow-none'>
             <div className="flex justify-between mb-1">
                 <h1 className="text-xl text-violet-700 font-semibold">
                     Add Category
@@ -68,7 +70,7 @@ const AddCategoryPage = () => {
 
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.categories.categories}>
-                            Back to Categories
+                            Show Categories
                         </Link>
                     </Button>
                 </div>
@@ -104,7 +106,24 @@ const AddCategoryPage = () => {
                                     </FormItem>
                                 )}
                             />
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="Write the description"
+                                                className="resize-none"
+                                                {...field}
+                                            />
+                                        </FormControl>
 
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <ButtonLoading
                                 type="submit"
                                 loading={form.formState.isSubmitting}
@@ -114,7 +133,7 @@ const AddCategoryPage = () => {
                     </Form>
                 </CardContent>
             </Card>
-        </div>
+        </Card>
     </div>
     )
 }

@@ -7,10 +7,10 @@ export default function UserLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div>
+        <div className="max-w-[1600px] mx-auto">
             <Navbar />
             <main>{children}</main>
-            <Footer />
+            {/* <Footer /> */}
         </div>
     );
 }

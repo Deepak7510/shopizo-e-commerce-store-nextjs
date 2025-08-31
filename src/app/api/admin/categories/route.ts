@@ -21,7 +21,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
         const globalFilter = searchParams.get("globalFilter") || "";
 
         if (!["SD", "PD"].includes(deleteType)) {
-            throw new ApiError(403, "Invalid delete type.");
+            throw new ApiError(403, "Invalid delete type");
         }
 
         const pipeline: any[] = [];
@@ -64,6 +64,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                 _id: 1,
                 name: 1,
                 slug: 1,
+                description: 1,
                 createdAt: 1,
                 updatedAt: 1,
                 deletedAt: 1

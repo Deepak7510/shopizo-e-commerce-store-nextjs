@@ -10,6 +10,7 @@ export type TypeOfSubcategoryData = {
     name: string;
     slug: string;
     category: TypeOfCategoryData;
+    description: string;
     createdAt: Date;
     updatedAt: Date;
 };

@@ -22,17 +22,17 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
             throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
-        const { name, slug } = checkValidation.data
+        const { slug } = checkValidation.data
 
         const checkBrandExisting = await BrandModel.findOne<IBrand>({ slug });
 
         if (checkBrandExisting) {
-            throw new ApiError(400, "Brand already exist")
+            throw new ApiError(401, "Already exist")
         }
 
-        await BrandModel.create<IBrand>({ name, slug });
+        await BrandModel.create<IBrand>(checkValidation.data);
 
-        return apiResponse(201, "Brand added successfully")
+        return apiResponse(201, "Added Successfully")
     } catch (error) {
         return errorHandler(error)
     }

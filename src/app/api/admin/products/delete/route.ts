@@ -17,7 +17,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         const { deleteType, selectedIdList } = body
 
         if (!["SD", "RSD"].includes(deleteType)) {
-            throw new ApiError(401, "Invalid delete type.");
+            throw new ApiError(401, "Invalid delete type");
         }
 
         if (deleteType === "SD") {
@@ -27,8 +27,8 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         }
 
         const message = deleteType === "SD"
-            ? "Product moved to trash successfully."
-            : "Product restored successfully.";
+            ? "Moved to trash"
+            : "Restored successfully";
         return apiResponse(200, message)
 
     } catch (error) {
@@ -46,12 +46,12 @@ export const DELETE = async function (request: NextRequest): Promise<NextRespons
         const { deleteType, selectedIdList } = body
 
         if (deleteType !== "PD") {
-            throw new ApiError(401, "Invalid delete type.");
+            throw new ApiError(401, "Invalid delete type");
         }
 
         await ProductModel.deleteMany({ _id: { $in: selectedIdList } });
 
-        return apiResponse(200, "Product deleted successfully.")
+        return apiResponse(200, "Deleted successfully")
 
     } catch (error) {
         return errorHandler(error)

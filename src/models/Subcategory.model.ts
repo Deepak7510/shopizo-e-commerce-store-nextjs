@@ -4,6 +4,7 @@ export interface ISubcategory extends Document {
     name: string;
     slug: string;
     category: ObjectId;
+    description: string,
     deletedAt: Date;
     createdAt: Date;
     updatedAt: Date;
@@ -14,18 +15,21 @@ const subcategorySchema = new mongoose.Schema<ISubcategory>(
         name: {
             type: String,
             required: true,
-            unique: true,
         },
         slug: {
             type: String,
             required: true,
             unique: true,
+            lowercase: true,
             trim: true,
         },
         category: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Category",
             required: true,
+        },
+        description: {
+            type: String
         },
         deletedAt: {
             type: Date,
@@ -38,5 +42,5 @@ const subcategorySchema = new mongoose.Schema<ISubcategory>(
 
 const SubcategoryModel =
     mongoose.models.Subcategory ||
-    mongoose.model("Subcategory", subcategorySchema);
+    mongoose.model<ISubcategory>("Subcategory", subcategorySchema);
 export default SubcategoryModel;

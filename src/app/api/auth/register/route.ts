@@ -27,10 +27,10 @@ export const POST = async function (req: NextRequest): Promise<NextResponse> {
 
         const checkUser = await User.exists({ email });
         if (checkUser) {
-            throw new ApiError(409, "Email already registered.");
+            throw new ApiError(409, "Email already registered");
         }
 
-        const newUser: IUser = new User({ name, email, password });
+        const newUser = new User({ name, email, password });
         await newUser.save();
 
         const token = await generateToken({ userId: String(newUser._id) }, "10m");
@@ -44,11 +44,11 @@ export const POST = async function (req: NextRequest): Promise<NextResponse> {
         );
 
         if (!result.success) {
-            throw apiResponse(400, "Registration failed.");
+            throw apiResponse(400, "Registration failed");
         }
 
         await VerifyTokenModel.create<IVerifyToken>({ email, token });
-        return apiResponse(201, "Registration successful.", null, "EMAIL_VERIFICATION");
+        return apiResponse(201, "Registration successful", null, "EMAIL_VERIFICATION");
     } catch (error) {
         return errorHandler(error as Error);
     }

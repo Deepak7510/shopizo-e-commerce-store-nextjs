@@ -17,9 +17,9 @@ export const verifyToken = async function (token: string): Promise<typeOfVerifyT
         return payload as typeOfVerifyTokenResult;
     } catch (error: any) {
         if (error.name === "TokenExpiredError") {
-            throw new ApiError(401, "Token expired.");
+            throw new ApiError(401, "Token expired");
         } else {
-            throw new ApiError(401, "Invalid token.");
+            throw new ApiError(401, "Invalid token");
         }
     }
 }

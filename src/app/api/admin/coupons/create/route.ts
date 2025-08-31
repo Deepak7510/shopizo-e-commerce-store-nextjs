@@ -27,12 +27,12 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
         const checkCouponExisting = await CouponModel.findOne({ code });
 
         if (checkCouponExisting) {
-            throw new ApiError(400, "Coupon already exist");
+            throw new ApiError(400, "Already exist");
         }
 
         await CouponModel.create<ICoupon>(checkValidation.data);
 
-        return apiResponse(201, "Coupon added successfully");
+        return apiResponse(201, "Added successfully");
 
     } catch (error) {
         return errorHandler(error);

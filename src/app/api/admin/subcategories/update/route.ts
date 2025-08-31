@@ -23,7 +23,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
             throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
-        const { _id, name, slug, category } = checkValidation.data;
+        const { _id, name, slug, category, description } = checkValidation.data;
 
         if (!isValidObjectId(_id)) {
             throw new ApiError(400, "Invalid data Id",);
@@ -35,7 +35,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
             throw new ApiError(403, "Subcategory already added");
         }
 
-        const updatedCategory = await SubcategoryModel.findByIdAndUpdate<ISubcategory>(_id, { name, slug, category }, { new: true });
+        const updatedCategory = await SubcategoryModel.findByIdAndUpdate<ISubcategory>(_id, { name, slug, category, description }, { new: true });
 
         if (!updatedCategory) {
             throw new ApiError(404, "Subcategory not found");

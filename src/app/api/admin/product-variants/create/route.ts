@@ -35,7 +35,7 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
 
         await ProductVariantModel.create(checkValidation.data);
 
-        return apiResponse(201, "Product variant added successfully");
+        return apiResponse(201, "Added successfully");
     } catch (error) {
         return errorHandler(error);
     }

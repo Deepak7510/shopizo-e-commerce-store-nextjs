@@ -43,7 +43,7 @@ const VerifyOtpPage: React.FC<VerifyOtpPageProps> = ({ params }) => {
 
     useEffect(() => {
         try {
-            const stored = sessionStorage.getItem("resendotpcooldownSec");
+            const stored = sessionStorage.getItem("resendOtpCoolDownSec");
             if (stored) {
                 const parsed = JSON.parse(stored);
                 if (!isNaN(parsed)) {
@@ -61,7 +61,7 @@ const VerifyOtpPage: React.FC<VerifyOtpPageProps> = ({ params }) => {
                 setCooldown(pre => {
                     let updated = pre - 1
                     try {
-                        sessionStorage.setItem("resendotpcooldownSec", JSON.stringify(updated));
+                        sessionStorage.setItem("resendOtpCoolDownSec", JSON.stringify(updated));
                     } catch (error) {
                         console.error("Failed to write cooldown from sessionStorage:", error);
                     }
@@ -70,13 +70,16 @@ const VerifyOtpPage: React.FC<VerifyOtpPageProps> = ({ params }) => {
             }, 1000)
         } else {
             if (intervalId.current) clearInterval(intervalId.current);
+            sessionStorage.removeItem("resendOtpCoolDownSec")
         }
 
         return () => {
-            if (intervalId.current) clearInterval(intervalId.current)
+            if (intervalId.current) {
+                clearInterval(intervalId.current)
+                intervalId.current = null;
+            }
         }
     }, [cooldown]);
-
 
 
     const form = useForm<TypeOfOtpInput>({

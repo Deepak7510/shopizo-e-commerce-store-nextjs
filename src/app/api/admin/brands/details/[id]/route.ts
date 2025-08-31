@@ -18,13 +18,13 @@ export const GET = async function (request: NextRequest, { params }: { params: P
             throw new ApiError(400, "Invalid data id");
         }
 
-        const brandDetails = await BrandModel.findById<IBrand>(id);
+        const brand = await BrandModel.findById<IBrand>(id);
 
-        if (!brandDetails) {
+        if (!brand) {
             throw new ApiError(404, "Brand not found");
         }
 
-        return apiResponse(200, "Brand details fetched successfully", { brandDetails })
+        return apiResponse(200, "Brand fetched successfully", { brand })
     } catch (error) {
         return errorHandler(error);
     }

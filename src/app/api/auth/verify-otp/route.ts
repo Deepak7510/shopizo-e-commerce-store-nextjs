@@ -24,13 +24,13 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
 
         const user = await User.findOne<IUser>({ email }).select("name email role");
         if (!user) {
-            throw new ApiError(404, "User is not found.");
+            throw new ApiError(404, "User is not found");
         }
 
 
         const existingOtp = await OTPModel.findOne<IOtp>({ email, otp });
         if (!existingOtp) {
-            throw new ApiError(429, "Invalid or expired OTP.");
+            throw new ApiError(429, "Invalid or expired OTP");
         }
 
         await OTPModel.deleteMany({ email });

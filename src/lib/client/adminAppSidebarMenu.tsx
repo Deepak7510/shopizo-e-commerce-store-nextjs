@@ -10,6 +10,8 @@ import {
     Users2,
     Star,
     Image,
+    Sun,
+    Square,
 } from "lucide-react";
 
 import { adminRoutes } from "./routes";
@@ -19,6 +21,11 @@ export const adminAppSidebarMenu = [
         title: "Dashboard",
         url: adminRoutes.dashboard,
         icon: <LayoutDashboard />
+    },
+    {
+        title: "Banners",
+        url: adminRoutes.banners.Banners,
+        icon: <Square />
     },
     {
         title: "Brands",
@@ -41,6 +48,11 @@ export const adminAppSidebarMenu = [
         icon: <Shirt />,
     },
     {
+        title: "Colors",
+        url: adminRoutes.colors.colors,
+        icon: <Sun />,
+    },
+    {
         title: "Product Variants",
         url: adminRoutes.productVariants.productVariants,
         icon: <PackageSearch />,
@@ -52,17 +64,17 @@ export const adminAppSidebarMenu = [
     },
     {
         title: "Orders",
-        url: "#",
+        url: adminRoutes.orders.orders,
         icon: <ShoppingCart />,
     },
     {
         title: "Customers",
-        url: "#",
+        url: adminRoutes.customers.customers,
         icon: <Users2 />,
     },
     {
         title: "Ratings & Reviews",
-        url: "#",
+        url: adminRoutes.reviews.reviews,
         icon: <Star />,
     },
     {

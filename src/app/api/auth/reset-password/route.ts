@@ -27,26 +27,26 @@ export const POST = async function (request: NextRequest) {
         const token = body?.token;
 
         if (!token) {
-            throw new ApiError(400, "Token is required to reset password.");
+            throw new ApiError(400, "Token is required to reset password");
         }
 
         const { userId } = await verifyToken(token);
 
         if (!userId) {
-            throw new ApiError(401, "Invalid or expired token.");
+            throw new ApiError(401, "Invalid or expired token");
         }
 
         const user = await User.findById<IUser>(userId);
 
         if (!user) {
-            throw new ApiError(404, "User not found.");
+            throw new ApiError(404, "User not found");
         }
 
         user.password = password;
         await user.save();
         await VerifyTokenModel.deleteMany({ email: (user.email) });
 
-        return apiResponse(200, "Your password has been reset successfully.");
+        return apiResponse(200, "Your password has been reset successfully");
 
     } catch (error) {
         return errorHandler(error)

@@ -18,16 +18,19 @@ export const GET = async function (request: NextRequest, { params }: { params: P
             throw new ApiError(400, "Invalid data id");
         }
 
-        const productVariantDetails = await ProductVariantModel.findById(id).populate({
+        const productVariant = await ProductVariantModel.findById(id).populate({
             path: "media",
             select: "secure_url"
+        }).populate({
+            path: "color",
+            select: "name"
         });
 
-        if (!productVariantDetails) {
+        if (!productVariant) {
             throw new ApiError(404, "Product Variant not found");
         }
 
-        return apiResponse(200, "Product Variant details fetched successfully", { productVariantDetails })
+        return apiResponse(200, "Product Variant fetched successfully", { productVariant })
     } catch (error) {
         return errorHandler(error);
     }

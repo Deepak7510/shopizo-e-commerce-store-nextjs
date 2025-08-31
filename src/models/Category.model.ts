@@ -3,18 +3,17 @@ import mongoose, { Document } from "mongoose"
 export interface ICategory extends Document {
     name: string,
     slug: string,
+    description: string,
     deletedAt: Date | null
     createAt: Date,
     updatedAt: Date
 }
-
 
 const categorySchema = new mongoose.Schema<ICategory>({
     name: {
         type: String,
         required: true,
         trim: true,
-        unique: true
     },
     slug: {
         type: String,
@@ -22,6 +21,9 @@ const categorySchema = new mongoose.Schema<ICategory>({
         trim: true,
         unique: true,
         lowercase: true
+    },
+    description: {
+        type: String,
     },
     deletedAt: {
         type: Date,
@@ -31,6 +33,6 @@ const categorySchema = new mongoose.Schema<ICategory>({
 }, { timestamps: true });
 
 
-const CategoryModel = mongoose.models.Category || mongoose.model("Category", categorySchema);
+const CategoryModel = mongoose.models.Category || mongoose.model<ICategory>("Category", categorySchema);
 
 export default CategoryModel

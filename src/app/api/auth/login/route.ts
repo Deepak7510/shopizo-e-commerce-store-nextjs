@@ -7,7 +7,7 @@ import generateOTP from "@/lib/server/generateOTP";
 import { generateToken } from "@/lib/server/generateToken";
 import { mailOtpVerifyTemplate } from "@/lib/server/mailOtpVerifyTemplate";
 import { sendMail } from "@/lib/server/sendMail";
-import OTPModel, { IOtp } from "@/models/Otp.model";
+import OTPModel from "@/models/Otp.model";
 import User, { IUser } from "@/models/User.model";
 import VerifyTokenModel, { IVerifyToken } from "@/models/Verifytoken.model";
 import { NextRequest, NextResponse } from "next/server";
@@ -32,12 +32,12 @@ export const POST = async function (req: NextRequest): Promise<NextResponse> {
 
         const user = await User.findOne<IUser>({ email });
         if (!user) {
-            throw new ApiError(409, "Invalid email or password credentials.");
+            throw new ApiError(409, "Invalid email or password credentials");
         }
 
         const checkPassword = await user.comparePassword(password!);
         if (!checkPassword) {
-            throw new ApiError(409, "Invalid email or password credentials.");
+            throw new ApiError(409, "Invalid email or password credentials");
         }
 
         if (!user.isEmailVerified) {
@@ -53,7 +53,7 @@ export const POST = async function (req: NextRequest): Promise<NextResponse> {
             await VerifyTokenModel.create<IVerifyToken>({ email, token });
             return apiResponse(
                 200,
-                "Email is not verified. A verification link has been sent.",
+                "Email is not verified. A verification link has been sent",
                 null,
                 "EMAIL_VERIFICATION"
             );
@@ -63,11 +63,11 @@ export const POST = async function (req: NextRequest): Promise<NextResponse> {
         const result = await sendMail("OTP Verification", email!, mailOtpVerifyTemplate(OTP));
 
         if (!result.success) {
-            throw new ApiError(500, "Failed to send OTP.");
+            throw new ApiError(500, "Failed to send OTP");
         }
         await OTPModel.deleteMany({ email });
         await OTPModel.create({ email, otp: OTP });
-        return apiResponse(200, "OTP has been sent successfully.", null, "OTP_VERIFICATION")
+        return apiResponse(200, "OTP has been sent successfully", null, "OTP_VERIFICATION")
 
     } catch (error) {
         return errorHandler(error);

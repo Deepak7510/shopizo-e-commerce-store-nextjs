@@ -5,7 +5,7 @@ import BreadCrumb, {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, Plus } from "lucide-react";
+import { ArrowUpDown, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
@@ -21,6 +21,8 @@ import {
 import { MoreVertical } from "lucide-react";
 import EditAction from "@/components/application/admin/EditAction";
 import DeleteAction from "@/components/application/admin/DeleteAction";
+import { Card } from "@/components/ui/card";
+import { dateResolver, stringShorter } from "@/lib/client/helperFunction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -74,7 +76,21 @@ const brandsColumns: ColumnDef<TypeOfBrandData, unknown>[] = [
         accessorKey: "slug",
         header: "Slug",
     },
-
+    {
+        accessorKey: "description",
+        header: "Description",
+        cell: ({ row }) => {
+            return <span>{(row.original.description && stringShorter(row.original.description, 3)) || "-"}</span>
+        }
+    },
+    {
+        accessorKey: "website",
+        header: "Website",
+        cell: ({ row }) => {
+            const website = row.original.website;
+            return website ? <a className="underline text-violet-700" href={row.original.website || "#"} target="_blank">link</a> : "-"
+        }
+    },
     {
         accessorKey: "createdAt",
         header: "Created At",
@@ -82,11 +98,7 @@ const brandsColumns: ColumnDef<TypeOfBrandData, unknown>[] = [
             const date = new Date(row.getValue("createdAt"));
             return (
                 <span>
-                    {date.toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                    })}
+                    {dateResolver(date)}
                 </span>
             );
         },
@@ -98,11 +110,7 @@ const brandsColumns: ColumnDef<TypeOfBrandData, unknown>[] = [
             const date = new Date(row.getValue("updatedAt"));
             return (
                 <span>
-                    {date.toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                    })}
+                    {dateResolver(date)}
                 </span>
             );
         },
@@ -144,12 +152,12 @@ const BrandsPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">Brands</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.brands.addBrands}>
-                            <Plus />
+                            <PlusCircle />
                             Add Brand
                         </Link>
                     </Button>
@@ -164,7 +172,7 @@ const BrandsPage = () => {
                     deleteType={deleteType}
                     fetchDataURL={fetchDataURL}
                 />
-            </div>
+            </Card>
         </div>
     );
 };

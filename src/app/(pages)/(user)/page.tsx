@@ -1,10 +1,36 @@
-import { Button } from "@/components/ui/button";
+import BigPromoBanner from "@/components/application/user/BigPromoBanner";
+import FeaturesProducts from "@/components/application/user/FeaturesProducts";
+import { MainSlider } from "@/components/application/user/MainSlider";
+import PromoBanner from "@/components/application/user/PromoBanner";
 
 export default async function HomePage() {
-  await new Promise((resolve) => setTimeout(resolve, 3000)); // 3 sec delay
   return (
-    <div>
-      <Button>E-Store</Button>
-    </div>
+    <>
+      {/* slider seaction  */}
+      <MainSlider />
+      <div className="px-20">
+
+        {/* promotion Section  */}
+        <section className="my-15">
+          <PromoBanner />
+        </section>
+
+        {/* Normal Banner  */}
+        <section className="my-15">
+          <BigPromoBanner />
+        </section>
+
+
+        {/* features Product Section  */}
+        <section className="my-15">
+          <FeaturesProducts />
+        </section>
+
+
+
+      </div>
+
+
+    </>
   );
 }

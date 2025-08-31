@@ -1,5 +1,4 @@
 "use client"
-
 import ApplicationLogo from '@/components/application/common/ApplicationLogo'
 import { ButtonLoading } from '@/components/application/common/ButtonLoading'
 import { Button } from '@/components/ui/button'
@@ -40,7 +39,7 @@ const ResetPassowrdPage: React.FC<ResetPassowrdPageProps> = ({ params }) => {
     async function onSubmit(value: TypeOfResetPasswordInput) {
 
         if (!token) {
-            toast.error("Token is required to reset password.");
+            toast.error("Token is required to reset password");
             return
         }
 

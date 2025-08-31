@@ -29,8 +29,8 @@ export const PUT = async function (req: NextRequest): Promise<NextResponse> {
         }
 
         const message = deleteType === "SD"
-            ? "Category moved to trash successfully"
-            : "Category restored successfully";
+            ? "Moved to trash"
+            : "Restored successfully";
 
         return apiResponse(200, message);
 
@@ -54,7 +54,7 @@ export const DELETE = async function (req: NextRequest): Promise<NextResponse> {
 
         await CategoryModel.deleteMany({ _id: { $in: selectedIdList } });
 
-        return apiResponse(200, "Category deleted successfully");
+        return apiResponse(200, "Deleted successfully");
 
     } catch (error) {
         return errorHandler(error)

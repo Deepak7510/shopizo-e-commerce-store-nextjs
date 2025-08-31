@@ -32,7 +32,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
         const checkProduct = await ProductModel.findOne<IProduct>({ slug, _id: { $ne: _id } });
 
         if (checkProduct) {
-            throw new ApiError(403, "Product already exist");
+            throw new ApiError(403, "Already exist");
         }
 
         const updatedProduct = await ProductModel.findByIdAndUpdate<IProduct>(_id, checkValidation.data, { new: true });
@@ -41,7 +41,7 @@ export const PUT = async function (request: NextRequest): Promise<NextResponse> 
             throw new ApiError(404, "Product not found");
         }
 
-        return apiResponse(200, "Product updated successfully");
+        return apiResponse(200, "Updated successfully");
     } catch (error) {
         return errorHandler(error)
 

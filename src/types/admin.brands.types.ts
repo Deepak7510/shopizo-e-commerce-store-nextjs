@@ -8,6 +8,8 @@ export type TypeOfBrandData = {
     _id: string;
     name: string;
     slug: string;
+    description: string,
+    website: string,
     createdAt: string;
     deletedAt: string;
     updatedAt: string;

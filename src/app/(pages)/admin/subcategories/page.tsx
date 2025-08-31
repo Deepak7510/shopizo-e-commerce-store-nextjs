@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, MoreVertical, Plus } from "lucide-react";
+import { ArrowUpDown, MoreVertical, Plus, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
@@ -16,6 +16,8 @@ import { TypeOfSubcategoryData } from "@/types/admin.subcategories.types";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EditAction from "@/components/application/admin/EditAction";
 import DeleteAction from "@/components/application/admin/DeleteAction";
+import { Card } from "@/components/ui/card";
+import { dateResolver, stringShorter } from "@/lib/client/helperFunction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -72,13 +74,18 @@ export const subCategoriesColumns: ColumnDef<
             accessorKey: "slug",
             header: "Slug",
         },
-
         {
             accessorKey: "category.name",
             header: "Category",
             cell: ({ row }) => row.original.category?.name || "-",
         },
-
+        {
+            accessorKey: "description",
+            header: "Description",
+            cell: ({ row }) => {
+                return <span>{(row.original.description && stringShorter(row.original.description, 3)) || "-"}</span>
+            }
+        },
         {
             accessorKey: "createdAt",
             header: "Created At",
@@ -86,11 +93,7 @@ export const subCategoriesColumns: ColumnDef<
                 const date = new Date(row.getValue("createdAt"));
                 return (
                     <span>
-                        {date.toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                        })}
+                        {dateResolver(date)}
                     </span>
                 );
             },
@@ -102,11 +105,7 @@ export const subCategoriesColumns: ColumnDef<
                 const date = new Date(row.getValue("updatedAt"));
                 return (
                     <span>
-                        {date.toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                        })}
+                        {dateResolver(date)}
                     </span>
                 );
             },
@@ -148,12 +147,12 @@ const SubcategoriesPage = () => {
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
-            <div className="border rounded-md p-3">
+            <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
                     <h1 className="text-xl text-violet-700 font-semibold">Subcategories</h1>
                     <Button asChild size={"sm"}>
                         <Link href={adminRoutes.subcategories.addSubcategory}>
-                            <Plus />
+                            <PlusCircle />
                             Add Subcategory
                         </Link>
                     </Button>
@@ -168,8 +167,8 @@ const SubcategoriesPage = () => {
                     fetchDataURL={fetchDataURL}
                     Action={Action}
                 />
-            </div>
-        </div>
+            </Card>
+        </div >
     );
 };
 

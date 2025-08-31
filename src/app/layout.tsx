@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
-// import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import GlobalLayout from "@/components/application/common/GlobalLayout";
 import { ThemeProvider } from "@/components/application/common/ThemeProvider";
 import GlobalProvider from "@/components/application/common/GlobalProvider";
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
 
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Shopizo",
@@ -22,17 +15,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-
-
-
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`antialiased`}
-      >
+    <html lang="en" className={`${inter.className} antialiased`} suppressHydrationWarning>
+      <body>
         <GlobalProvider>
           <ThemeProvider
             attribute="class"
@@ -45,7 +33,6 @@ export default function RootLayout({
               <Toaster position="top-right" richColors />
             </GlobalLayout>
           </ThemeProvider>
-
         </GlobalProvider>
       </body>
     </html>
