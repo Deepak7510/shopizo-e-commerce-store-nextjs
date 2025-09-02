@@ -51,12 +51,10 @@ const breadcrumbList: breadcrumbListType[] = [
 
 const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const router = useRouter()
-    const { id } = use(params)
+    const { id } = use(params);
     const { data, error: couponError, loading: couponLoading } = useFetch(`/api/admin/coupons/details/${id}`, {}, [id])
 
-    if (couponError) {
-        return <div>{couponError.message || "Somthing went worng"}</div>
-    }
+
     const form = useForm<TypeOfEditCouponInput>({
         resolver: zodResolver(editCouponZodSchema),
         defaultValues: {
@@ -79,7 +77,11 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 validity: coupon?.validity || undefined,
             });
         }
-    }, [data, form])
+    }, [data, form]);
+
+    if (couponError) {
+        return <div>{couponError.message || "Somthing went worng"}</div>
+    }
 
     async function onSubmit(data: TypeOfEditCouponInput) {
         const result = await updateCouponService(data);

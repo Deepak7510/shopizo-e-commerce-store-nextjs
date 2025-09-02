@@ -83,6 +83,19 @@ const AddProductPage = () => {
         },
     });
 
+    const {
+        data: brandData,
+        loading: brandLoading,
+        error: brandError,
+    } = useFetch(`/api/admin/brands/get-all`, {}, []);
+    const {
+        data: categoryData,
+        loading: categoryLoading,
+        error: categoryError,
+    } = useFetch(`/api/admin/categories/get-all`, {}, []);
+
+    const brands = brandData?.data?.brands as TypeOfBrandData[];
+    const categories = categoryData?.data?.categories as TypeOfCategoryData[];
 
     useEffect(() => {
         const title = form.watch("title");
@@ -97,20 +110,6 @@ const AddProductPage = () => {
         }
     }, [selectedMedia, form]);
 
-
-    const {
-        data: brandData,
-        loading: brandLoading,
-        error: brandError,
-    } = useFetch(`/api/admin/brands/get-all`, {}, []);
-    const {
-        data: categoryData,
-        loading: categoryLoading,
-        error: categoryError,
-    } = useFetch(`/api/admin/categories/get-all`, {}, []);
-
-    const brands = brandData?.data?.brands as TypeOfBrandData[];
-    const categories = categoryData?.data?.categories as TypeOfCategoryData[];
 
     useEffect(() => {
         if (form.watch("category")) {
@@ -147,6 +146,7 @@ const AddProductPage = () => {
             </div>
         );
     }
+
 
     async function onSubmit(data: TypeOfAddProductInput) {
         const result = await createProductService(data);

@@ -133,7 +133,7 @@ const MediaPage = () => {
         if (allMediaList?.length === selectedMedia.length) {
             setSelectedMedia([]);
         } else {
-            const allMediasId = allMediaList?.map((media) => media._id)!;
+            const allMediasId = allMediaList?.map((media) => media._id) || [];
             setSelectedMedia(allMediasId);
         }
     }

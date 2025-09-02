@@ -88,6 +88,24 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
 
+    const form = useForm<TypeOfEditProductVarinatInput>({
+        resolver: zodResolver(editProductVarinatZodSchema),
+        defaultValues: {
+            _id: "",
+            productId: "",
+            sku: "",
+            size: "",
+            color: "",
+            material: "",
+            stock: 0,
+            mrp: 0,
+            sellingPrice: 0,
+            discountPercentage: 0,
+            media: [],
+            isDefault: false
+        },
+    });
+
     const {
         data: productData,
         loading: productLoading,
@@ -106,36 +124,8 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
         error: colorError,
     } = useFetch(`/api/admin/colors/get-all`, {}, []);
 
-    if (productError || productVariantError || colorError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {productError?.message ||
-                    productVariantError?.message || colorError?.message ||
-                    "Something went worng."}
-            </div>
-        );
-    }
-
     const products = productData?.data?.products;
     const colors = colorData?.data?.colors
-
-    const form = useForm<TypeOfEditProductVarinatInput>({
-        resolver: zodResolver(editProductVarinatZodSchema),
-        defaultValues: {
-            _id: "",
-            productId: "",
-            sku: "",
-            size: "",
-            color: "",
-            material: "",
-            stock: 0,
-            mrp: 0,
-            sellingPrice: 0,
-            discountPercentage: 0,
-            media: [],
-            isDefault: false
-        },
-    });
 
     useEffect(() => {
         const mrp = form.watch("mrp");
@@ -176,6 +166,15 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
     }, [productVariantData, form]);
 
 
+    if (productError || productVariantError || colorError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {productError?.message ||
+                    productVariantError?.message || colorError?.message ||
+                    "Something went worng."}
+            </div>
+        );
+    }
 
     async function onSubmit(data: TypeOfEditProductVarinatInput) {
         const result = await updateProductVariantService(data);
@@ -465,7 +464,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
                                             <FormField
                                                 control={form.control}
                                                 name="media"
-                                                render={({ field }) => (
+                                                render={() => (
                                                     <FormItem className="flex flex-col justify-center items-center">
                                                         <FormLabel>Media <span className="text-red-600">*</span> </FormLabel>
                                                         <FormControl>

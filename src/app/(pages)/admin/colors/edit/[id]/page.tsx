@@ -41,9 +41,7 @@ const EditColorPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const id = paramsValue.id;
     const { data, error, loading } = useFetch(`/api/admin/colors/details/${id}`, {}, [id]);
 
-    if (error) {
-        return <div className='text-base text-red-700 font-medium'>{error.message}</div>
-    }
+
 
 
     const form = useForm<TypeOfEditColorInput>({
@@ -77,6 +75,10 @@ const EditColorPage = ({ params }: { params: Promise<{ id: string }> }) => {
             })
         }
     }, [data, form])
+
+    if (error) {
+        return <div className='text-base text-red-700 font-medium'>{error.message}</div>
+    }
 
     async function onSubmit(data: TypeOfEditColorInput) {
         const result = await updateColorService(data);

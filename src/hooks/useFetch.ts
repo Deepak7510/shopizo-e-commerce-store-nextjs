@@ -1,53 +1,45 @@
-import axiosInstance from "@/lib/client/axios"
+import axiosInstance from "@/lib/client/axios";
 import { TypeOfAxoisResponse } from "@/types/axoisInstance.types";
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react";
 
-const useFetch = function (url: string, option = {}, dependencies: any[] = []) {
+const useFetch = (url: string, options = {}, dependencies: any[] = []) => {
     const [data, setData] = useState<TypeOfAxoisResponse | null>(null);
-    const [loading, setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false);
     const [refetchIndex, setRefetchIndex] = useState<number>(0);
     const [error, setError] = useState<TypeOfAxoisResponse | null>(null);
 
 
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await axiosInstance.get(url, options);
+            setData(response.data);
+            setError(null);
+        } catch (error: any) {
+            console.error("useFetch error", error);
+            setData(null);
+            setError(error.response?.data || error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [url, JSON.stringify(options)]);
+
+
     useEffect(() => {
         let isMounted = true;
-
-        async function fetchData() {
-            try {
-                setLoading(true);
-                const response = await axiosInstance.get(url, { ...option });
-                if (isMounted) {
-                    setData(response.data);
-                    setError(null);
-                }
-            } catch (error: any) {
-                if (isMounted) {
-                    console.error("useFetch error", error);
-                    setData(null);
-                    setError(error.response?.data || error.message);
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
-            }
+        if (url && isMounted) {
+            fetchData();
         }
-
-        if (url) fetchData();
-
         return () => {
             isMounted = false;
         };
-    }, [...dependencies, option, url, refetchIndex]);
+    }, [fetchData, refetchIndex, ...dependencies]);
 
+    const refetch = useCallback(() => {
+        setRefetchIndex((prev) => prev + 1);
+    }, []);
 
-
-    function refetch() {
-        setRefetchIndex(pre => pre + 1)
-    }
-
-
-    return { data, loading, error, refetch }
-}
+    return { data, loading, error, refetch };
+};
 
 export default useFetch;

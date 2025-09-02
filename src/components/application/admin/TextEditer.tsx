@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Editor, EditorState, RichUtils } from "draft-js";
+import { Editor, EditorState, RichUtils } from "draft-js"; // error hai 
 import "draft-js/dist/Draft.css";
 
 export default function TextEditor() {

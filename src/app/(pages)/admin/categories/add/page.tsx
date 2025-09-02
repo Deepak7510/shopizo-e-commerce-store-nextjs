@@ -47,7 +47,7 @@ const AddCategoryPage = () => {
     useEffect(() => {
         const slugValue = slugify(categoryName.toLowerCase())
         form.setValue("slug", slugValue)
-    }, [categoryName])
+    }, [categoryName, form])
 
     async function onSubmit(data: TypeOfAddCategoryInput) {
         const result = await createCategoryService(data);

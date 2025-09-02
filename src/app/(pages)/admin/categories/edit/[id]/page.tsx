@@ -42,9 +42,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const router = useRouter()
     const { data, loading, error } = useFetch(`/api/admin/categories/details/${id}`, {}, [id]);
 
-    if (error) {
-        return <div className='text-xl text-red-700 font-medium'>{error.message}</div>
-    }
+
 
     const form = useForm<TypeOfEditCategoryInput>({
         resolver: zodResolver(editCatgeoryZodSchema),
@@ -86,6 +84,10 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return router.push(adminRoutes.categories.categories);
     }
 
+
+    if (error) {
+        return <div className='text-xl text-red-700 font-medium'>{error?.message}</div>
+    }
 
 
     return (<div className='space-y-3'>

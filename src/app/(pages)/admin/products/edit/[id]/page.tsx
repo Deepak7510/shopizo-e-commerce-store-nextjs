@@ -1,4 +1,5 @@
 "use client";
+
 import BreadCrumb, {
     breadcrumbListType,
 } from "@/components/application/common/BreadCrumb";
@@ -79,26 +80,11 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         error: categoryError,
     } = useFetch(`/api/admin/categories/get-all`, {}, []);
 
-
     const {
         data: productData,
         loading: productDataLoading,
         error: productDataError,
     } = useFetch(`/api/admin/products/details/${id}`, {}, [id]);
-
-    if (brandError || categoryError || productDataError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {brandError?.message ||
-                    categoryError?.message ||
-                    productDataError?.message ||
-                    "Something went worng."}
-            </div>
-        );
-    }
-
-    const brands = brandData?.data?.brands as TypeOfBrandData[];
-    const categories = categoryData?.data?.categories as TypeOfCategoryData[];
 
     const form = useForm<TypeOfEditProductInput>({
         resolver: zodResolver(editProductZodSchema),
@@ -114,11 +100,18 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         },
     });
 
+    const brands = brandData?.data?.brands as TypeOfBrandData[];
+    const categories = categoryData?.data?.categories as TypeOfCategoryData[];
+
+
+
+    const watchedTitle = form.watch("title");
+    const watchedCategory = form.watch("category");
+
     useEffect(() => {
-        const title = form.watch("title");
-        const slugValue = slugify(title.toLowerCase());
+        const slugValue = slugify(watchedTitle.toLowerCase());
         form.setValue("slug", slugValue);
-    }, [form.watch("title"), form]);
+    }, [watchedTitle, form]);
 
     useEffect(() => {
         if (selectedMedia && selectedMedia.length > 0) {
@@ -127,12 +120,11 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         }
     }, [selectedMedia, form]);
 
-
     useEffect(() => {
-        if (form.watch("category")) {
+        if (watchedCategory) {
             async function fetchSubcategories() {
                 try {
-                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${form.watch("category")}`);
+                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${watchedCategory}`);
                     const subcategories = response.data.data.subcategories;
                     setSubcategories(subcategories);
                 } catch (error: any) {
@@ -141,7 +133,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             }
             fetchSubcategories();
         }
-    }, [form.watch("category"), form]);
+    }, [watchedCategory]);
 
     useEffect(() => {
         if (productData?.data?.product) {
@@ -158,8 +150,18 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             })
             setSelectedMedia(product.media)
         }
-    }, [productData])
+    }, [productData, form])
 
+    if (brandError || categoryError || productDataError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {brandError?.message ||
+                    categoryError?.message ||
+                    productDataError?.message ||
+                    "Something went wrong."}
+            </div>
+        );
+    }
 
     async function onSubmit(data: TypeOfEditProductInput) {
         const result = await updateProductService(data);
@@ -389,7 +391,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                                 className="w-full md:min-w-md"
                                                                 variant={"outline"}
                                                             >
-                                                                Choese Media
+                                                                Choose Media
                                                             </Button>
                                                         </FormControl>
                                                         <FormMessage />
@@ -430,4 +432,3 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 };
 
 export default EditProductPage;
-

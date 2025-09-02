@@ -42,12 +42,6 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
     const paramsValue = use(params)
     const { data, error, loading } = useFetch(`/api/admin/media/details/${paramsValue.id}`, {}, [paramsValue.id]);
 
-    if (error) {
-        return <div className='text-red-700'>
-            {error.message}
-        </div>
-    }
-
     const form = useForm<TypeOfEditMedia>({
         resolver: zodResolver(editMediaZodSchema),
         defaultValues: {
@@ -84,7 +78,12 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
         });
     }
 
-    paramsValue.id
+    if (error) {
+        return <div className='text-red-700'>
+            {error.message}
+        </div>
+    }
+
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />

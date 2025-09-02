@@ -85,30 +85,6 @@ const AddProductVariantPage = () => {
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
 
-    const {
-        data: productData,
-        loading: productLoading,
-        error: productError,
-    } = useFetch(`/api/admin/products/get-all`, {}, []);
-
-    const {
-        data: colorData,
-        loading: colorLoading,
-        error: colorError,
-    } = useFetch(`/api/admin/colors/get-all`, {}, []);
-
-    if (productError || colorError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {productError?.message || colorError?.message ||
-                    "Something went worng."}
-            </div>
-        );
-    }
-
-    const products = productData?.data?.products;
-    const colors = colorData?.data?.colors;
-
 
     const form = useForm<TypeOfAddProductVarinatInput>({
         resolver: zodResolver(addProductVarinatZodSchema),
@@ -127,6 +103,21 @@ const AddProductVariantPage = () => {
         },
     });
 
+    const {
+        data: productData,
+        loading: productLoading,
+        error: productError,
+    } = useFetch(`/api/admin/products/get-all`, {}, []);
+
+    const {
+        data: colorData,
+        loading: colorLoading,
+        error: colorError,
+    } = useFetch(`/api/admin/colors/get-all`, {}, []);
+
+    const products = productData?.data?.products;
+    const colors = colorData?.data?.colors;
+
     useEffect(() => {
         const mrp = form.watch("mrp");
         const sellingPrice = form.watch("sellingPrice");
@@ -142,6 +133,15 @@ const AddProductVariantPage = () => {
             form.setValue("media", mediaIds);
         }
     }, [selectedMedia, form]);
+
+    if (productError || colorError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {productError?.message || colorError?.message ||
+                    "Something went worng."}
+            </div>
+        );
+    }
 
     async function onSubmit(data: TypeOfAddProductVarinatInput) {
         const result = await createproductVariantService(data);
@@ -435,7 +435,7 @@ const AddProductVariantPage = () => {
                                             <FormField
                                                 control={form.control}
                                                 name="media"
-                                                render={({ field }) => (
+                                                render={() => (
                                                     <FormItem className="flex flex-col justify-center items-center">
                                                         <FormLabel>Media <span className="text-red-600">*</span> </FormLabel>
                                                         <FormControl>
