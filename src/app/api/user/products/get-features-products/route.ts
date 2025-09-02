@@ -17,48 +17,28 @@ export const GET = async function (request: NextRequest): Promise<NextResponse> 
                     as: "brand"
                 }
             },
+
             {
                 $unwind: {
                     path: "$brand",
                     preserveNullAndEmptyArrays: true
                 }
             },
-
             {
                 $lookup: {
-                    from: "productvariants",
-                    let: { productId: "$_id" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ["$productId", "$$productId"] },
-                                        { $eq: ["$isDefault", true] }
-                                    ]
-                                }
-                            }
-                        },
-                        { $limit: 1 },
-                        {
-                            $lookup: {
-                                from: "media",
-                                localField: "media",
-                                foreignField: "_id",
-                                as: "media"
-                            }
-                        }
-                    ],
-                    as: "defaultVariant"
+                    from: "media",
+                    localField: "media",
+                    foreignField: "_id",
+                    as: "media"
                 }
             },
             {
-                $match: {
-                    "defaultVariant.0": { $exists: true }
-                }
+                $limit: 10
             },
             {
-                $limit: 8
+                $sort: {
+                    _id: -1
+                }
             },
             {
                 $project: {
@@ -69,7 +49,10 @@ export const GET = async function (request: NextRequest): Promise<NextResponse> 
                         _id: "$brand._id",
                         name: "$brand.name",
                     },
-                    defaultVariant: 1
+                    media: 1,
+                    mrp: 1,
+                    sellingPrice: 1,
+                    discountPercentage: 1,
                 }
             }
         ];

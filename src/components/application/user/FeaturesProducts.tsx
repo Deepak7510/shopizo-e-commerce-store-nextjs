@@ -16,19 +16,18 @@ const fetchProduct = async function () {
 
 const FeaturesProducts = async () => {
   const result = await fetchProduct();
-  console.log(result)
 
   return (
     <div>
       <div className="flex justify-between items-center mb-5">
-        <h2 className='mb-5 font-medium text-2xl underline'>
+        <h2 className='font-medium  text-xl md:text-2xl underline'>
           Features Products
         </h2>
-        <Button className='px-5 rounded-full' size={"sm"} variant={"outline"}>
+        <Button className='px-5 rounded-full' size={"sm"} variant={"secondary"}>
           View All
         </Button>
       </div>
-      <div className='grid sm:grid-cols-2 md:grid-cols-5 gap-10'>
+      <div className='grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-10'>
         {
           result && result?.data?.products && result?.data?.products.length > 0 ?
             result.data.products.map((productItem: any) => {

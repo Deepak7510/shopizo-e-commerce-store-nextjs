@@ -8,6 +8,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import Image from 'next/image';
 import React, { SetStateAction, useEffect, useState } from 'react'
+import { ButtonLoading } from '../common/ButtonLoading';
+import MediaCardSkeleton from './MediaCardSkeleton';
 
 type SelectMediaModelProps = {
     openSelectMediaModel: boolean;
@@ -67,6 +69,42 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
                     <DialogTitle>Select Media</DialogTitle>
                 </AlertDialogHeader>
                 <div className="border h-[calc(100vh-8rem)] overflow-auto p-1 rounded">
+                    <>
+                        {status === "pending" ? (
+                            <div className="grid grid-cols-5 gap-2">
+                                {Array(10)
+                                    .fill(null)
+                                    .map((_, index) => (
+                                        <MediaCardSkeleton key={index} />
+                                    ))}
+                            </div>
+                        ) : status === "error" ? (
+                            <div>error</div>
+                        ) : allMediaList && allMediaList?.length > 0 ? (
+                            <div className="grid grid-cols-5 gap-2">
+                                {allMediaList?.map((media) => {
+                                    return <div onClick={() => handleSelecteMediaList(media)} key={media._id} className="border rounded overflow-hidden space-y-2">
+                                        <div className="h-64 relative">
+                                            <Image
+                                                src={media.secure_url}
+                                                alt={media.alt || "Media Image"}
+                                                className="object-cover w-full h-full"
+                                                width={300}
+                                                height={300}
+                                            />
+                                            <div className={`w-full h-full flex justify-center items-center top-0 absolute bg-gray-800 ${selecteMediaList.findIndex(mediItem => mediItem._id === media._id) >= 0 ? "opacity-50" : "opacity-0"}`}>
+                                                <Check className="text-white w-10 h-10" />
+                                            </div>
+                                        </div>
+                                        <h2 className="text-sm font-medium px-2 line-clamp-1">{media.title || "No Title"}</h2>
+                                    </div>
+                                })}
+                            </div>
+                        ) : (
+                            <div>No Media</div>
+                        )}
+                    </>
+
                     <div className="grid grid-cols-5 gap-2">
                         {allMediaList?.map((media) => {
                             return <div onClick={() => handleSelecteMediaList(media)} key={media._id} className="border rounded overflow-hidden space-y-2">
@@ -86,13 +124,18 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
                             </div>
                         })}
                     </div>
-                    <div className='flex justify-center my-2'>
-                        {
-                            hasNextPage ?
-                                <Button size={"sm"} type="button" disabled={!hasNextPage} onClick={() => fetchNextPage()}>Load More</Button>
-                                :
-                                <div className='font-medium text-red-400'>No more media</div>
-                        }
+
+                    <div className="flex justify-center my-4">
+                        {hasNextPage ? (
+                            <ButtonLoading
+                                type="button"
+                                text="Load More"
+                                onclick={() => fetchNextPage()}
+                                loading={isFetching}
+                            />
+                        ) : !isFetching && allMediaList?.length !== 0 ? (
+                            <p className="font-medium">No more media</p>
+                        ) : null}
                     </div>
                 </div>
 

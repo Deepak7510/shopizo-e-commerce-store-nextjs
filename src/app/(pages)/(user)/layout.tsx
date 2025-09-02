@@ -1,16 +1,18 @@
-import Navbar from "@/components/application/user/Navbar";
 import Footer from "@/components/application/user/Footer";
+import Navbar from "@/components/application/user/Navbar";
 
 export default function UserLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+
+
     return (
         <div className="max-w-[1600px] mx-auto">
             <Navbar />
-            <main>{children}</main>
-            {/* <Footer /> */}
+            <main className="mt-[80px]">{children}</main>
+            <Footer />
         </div>
     );
 }

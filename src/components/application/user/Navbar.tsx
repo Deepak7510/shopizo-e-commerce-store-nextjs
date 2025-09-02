@@ -17,7 +17,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { authRoutes } from "@/lib/client/routes";
+import { authRoutes, userRoutes } from "@/lib/client/routes";
 
 
 const NavCategories = () => {
@@ -25,9 +25,9 @@ const NavCategories = () => {
     const categories = data?.data?.allDataList as TypeOfCategoryData[]
 
     return <ul className="flex gap-8 font-medium">
-        <li className="hover:text-muted-foreground transition-all"> <Link href={''}>Home</Link></li>
+        <li className="hover:text-muted-foreground transition-all"> <Link href={userRoutes.home}>Home</Link></li>
         <li className="hover:text-muted-foreground transition-all"> <Link href={''}>About</Link></li>
-        <li className="hover:text-muted-foreground transition-all"> <Link href={''}>Products</Link></li>
+        <li className="hover:text-muted-foreground transition-all"> <Link href={userRoutes.products}>Products</Link></li>
         {
             !loading && categories && categories.length > 0 && categories.map(item => {
                 return <li key={item._id} className="hover:text-muted-foreground transition-all"><Link key={item._id} href={''}>{item.name}</Link></li>
@@ -57,12 +57,12 @@ const Navbar = () => {
 
 
     return (
-        <header className="w-full text-gray-600 z-50 sticky top-0 left-0 bg-background flex px-4 md:px-8 justify-between items-center h-20 border-b">
+        <header className="w-full text-muted-foreground z-50 fixed top-0 left-0 bg-background flex px-2 md:px-8 justify-between items-center h-18 md:h-20 border-b">
             <ApplicationLogo />
             <nav className="hidden md:block">
                 <NavCategories />
             </nav>
-            <div className="flex gap-2 justify-center items-center">
+            <div className="flex  gap-1 md:gap-2 justify-center items-center">
                 <Button onClick={() => setOpenSearch(pre => !pre)} size={"icon"} variant={"ghost"}><Search /></Button>
                 <ShoppingCart />
                 <ThemeButton />

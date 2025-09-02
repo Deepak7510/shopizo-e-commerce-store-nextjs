@@ -21,9 +21,9 @@ export const POST = async function (request: NextRequest): Promise<NextResponse>
             throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
         }
 
-        const { slug } = checkValidation.data;
+        const { slug, category } = checkValidation.data;
 
-        const checkSubcategoryExisting = await SubcategoryModel.findOne({ slug });
+        const checkSubcategoryExisting = await SubcategoryModel.findOne({ $and: [{ slug }, { category }] });
 
         if (checkSubcategoryExisting) {
             throw new ApiError(400, "Already exist");

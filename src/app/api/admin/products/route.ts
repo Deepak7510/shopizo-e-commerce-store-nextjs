@@ -143,11 +143,13 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                     name: "$brand.name",
                     slug: "$brand.slug"
                 },
+                mrp: 1,
+                sellingPrice: 1,
+                discountPercentage: 1,
                 description: 1,
                 media: 1,
                 createdAt: 1,
                 updatedAt: 1,
-                deletedAt: 1
             },
         });
 

@@ -75,8 +75,11 @@ const AddProductPage = () => {
             brand: "",
             category: "",
             subcategory: "",
-            media: [],
+            mrp: 0,
+            sellingPrice: 0,
+            discountPercentage: 0,
             description: "",
+            media: [],
         },
     });
 
@@ -125,6 +128,14 @@ const AddProductPage = () => {
         }
     }, [form.watch("category")]);
 
+    useEffect(() => {
+        const mrp = form.watch("mrp");
+        const sellingPrice = form.watch("sellingPrice");
+        if (mrp > 0 || sellingPrice > 0) {
+            const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
+            form.setValue("discountPercentage", discountPercentage);
+        }
+    }, [form.watch("mrp"), form.watch("sellingPrice")]);
 
 
     if (brandError || categoryError) {
@@ -178,7 +189,7 @@ const AddProductPage = () => {
                                         className="space-y-3"
                                     >
                                         <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
-                                            <div className="md:col-span-2">
+                                            <div>
                                                 <FormField
                                                     control={form.control}
                                                     name="title"
@@ -317,6 +328,65 @@ const AddProductPage = () => {
                                                                         )}
                                                                 </SelectContent>
                                                             </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="mrp"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>MRP <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Enter the MRP"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="sellingPrice"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Selling price <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Enter the Selling Price"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="discountPercentage"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Discount percentage <span className="text-red-600">*</span> </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    readOnly
+                                                                    type="number"
+                                                                    placeholder="Enter the Discount Percentage"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}

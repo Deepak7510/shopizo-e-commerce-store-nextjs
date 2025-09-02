@@ -102,6 +102,5 @@ export const adminRoutes = {
 
 export const userRoutes = {
     home: '/',
-
-
+    products: "/products"
 }

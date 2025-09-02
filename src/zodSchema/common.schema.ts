@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-const toNumber = (val: unknown) => {
-    if (val === "" || val === null || val === undefined) return undefined;
-    return Number(val);
+const toNumber = (val: unknown): number => {
+    if (val === "" || val === null || val === undefined) return 0;
+    const num = Number(val);
+    return isNaN(num) ? 0 : num;
 };
-
 const commonZodSchema = z.object({
     name: z
         .string()
@@ -27,17 +27,13 @@ const commonZodSchema = z.object({
         message: "Your one-time password must be 6 characters",
     }),
     token: z.string().nonempty("Token is required"),
-
     asset_id: z.string().nonempty("Asset id is required"),
     public_id: z.string().nonempty("Public id is required"),
     secure_url: z.string().url().nonempty("Secure url is required"),
     path: z.string().nonempty("Path url is required"),
     thumbnail_url: z.string().url().optional(),
     _id: z.string().nonempty("Id is required"),
-    title: z
-        .string()
-        .nonempty("Title is required")
-        .min(3, "Title must be at least 3 character long"),
+    title: z.string().nonempty("Title is required").min(3, "Title must be at least 3 characters"),
     alt: z
         .string()
         .nonempty("Alt is required")
@@ -46,15 +42,14 @@ const commonZodSchema = z.object({
         .string()
         .nonempty("Slug is required")
         .min(3, "Slug must be at least 3 character long"),
-    category: z.string().nonempty("Category Name is required"),
-    subcategory: z.string().nonempty("Subcategory Name is required"),
-    brand: z.string().nonempty("Brand Name is required"),
+    brand: z.string().nonempty("Brand is required"),
+    category: z.string().nonempty("Category is required"),
+    subcategory: z.string().nonempty("Subcategory is required"),
     media: z
         .array(z.string().nonempty("Media ID cannot be empty"))
         .min(1, "At least one media item is required"),
     description: z.string().optional(),
     website: z.string().optional(),
-
     productId: z.string().nonempty("Product id is required"),
     sku: z
         .string().nonempty("SKU is required")
@@ -79,30 +74,17 @@ const commonZodSchema = z.object({
     ),
     mrp: z.preprocess(
         toNumber,
-        z
-            .number({
-                required_error: "MRP is required",
-                invalid_type_error: "MRP must be a valid number",
-            })
+        z.number({ required_error: "MRP is required", invalid_type_error: "MRP must be a number" })
             .positive("MRP must be greater than 0")
     ),
-
     sellingPrice: z.preprocess(
         toNumber,
-        z
-            .number({
-                required_error: "Selling Price is required",
-                invalid_type_error: "Selling Price must be a valid number",
-            })
+        z.number({ required_error: "Selling Price is required", invalid_type_error: "Selling Price must be a number" })
             .positive("Selling Price must be greater than 0")
     ),
     discountPercentage: z.preprocess(
         toNumber,
-        z
-            .number({
-                required_error: "Discount Percentage is required",
-                invalid_type_error: "Discount Percentage must be a valid number",
-            })
+        z.number({ required_error: "Discount Percentage is required", invalid_type_error: "Discount must be a number" })
             .min(0, "Discount can't be negative")
             .max(100, "Discount can't be more than 100%")
     ),
@@ -131,9 +113,5 @@ const commonZodSchema = z.object({
     endDate: z.coerce.date(),
     isActive: z.boolean(),
 });
-
-
-
-
 
 export default commonZodSchema;

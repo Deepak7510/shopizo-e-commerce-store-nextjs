@@ -7,7 +7,6 @@ import { TypeOfSubcategoryData } from "./admin.subcategories.types";
 export type TypeOfAddProductInput = z.infer<typeof addProductZodSchema>
 export type TypeOfEditProductInput = z.infer<typeof editProductZodSchema>
 
-
 export type TypeOfProductData = {
     _id: string;
     title: string;
@@ -20,7 +19,6 @@ export type TypeOfProductData = {
     discountPercentage: number;
     description: string;
     media: any[]
-    deletedAt: Date | null
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 };

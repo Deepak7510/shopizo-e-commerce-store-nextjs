@@ -6,8 +6,11 @@ export const addProductZodSchema = commonZodSchema.pick({
     brand: true,
     category: true,
     subcategory: true,
-    media: true,
+    mrp: true,
+    sellingPrice: true,
+    discountPercentage: true,
     description: true,
+    media: true,
 });
 
 export const editProductZodSchema = commonZodSchema.pick({
@@ -17,6 +20,9 @@ export const editProductZodSchema = commonZodSchema.pick({
     brand: true,
     category: true,
     subcategory: true,
-    media: true,
+    mrp: true,
+    sellingPrice: true,
+    discountPercentage: true,
     description: true,
+    media: true,
 })

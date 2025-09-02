@@ -16,6 +16,7 @@ import useFetch from "@/hooks/useFetch";
 import { TypeOfBannerData } from "@/types/admin.banners.types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function MainSlider() {
     const plugin = React.useRef(
@@ -32,15 +33,13 @@ export function MainSlider() {
 
     if (loading) {
         return (
-            <div className="w-full h-[600px] flex items-center justify-center">
-                <p className="text-muted-foreground">Loading banners...</p>
-            </div>
+            <Skeleton className="w-full h-[350px] md:h-[500px]" />
         );
     }
 
     if (error) {
         return (
-            <div className="w-full h-[600px] flex items-center justify-center">
+            <div className="w-full h-[350px] md:h-[500px] flex items-center justify-center">
                 <p className="text-destructive">Failed to load banners</p>
             </div>
         );
@@ -48,7 +47,7 @@ export function MainSlider() {
 
     if (!banners?.length) {
         return (
-            <div className="w-full h-[600px] flex items-center justify-center">
+            <div className="w-full h-[500px] flex items-center justify-center">
                 <p className="text-muted-foreground">No banners available</p>
             </div>
         );
@@ -65,7 +64,7 @@ export function MainSlider() {
                 {banners.map((bannerItem, index) => (
                     <CarouselItem
                         key={bannerItem._id || index}
-                        className="h-[600px] w-full relative"
+                        className="h-[350px] md:h-[500px] w-full relative"
                     >
                         <div className="w-full">
                             <Image
@@ -77,18 +76,18 @@ export function MainSlider() {
                                 className="object-cover"
                             />
                         </div>
-                        <div className="absolute left-[15%] translate-x-[-15%] bottom-15 z-10  flex flex-col gap-6">
-                            <h2 className="font-extrabold text-white text-5xl">
+                        <div className="absolute left-[20%] md:left-[15%] translate-x-[-15%] bottom-15 z-10  flex flex-col gap-3 md:gap-6">
+                            <h2 className="font-extrabold text-white text-3xl md:text-5xl">
                                 {bannerItem.title}
                             </h2>
                             {bannerItem.subtitle && (
-                                <p className="font-medium text-white text-2xl">
+                                <p className="font-medium text-white text-xl md:text-2xl">
                                     {bannerItem.subtitle}
                                 </p>
                             )}
                             <Button
                                 variant={"secondary"}
-                                className="rounded-full w-fit px-15 border-none dark:bg-white text-black"
+                                className="rounded-full md:size-fit w-fit px-15 border-none dark:bg-white text-black"
                                 asChild
                             >
                                 <Link href={bannerItem.link}>

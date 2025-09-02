@@ -92,6 +92,21 @@ export const ProductsColumns: ColumnDef<
             cell: ({ row }) => row.original.subcategory?.name || "-",
         },
         {
+            accessorKey: "mrp",
+            header: "MRP",
+        },
+        {
+            accessorKey: "sellingPrice",
+            header: "Selling price",
+        },
+        {
+            accessorKey: "discountPercentage",
+            header: "Discount",
+            cell: ({ row }) => {
+                return <span>{row.original.discountPercentage || 0} %</span>
+            }
+        },
+        {
             accessorKey: "media",
             header: "Media",
             cell: ({ row }) => {

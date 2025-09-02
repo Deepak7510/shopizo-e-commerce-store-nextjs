@@ -15,7 +15,7 @@ import Link from "next/link";
 export function AppSidebar() {
     return (
         <Sidebar>
-            <SidebarHeader className="border-b ps-0 h-13">
+            <SidebarHeader className="border-b ps-0 h-14">
                 <ApplicationLogo />
             </SidebarHeader>
             <SidebarContent>
@@ -42,7 +42,3 @@ export function AppSidebar() {
         </Sidebar >
     )
 }
-
-
-
-
