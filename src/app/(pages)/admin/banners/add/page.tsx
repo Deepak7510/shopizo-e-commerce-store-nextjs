@@ -59,7 +59,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const bannerType = [
+const bannerType: any = [
     { label: "HERO", value: "hero" },
     { label: "SLIDER", value: "slider" },
     { label: "PROMO", value: "promo" },

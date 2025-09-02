@@ -29,7 +29,14 @@ import { TypeOfEditBannerInput } from "@/types/admin.banners.types";
 import { updateBannerService } from "@/services/client/admin/banners/updateBannerService";
 import useFetch from "@/hooks/useFetch";
 import { useRouter } from "next/navigation";
-import { bannerType } from "../../add/page";
+const bannerType: any = [
+    { label: "HERO", value: "hero" },
+    { label: "SLIDER", value: "slider" },
+    { label: "PROMO", value: "promo" },
+    { label: "BIGPROMO", value: "bigpromo" },
+    { label: "SIDEBAR", value: "sidebar" },
+    { label: "POPUP", value: "popup" },
+];
 import {
     Select,
     SelectContent,
