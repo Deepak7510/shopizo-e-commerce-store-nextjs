@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, MoreVertical, Plus, PlusCircle } from "lucide-react";
+import { ArrowUpDown, MoreVertical, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
@@ -200,6 +200,9 @@ const Action = React.memo<{
         </DropdownMenu>
     );
 });
+
+
+Action.displayName = "Action"
 
 const BannersPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");

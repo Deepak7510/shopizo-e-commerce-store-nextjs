@@ -134,14 +134,14 @@ const AddProductVariantPage = () => {
             const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
             form.setValue("discountPercentage", discountPercentage);
         }
-    }, [form.watch("mrp"), form.watch("sellingPrice")]);
+    }, [form.watch("mrp"), form.watch("sellingPrice"), form]);
 
     useEffect(() => {
         if (selectedMedia && selectedMedia.length > 0) {
             const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
             form.setValue("media", mediaIds);
         }
-    }, [selectedMedia]);
+    }, [selectedMedia, form]);
 
     async function onSubmit(data: TypeOfAddProductVarinatInput) {
         const result = await createproductVariantService(data);

@@ -34,7 +34,6 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { TypeOfCategoryData } from "@/types/admin.category.types";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import SubcategoryFormSkeleton from "@/components/application/admin/SubcategoryFormSkeleton";
 
@@ -74,7 +73,7 @@ const AddSubcategoryPage = () => {
     useEffect(() => {
         const slugValue = slugify(categoryName.toLowerCase());
         form.setValue("slug", slugValue);
-    }, [categoryName]);
+    }, [categoryName, form]);
 
     async function onSubmit(data: TypeOfAddSubcategoryInput) {
         const result = await createSubcategoryService(data);

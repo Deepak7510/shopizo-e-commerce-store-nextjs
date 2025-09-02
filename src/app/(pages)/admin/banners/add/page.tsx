@@ -98,7 +98,7 @@ const AddBannerPage = () => {
             const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
             form.setValue("bannerImage", mediaIds[0]);
         }
-    }, [selectedMedia]);
+    }, [selectedMedia, form]);
 
     async function onSubmit(data: TypeOfAddBannerInput) {
         const result = await createBannerService(data);
@@ -351,7 +351,7 @@ const AddBannerPage = () => {
                                         <FormField
                                             control={form.control}
                                             name="bannerImage"
-                                            render={({ field }) => (
+                                            render={() => (
                                                 <FormItem className="flex flex-col justify-center items-center">
                                                     <FormLabel>
                                                         Banner image <span className="text-red-600">*</span>

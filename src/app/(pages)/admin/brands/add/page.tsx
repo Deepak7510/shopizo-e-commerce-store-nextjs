@@ -56,7 +56,7 @@ const AddBrandsPage = () => {
     useEffect(() => {
         const slugValue = slugify(brandName.toLowerCase());
         form.setValue("slug", slugValue);
-    }, [brandName]);
+    }, [brandName, form]);
 
     async function onSubmit(data: TypeOfAddBrandInput) {
         const result = await createBrandService(data);

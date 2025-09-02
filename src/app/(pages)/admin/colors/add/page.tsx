@@ -59,7 +59,7 @@ const AddColorPage = () => {
     useEffect(() => {
         const slugValue = slugify(colorName.toLowerCase());
         form.setValue("slug", slugValue);
-    }, [colorName]);
+    }, [colorName, form]);
 
     async function onSubmit(data: TypeOfAddColorInput) {
         const result = await createColorService(data);

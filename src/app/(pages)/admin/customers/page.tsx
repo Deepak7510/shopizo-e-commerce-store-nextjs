@@ -5,7 +5,7 @@ import BreadCrumb, {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import { ArrowUpDown, Plus } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import React, { useState } from "react";
 import { TypeOfDeleteType } from "@/types/global.types";
 import CommonDataTable from "@/components/application/admin/CommonDataTable";
@@ -165,6 +165,9 @@ const Action = React.memo<{
         </DropdownMenu>
     );
 });
+
+Action.displayName = "Action"
+
 
 const CustomersPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");

@@ -40,7 +40,13 @@ const breadcrumbList: breadcrumbListType[] = [
 
 const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
     const paramsValue = use(params)
-    const { data, error, loading, refetch } = useFetch(`/api/admin/media/details/${paramsValue.id}`, {}, [paramsValue.id]);
+    const { data, error, loading } = useFetch(`/api/admin/media/details/${paramsValue.id}`, {}, [paramsValue.id]);
+
+    if (error) {
+        return <div className='text-red-700'>
+            {error.message}
+        </div>
+    }
 
     const form = useForm<TypeOfEditMedia>({
         resolver: zodResolver(editMediaZodSchema),
@@ -52,20 +58,16 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
     })
 
     useEffect(() => {
-        if (data && !loading) {
+        if (data) {
             form.reset({
                 _id: data.data.media._id || "",
                 alt: data.data.media.alt || "",
                 title: data.data.media.title || "",
             })
         }
-    }, [data])
+    }, [data, form])
 
-    if (error) {
-        return <div className='text-red-700'>
-            {error.message}
-        </div>
-    }
+
 
     async function onSubmit(data: TypeOfEditMedia) {
         const result = await updateMediaService(data);

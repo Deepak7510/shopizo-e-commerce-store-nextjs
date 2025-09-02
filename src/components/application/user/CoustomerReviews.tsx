@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
     Carousel,
     CarouselContent,
@@ -43,11 +43,11 @@ function CoustomerReviews() {
                                             <h1 className="font-semibold">Title Title Title Title</h1>
                                             <p className="text-muted-foreground text-sm">
                                                 Jokester began sneaking into the castle in the middle of the night and leaving
-                                                jokes all over the place: under the king's pillow, in his soup, even in the
-                                                royal toilet. The king was furious, but he couldn't seem to stop Jokester. And
+                                                jokes all over the place: under the king&apos;s pillow, in his soup, even in the
+                                                royal toilet. The king was furious, but he couldn&apos;t seem to stop Jokester. And
                                                 then, one day, the people of the kingdom discovered that the jokes left by
-                                                Jokester were so funny that they couldn't help but laugh. And once they
-                                                started laughing, they couldn't stop.
+                                                Jokester were so funny that they couldn&apos;t help but laugh. And once they
+                                                started laughing, they couldn&apos;t stop.
                                             </p>
                                         </ScrollArea>
                                     </CardContent>

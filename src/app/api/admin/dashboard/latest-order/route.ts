@@ -16,6 +16,7 @@ export const GET = async function (request: NextRequest): Promise<NextResponse> 
 
 
         return apiResponse(200, "Count fetched successfully", {
+            totalUser
         });
     } catch (error) {
         return errorHandler(error);

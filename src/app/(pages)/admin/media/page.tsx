@@ -111,7 +111,7 @@ const MediaPage = () => {
                 queryClient.invalidateQueries({ queryKey: ['medias'] })
             },
             onError: (error: any) => {
-                toast.error(error.message)
+                toast.error(error?.message)
                 console.error("Delete media error", error)
             },
         });

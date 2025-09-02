@@ -99,7 +99,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const brands = brandData?.data?.brands as TypeOfBrandData[];
     const categories = categoryData?.data?.categories as TypeOfCategoryData[];
-    const product = productData?.data?.product;
 
     const form = useForm<TypeOfEditProductInput>({
         resolver: zodResolver(editProductZodSchema),
@@ -119,31 +118,14 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         const title = form.watch("title");
         const slugValue = slugify(title.toLowerCase());
         form.setValue("slug", slugValue);
-    }, [form.watch("title")]);
+    }, [form.watch("title"), form]);
 
     useEffect(() => {
         if (selectedMedia && selectedMedia.length > 0) {
             const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
             form.setValue("media", mediaIds);
         }
-    }, [selectedMedia]);
-
-
-    useEffect(() => {
-        if (product && !productDataLoading) {
-            form.reset({
-                _id: product._id || "",
-                title: product.title || "",
-                slug: product.slug || "",
-                category: product.category || "",
-                subcategory: product.subcategory || "",
-                media: product?.media?.map((m: any) => m._id) || [],
-                brand: product.brand || "",
-                description: product.description || "",
-            })
-            setSelectedMedia(product.media)
-        }
-    }, [product])
+    }, [selectedMedia, form]);
 
 
     useEffect(() => {
@@ -159,8 +141,24 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             }
             fetchSubcategories();
         }
-    }, [form.watch("category")]);
+    }, [form.watch("category"), form]);
 
+    useEffect(() => {
+        if (productData?.data?.product) {
+            const product = productData?.data?.product;
+            form.reset({
+                _id: product._id || "",
+                title: product.title || "",
+                slug: product.slug || "",
+                category: product.category || "",
+                subcategory: product.subcategory || "",
+                media: product?.media?.map((m: any) => m._id) || [],
+                brand: product.brand || "",
+                description: product.description || "",
+            })
+            setSelectedMedia(product.media)
+        }
+    }, [productData])
 
 
     async function onSubmit(data: TypeOfEditProductInput) {
@@ -381,7 +379,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                             <FormField
                                                 control={form.control}
                                                 name="media"
-                                                render={({ field }) => (
+                                                render={() => (
                                                     <FormItem className="flex flex-col justify-center items-center">
                                                         <FormLabel>Media <span className="text-red-600">*</span></FormLabel>
                                                         <FormControl>

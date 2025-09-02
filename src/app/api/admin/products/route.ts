@@ -3,7 +3,7 @@ import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
-import ProductModel, { IProduct } from "@/models/Product.model";
+import ProductModel from "@/models/Product.model";
 import { UserRole } from "@/models/User.model";
 import { TypeOfDeleteType } from "@/types/global.types";
 import { NextRequest, NextResponse } from "next/server";

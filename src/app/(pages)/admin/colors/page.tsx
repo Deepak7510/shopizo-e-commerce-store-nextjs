@@ -146,6 +146,9 @@ const Action = React.memo<{
     );
 });
 
+
+Action.displayName = "Action"
+
 const ColorsPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/colors/delete";

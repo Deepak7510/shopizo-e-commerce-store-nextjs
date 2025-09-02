@@ -32,7 +32,6 @@ import { format } from "date-fns";
 import useFetch from "@/hooks/useFetch";
 import { updateCouponService } from "@/services/client/admin/coupons/updateCouponService";
 import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
 import CouponFormSkeleton from "@/components/application/admin/CouponFormSkeleton";
 
 const breadcrumbList: breadcrumbListType[] = [
@@ -58,7 +57,6 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
     if (couponError) {
         return <div>{couponError.message || "Somthing went worng"}</div>
     }
-
     const form = useForm<TypeOfEditCouponInput>({
         resolver: zodResolver(editCouponZodSchema),
         defaultValues: {
@@ -71,7 +69,7 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
     });
 
     useEffect(() => {
-        if (data && !couponLoading) {
+        if (data?.data?.coupon) {
             const coupon = data?.data.coupon;
             form.reset({
                 _id: coupon?._id,
@@ -81,7 +79,7 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 validity: coupon?.validity || undefined,
             });
         }
-    }, [data])
+    }, [data, form])
 
     async function onSubmit(data: TypeOfEditCouponInput) {
         const result = await updateCouponService(data);

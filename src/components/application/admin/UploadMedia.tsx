@@ -2,7 +2,7 @@
 import React from 'react'
 import { CldUploadWidget, CloudinaryUploadWidgetError, } from 'next-cloudinary';
 import { Button } from '@/components/ui/button';
-import { Plus, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { createmediaService } from '@/services/client/admin/media/createMediaService';
 import { useQueryClient } from '@tanstack/react-query';

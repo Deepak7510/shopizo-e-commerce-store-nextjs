@@ -3,7 +3,7 @@ import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler";
 import { verifyRole } from "@/lib/server/verifyRole";
-import BannerModel, { BannerType, IBanner } from "@/models/Banner.model";
+import BannerModel, { BannerType } from "@/models/Banner.model";
 import { UserRole } from "@/models/User.model";
 import { TypeOfAddBannerInput } from "@/types/admin.banners.types";
 import { addBannerZodSchema } from "@/zodSchema/admin.banner.schema";

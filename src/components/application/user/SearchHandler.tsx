@@ -8,7 +8,7 @@ type Props = {
     setOpenSearch: React.Dispatch<SetStateAction<boolean>>
 }
 
-const SearchHandler: React.FC<Props> = ({ openSearch, setOpenSearch }) => {
+const SearchHandler: React.FC<Props> = ({ setOpenSearch }) => {
     return (
         <div className='flex gap-3 px-2 md:px-50'>
             <Input placeholder='Search' className='rounded-full md:min-w-[300px] shadow-none' type="search" />

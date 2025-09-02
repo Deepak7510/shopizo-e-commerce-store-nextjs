@@ -64,11 +64,13 @@ const breadcrumbList: breadcrumbListType[] = [
 ];
 
 const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const router = useRouter()
-    const { id } = use(params)
+    const paramsValue = use(params);
+    const id = paramsValue.id;
+    const router = useRouter();
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
+
     const form = useForm<TypeOfEditBannerInput>({
         resolver: zodResolver(editBannerZodSchema),
         defaultValues: {
@@ -87,18 +89,21 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
         error: bannerDataError,
     } = useFetch(`/api/admin/banners/details/${id}`, {}, [id]);
 
-    if (bannerDataError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {bannerDataError?.message ||
-                    "Something went worng."}
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (selectedMedia && selectedMedia.length > 0) {
+            if (selectedMedia.length > 1) {
+                setSelectedMedia([]);
+                toast.error("You can select only one image");
+                return;
+            }
+            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
+            form.setValue("bannerImage", mediaIds[0]);
+        }
+    }, [selectedMedia, form]);
 
     useEffect(() => {
-        if (data && !bannerDataLoading) {
-            const banner = data.data.banner
+        if (data?.data?.banner) {
+            const banner = data.data.banner;
             form.reset({
                 _id: banner._id || "",
                 name: banner.name || "",
@@ -108,24 +113,20 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 link: banner.link || "",
                 type: banner.type || "",
                 startDate: banner.startDate || undefined,
-                endDate: banner.endDate || "",
-                bannerImage: banner?.bannerImage._id || undefined
-            })
-            setSelectedMedia([banner.bannerImage])
+                endDate: banner.endDate || undefined,
+                bannerImage: banner?.bannerImage._id || "",
+            });
+            setSelectedMedia([banner.bannerImage]);
         }
-    }, [data]);
+    }, [data, form]);
 
-    useEffect(() => {
-        if (selectedMedia && selectedMedia.length > 0) {
-            if (selectedMedia.length > 1) {
-                setSelectedMedia([]);
-                toast.error("You can select only one image");
-                return
-            }
-            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
-            form.setValue("bannerImage", mediaIds[0]);
-        }
-    }, [selectedMedia]);
+    if (bannerDataError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {bannerDataError?.message || "Something went worng."}
+            </div>
+        );
+    }
 
     async function onSubmit(data: TypeOfEditBannerInput) {
         const result = await updateBannerService(data);
@@ -136,7 +137,7 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
         form.reset();
         setSelectedMedia([]);
         toast.success(result.message);
-        return router.push(adminRoutes.banners.Banners)
+        return router.push(adminRoutes.banners.Banners);
     }
 
     return (
@@ -144,21 +145,19 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <BreadCrumb breadcrumbList={breadcrumbList} />
             <Card className="rounded-md px-3 py-2 gap-0 shadow-none">
                 <div className="flex justify-between mb-1">
-                    <h1 className="text-xl text-violet-700 font-semibold">
-                        Edit Banner
-                    </h1>
+                    <h1 className="text-xl text-violet-700 font-semibold">Edit Banner</h1>
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.banners.Banners}>
-                                Show Banners
-                            </Link>
+                            <Link href={adminRoutes.banners.Banners}>Show Banners</Link>
                         </Button>
                     </div>
                 </div>
                 <Separator className="mb-2" />
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
-                        {bannerDataLoading ? <BannerFormSkeleton /> :
+                        {bannerDataLoading ? (
+                            <BannerFormSkeleton />
+                        ) : (
                             <Form {...form} key={form.watch("_id") || "Edit banner"}>
                                 <form onSubmit={form.handleSubmit(onSubmit)}>
                                     <div className="grid md:grid-cols-2 gap-5">
@@ -221,7 +220,8 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>
-                                                            Button name <span className="text-red-600">*</span>
+                                                            Button name{" "}
+                                                            <span className="text-red-600">*</span>
                                                         </FormLabel>
                                                         <FormControl>
                                                             <Input
@@ -271,7 +271,10 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                             </FormControl>
                                                             <SelectContent>
                                                                 {bannerType.map((item) => (
-                                                                    <SelectItem key={item.label} value={item.value}>
+                                                                    <SelectItem
+                                                                        key={item.label}
+                                                                        value={item.value}
+                                                                    >
                                                                         {item.label}
                                                                     </SelectItem>
                                                                 ))}
@@ -384,10 +387,11 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                             <FormField
                                                 control={form.control}
                                                 name="bannerImage"
-                                                render={({ field }) => (
+                                                render={() => (
                                                     <FormItem className="flex flex-col justify-center items-center">
                                                         <FormLabel>
-                                                            Banner image <span className="text-red-600">*</span>
+                                                            Banner image{" "}
+                                                            <span className="text-red-600">*</span>
                                                         </FormLabel>
                                                         <FormControl>
                                                             <Button
@@ -430,11 +434,12 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                         text={"Save Banner"}
                                     />
                                 </form>
-                            </Form>}
+                            </Form>
+                        )}
                     </CardContent>
                 </Card>
-            </Card >
-        </div >
+            </Card>
+        </div>
     );
 };
 

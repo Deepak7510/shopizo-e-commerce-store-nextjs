@@ -59,7 +59,7 @@ const VerifyOtpPage: React.FC<VerifyOtpPageProps> = ({ params }) => {
         if (cooldown > 0) {
             intervalId.current = setInterval(() => {
                 setCooldown(pre => {
-                    let updated = pre - 1
+                    const updated = pre - 1
                     try {
                         sessionStorage.setItem("resendOtpCoolDownSec", JSON.stringify(updated));
                     } catch (error) {

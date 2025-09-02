@@ -3,7 +3,7 @@ import apiResponse from "@/lib/server/apiResponse";
 import { connectDB } from "@/lib/server/databaseConnection";
 import { errorHandler } from "@/lib/server/errorHandler"
 import { verifyRole } from "@/lib/server/verifyRole";
-import MediaModel, { IMedia } from "@/models/Media.model";
+import MediaModel from "@/models/Media.model";
 import { UserRole } from "@/models/User.model";
 import { TypedOfUploadMediaArray } from "@/types/admin.media.types";
 import { uploadMediaArrayZodSchema } from "@/zodSchema/admin.media.schema";

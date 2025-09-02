@@ -38,7 +38,7 @@ const useFetch = function (url: string, option = {}, dependencies: any[] = []) {
         return () => {
             isMounted = false;
         };
-    }, [...dependencies, refetchIndex]);
+    }, [...dependencies, option, url, refetchIndex]);
 
 
 

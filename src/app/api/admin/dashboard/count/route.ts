@@ -5,7 +5,6 @@ import { verifyRole } from "@/lib/server/verifyRole";
 import BrandModel from "@/models/Brand.model";
 import CategoryModel from "@/models/Category.model";
 import CouponModel from "@/models/Coupon.model";
-import MediaModel from "@/models/Media.model";
 import ProductModel from "@/models/Product.model";
 import ProductVariantModel from "@/models/Productvariant.model";
 import SubcategoryModel from "@/models/Subcategory.model";

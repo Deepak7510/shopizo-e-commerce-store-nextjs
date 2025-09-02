@@ -47,7 +47,7 @@ const ForgetPasswordVerifyOtpPage: React.FC<ForgetPasswordVerifyOtpPageProps> = 
         if (cooldown > 0) {
             intervalId.current = setInterval(() => {
                 setCoolDown(pre => {
-                    let updatedValue = pre - 1
+                    const updatedValue = pre - 1
                     try {
                         sessionStorage.setItem("forgetPasswordVerifyOtpCoolDownSec", JSON.stringify(updatedValue))
                     } catch (error) {

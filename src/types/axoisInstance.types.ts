@@ -1,5 +1,5 @@
 
-export type TypeOfAxoisResponse = {
+export interface TypeOfAxoisResponse {
     statusCode: number,
     success: boolean,
     message: string,

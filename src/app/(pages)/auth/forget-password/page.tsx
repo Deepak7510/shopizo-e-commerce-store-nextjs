@@ -69,7 +69,7 @@ const ForgetPasswordPage = () => {
                     </form>
                 </Form>
                 <div className="text-center">
-                    <p>Don't have an account?</p>
+                    <p>Don&apos;t have an account?</p>
                     <Link
                         className="text-violet-700 underline"
                         href={authRoutes.register}

@@ -10,7 +10,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArchiveRestore, Copy, Edit, EllipsisVertical, Trash, Undo } from "lucide-react";
+import { ArchiveRestore, Copy, Edit, EllipsisVertical, Trash } from "lucide-react";
 import { mediaType } from "@/types/admin.media.types";
 import Link from "next/link";
 import { adminRoutes } from "@/lib/client/routes";

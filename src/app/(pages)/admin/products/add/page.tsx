@@ -88,14 +88,14 @@ const AddProductPage = () => {
         const title = form.watch("title");
         const slugValue = slugify(title.toLowerCase());
         form.setValue("slug", slugValue);
-    }, [form.watch("title")]);
+    }, [form.watch("title"), form]);
 
     useEffect(() => {
         if (selectedMedia && selectedMedia.length > 0) {
             const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
             form.setValue("media", mediaIds);
         }
-    }, [selectedMedia]);
+    }, [selectedMedia, form]);
 
 
     const {
@@ -126,7 +126,7 @@ const AddProductPage = () => {
 
             fetchSubcategories();
         }
-    }, [form.watch("category")]);
+    }, [form.watch("category"), form]);
 
     useEffect(() => {
         const mrp = form.watch("mrp");
@@ -135,7 +135,7 @@ const AddProductPage = () => {
             const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
             form.setValue("discountPercentage", discountPercentage);
         }
-    }, [form.watch("mrp"), form.watch("sellingPrice")]);
+    }, [form.watch("mrp"), form.watch("sellingPrice"), form]);
 
 
     if (brandError || categoryError) {
@@ -424,7 +424,7 @@ const AddProductPage = () => {
                                                 <FormField
                                                     control={form.control}
                                                     name="media"
-                                                    render={({ field }) => (
+                                                    render={() => (
                                                         <FormItem className="flex flex-col justify-center items-center">
                                                             <FormLabel>Media <span className="text-red-600">*</span></FormLabel>
                                                             <FormControl>

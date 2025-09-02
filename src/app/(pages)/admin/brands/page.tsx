@@ -143,6 +143,9 @@ const Action = React.memo<{
     );
 });
 
+Action.displayName = "Action"
+
+
 const BrandsPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/brands/delete";

@@ -115,7 +115,7 @@ const LoginPage = () => {
             Forgot password?
           </Link>
           <div className="flex justify-center gap-1">
-            <p>Don't have an account?</p>
+            <p>Don&apos;t have an account?</p>
             <Link
               className="text-violet-700 underline"
               href={authRoutes.register}

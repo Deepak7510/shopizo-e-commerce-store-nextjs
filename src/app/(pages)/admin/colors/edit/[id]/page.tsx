@@ -36,22 +36,15 @@ const breadcrumbList: breadcrumbListType[] = [
 ]
 
 const EditColorPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const { id } = use(params);
     const router = useRouter()
+    const paramsValue = use(params);
+    const id = paramsValue.id;
     const { data, error, loading } = useFetch(`/api/admin/colors/details/${id}`, {}, [id]);
-    const color = data?.data.color as TypeOfColorData
 
-    useEffect(() => {
-        if (data && !loading) {
-            form.reset({
-                _id: color._id || "",
-                name: color.name || "",
-                slug: color.slug || "",
-                description: color.description || "",
-                hexCode: color.hexCode || "",
-            })
-        }
-    }, [data])
+    if (error) {
+        return <div className='text-base text-red-700 font-medium'>{error.message}</div>
+    }
+
 
     const form = useForm<TypeOfEditColorInput>({
         resolver: zodResolver(editColorZodSchema),
@@ -69,7 +62,21 @@ const EditColorPage = ({ params }: { params: Promise<{ id: string }> }) => {
     useEffect(() => {
         const slugValue = slugify(colorName.toLowerCase())
         form.setValue("slug", slugValue)
-    }, [colorName]);
+    }, [colorName, form]);
+
+
+    useEffect(() => {
+        if (data?.data?.color) {
+            const color = data?.data?.color as TypeOfColorData
+            form.reset({
+                _id: color._id || "",
+                name: color.name || "",
+                slug: color.slug || "",
+                description: color.description || "",
+                hexCode: color.hexCode || "",
+            })
+        }
+    }, [data, form])
 
     async function onSubmit(data: TypeOfEditColorInput) {
         const result = await updateColorService(data);
@@ -82,9 +89,6 @@ const EditColorPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return router.push(adminRoutes.colors.colors);
     }
 
-    if (error) {
-        return <div className='text-base text-red-700 font-medium'>{error.message}</div>
-    }
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />

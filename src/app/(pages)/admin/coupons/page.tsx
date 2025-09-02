@@ -150,6 +150,8 @@ const Action = React.memo<{
     );
 });
 
+Action.displayName = "Action"
+
 const CouponPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
     const deleteEndPoint = "/api/admin/coupons/delete";

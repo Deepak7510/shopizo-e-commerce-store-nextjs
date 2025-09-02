@@ -18,8 +18,6 @@ import { useRouter } from 'next/navigation';
 import { editBrandZodSchema } from '@/zodSchema/admin.brands.schema';
 import { TypeOfBrandData, TypeOfEditBrandInput } from '@/types/admin.brands.types';
 import { updateBrandService } from '@/services/client/admin/brands/updateBrandService';
-import { TypeOfCategoryData } from '@/types/admin.category.types';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import BrandFormSkeleton from '@/components/application/admin/BrandFormSkeleton';
 const breadcrumbList: breadcrumbListType[] = [
@@ -38,7 +36,8 @@ const breadcrumbList: breadcrumbListType[] = [
 ]
 
 const EditBrandPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const { id } = use(params);
+    const paramsValue = use(params);
+    const id = paramsValue.id;
     const router = useRouter()
     const form = useForm<TypeOfEditBrandInput>({
         resolver: zodResolver(editBrandZodSchema),
@@ -51,14 +50,18 @@ const EditBrandPage = ({ params }: { params: Promise<{ id: string }> }) => {
         }
     })
 
-    const { data, error, loading } = useFetch(`/api/admin/brands/details/${id}`, {}, [id]);
-    const brand = data?.data.brand as TypeOfBrandData
-    if (error) {
-        return <div className='text-base text-red-700 font-medium'>{error.message}</div>
-    }
+
+    const brandName = form.watch("name");
+    useEffect(() => {
+        const slugValue = slugify(brandName.toLowerCase())
+        form.setValue("slug", slugValue)
+    }, [brandName, form]);
+
+    const { data, loading } = useFetch(`/api/admin/brands/details/${id}`, {}, [id]);
 
     useEffect(() => {
-        if (data && !loading) {
+        if (data?.data?.brand) {
+            const brand = data?.data?.brand as TypeOfBrandData
             form.reset({
                 _id: brand._id || "",
                 name: brand.name || "",
@@ -67,15 +70,7 @@ const EditBrandPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 website: brand.website || "",
             })
         }
-    }, [data])
-
-
-    const brandName = form.watch("name");
-
-    useEffect(() => {
-        const slugValue = slugify(brandName.toLowerCase())
-        form.setValue("slug", slugValue)
-    }, [brandName]);
+    }, [data, form])
 
     async function onSubmit(data: TypeOfEditBrandInput) {
         const result = await updateBrandService(data);
@@ -87,8 +82,6 @@ const EditBrandPage = ({ params }: { params: Promise<{ id: string }> }) => {
         toast.success(result.message)
         return router.push(adminRoutes.brands.brands);
     }
-
-
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />

@@ -1,7 +1,7 @@
 "use client"
 import BreadCrumb, { breadcrumbListType } from '@/components/application/common/BreadCrumb';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { adminRoutes } from '@/lib/client/routes';
 import React, { use, useEffect } from 'react'
@@ -18,7 +18,6 @@ import useFetch from '@/hooks/useFetch';
 import { editCatgeoryZodSchema } from '@/zodSchema/admin.category.schema';
 import { useRouter } from 'next/navigation';
 import { updateCategoryService } from '@/services/client/admin/categories/updateCategoryService';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import CategoryFormSkeleton from '@/components/application/admin/CategoryFormSkeleton';
 
@@ -38,21 +37,14 @@ const breadcrumbList: breadcrumbListType[] = [
 ]
 
 const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const { id } = use(params);
+    const paramsValue = use(params);
+    const id = paramsValue.id;
     const router = useRouter()
     const { data, loading, error } = useFetch(`/api/admin/categories/details/${id}`, {}, [id]);
-    const category = data?.data.category as TypeOfCategoryData
 
-    useEffect(() => {
-        if (data && !loading) {
-            form.reset({
-                _id: category._id || "",
-                name: category.name || "",
-                slug: category.slug || "",
-                description: category.description || "",
-            })
-        }
-    }, [data])
+    if (error) {
+        return <div className='text-xl text-red-700 font-medium'>{error.message}</div>
+    }
 
     const form = useForm<TypeOfEditCategoryInput>({
         resolver: zodResolver(editCatgeoryZodSchema),
@@ -63,12 +55,25 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
             description: ""
         }
     })
+
     const categoryName = form.watch("name");
 
     useEffect(() => {
         const slugValue = slugify(categoryName.toLowerCase())
         form.setValue("slug", slugValue)
-    }, [categoryName])
+    }, [categoryName, form])
+
+    useEffect(() => {
+        if (data?.data?.category) {
+            const category = data?.data.category as TypeOfCategoryData
+            form.reset({
+                _id: category._id || "",
+                name: category.name || "",
+                slug: category.slug || "",
+                description: category.description || "",
+            })
+        }
+    }, [data, form])
 
     async function onSubmit(data: TypeOfEditCategoryInput) {
         const result = await updateCategoryService(data);
@@ -81,9 +86,7 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return router.push(adminRoutes.categories.categories);
     }
 
-    if (error) {
-        return <div className='text-xl text-red-700 font-medium'>{error.message}</div>
-    }
+
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />

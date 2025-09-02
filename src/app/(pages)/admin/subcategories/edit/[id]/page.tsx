@@ -20,7 +20,6 @@ import { TypeOfEditSubcategoryInput } from '@/types/admin.subcategories.types';
 import { editSubcategoryZodSchema } from '@/zodSchema/admin.subcategories.schema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TypeOfCategoryData } from '@/types/admin.category.types';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import SubcategoryFormSkeleton from '@/components/application/admin/SubcategoryFormSkeleton';
 
@@ -41,7 +40,8 @@ const breadcrumbList: breadcrumbListType[] = [
 
 const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
-    const { id } = use(params);
+    const paramsValue = use(params);
+    const id = paramsValue.id;
     const router = useRouter()
     const { data: subcatgory, loading, error } = useFetch(`/api/admin/subcategories/details/${id}`, {}, [id]);
 
@@ -66,10 +66,10 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
     useEffect(() => {
         const slugValue = slugify(categoryName.toLowerCase())
         form.setValue("slug", slugValue)
-    }, [categoryName]);
+    }, [categoryName, form]);
 
     useEffect(() => {
-        if (subcatgory && !loading) {
+        if (subcatgory) {
             form.reset({
                 _id: subcatgory.data.subcategory._id || "",
                 name: subcatgory.data.subcategory.name || "",
@@ -78,7 +78,7 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
                 description: subcatgory.data.subcategory.description || "",
             })
         }
-    }, [subcatgory]);
+    }, [subcatgory, form]);
 
 
     async function onSubmit(data: TypeOfEditSubcategoryInput) {

@@ -1,6 +1,6 @@
 import { connectDB } from "@/lib/server/databaseConnection";
 import { sendMail } from "@/lib/server/sendMail";
-import User, { IUser } from "@/models/User.model";
+import User from "@/models/User.model";
 import { ApiError } from "@/lib/server/apiError";
 import apiResponse from "@/lib/server/apiResponse";
 import { errorHandler } from "@/lib/server/errorHandler";

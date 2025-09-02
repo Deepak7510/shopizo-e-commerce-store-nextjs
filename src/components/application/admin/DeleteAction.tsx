@@ -1,7 +1,7 @@
 "use client"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { TypeOfDeleteType } from "@/types/global.types"
-import { ArchiveRestore, Edit, Trash } from "lucide-react"
+import { ArchiveRestore, Trash } from "lucide-react"
 
 const DeleteAction = ({ deleteType, row, handleDeleteAlert }: {
     deleteType: TypeOfDeleteType, row: any, handleDeleteAlert: (

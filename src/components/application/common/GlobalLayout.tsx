@@ -34,7 +34,7 @@ const GlobalLayout = ({
         }
 
         checkAuthHandler();
-    }, [pathName]);
+    }, [dispatch, pathName]);
 
 
     if (loading) return <LoaderOne />

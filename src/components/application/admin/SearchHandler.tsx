@@ -92,7 +92,7 @@ function SearchHandler() {
             const path = frameworks.find((framework) => framework.value === value)?.path
             if (path) return router.push(path);
         }
-    }, [value])
+    }, [value, router])
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

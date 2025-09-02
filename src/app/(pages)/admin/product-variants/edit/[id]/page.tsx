@@ -82,7 +82,8 @@ const breadcrumbList: breadcrumbListType[] = [
 
 const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const router = useRouter();
-    const { id } = use(params);
+    const paramsValue = use(params);
+    const id = paramsValue.id;
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
@@ -136,9 +137,25 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
         },
     });
 
+    useEffect(() => {
+        const mrp = form.watch("mrp");
+        const sellingPrice = form.watch("sellingPrice");
+        if (mrp > 0 || sellingPrice > 0) {
+            const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
+            form.setValue("discountPercentage", discountPercentage);
+        }
+    }, [form.watch("mrp"), form.watch("sellingPrice"), form]);
 
     useEffect(() => {
-        if (productVariantData && !productVariantLoading) {
+        if (selectedMedia && selectedMedia.length > 0) {
+            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
+            form.setValue("media", mediaIds);
+        }
+    }, [selectedMedia, form]);
+
+
+    useEffect(() => {
+        if (productVariantData?.data?.productVariant) {
             const productVariant = productVariantData.data.productVariant as TypeOfProductVariantData;
             form.reset({
                 _id: productVariant._id,
@@ -156,23 +173,8 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
             })
             setSelectedMedia(productVariant.media);
         }
-    }, [productVariantData]);
+    }, [productVariantData, form]);
 
-    useEffect(() => {
-        const mrp = form.watch("mrp");
-        const sellingPrice = form.watch("sellingPrice");
-        if (mrp > 0 || sellingPrice > 0) {
-            const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
-            form.setValue("discountPercentage", discountPercentage);
-        }
-    }, [form.watch("mrp"), form.watch("sellingPrice")]);
-
-    useEffect(() => {
-        if (selectedMedia && selectedMedia.length > 0) {
-            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
-            form.setValue("media", mediaIds);
-        }
-    }, [selectedMedia]);
 
 
     async function onSubmit(data: TypeOfEditProductVarinatInput) {
