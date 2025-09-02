@@ -30,7 +30,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const subCategoriesColumns: ColumnDef<
+const subCategoriesColumns: ColumnDef<
     TypeOfSubcategoryData,
     unknown
 >[] = [

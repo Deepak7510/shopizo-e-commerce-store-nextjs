@@ -30,7 +30,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const categoriesColumns: ColumnDef<TypeOfCategoryData>[] = [
+const categoriesColumns: ColumnDef<TypeOfCategoryData>[] = [
     {
         id: "select",
         header: ({ table }) => (

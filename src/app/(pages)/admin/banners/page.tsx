@@ -32,7 +32,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const bannersColumns: ColumnDef<
+const bannersColumns: ColumnDef<
     TypeOfBannerData,
     unknown
 >[] = [
