@@ -32,7 +32,7 @@ import { IDataForDelete, useDeleteMutation } from "@/hooks/useDeleteMutation";
 import { TypeOfDeleteType } from "@/types/global.types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-export const breadcrumbList: breadcrumbListType[] = [
+const breadcrumbList: breadcrumbListType[] = [
     {
         href: adminRoutes.dashboard,
         title: "Home",

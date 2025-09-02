@@ -32,7 +32,7 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-export const ProductVariatsColumn: ColumnDef<
+const ProductVariatsColumn: ColumnDef<
     TypeOfProductVariantData,
     unknown
 >[] = [
