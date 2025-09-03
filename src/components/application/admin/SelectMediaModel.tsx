@@ -88,9 +88,9 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
                                             <Image
                                                 src={media.secure_url}
                                                 alt={media.alt || "Media Image"}
-                                                className="object-cover w-full h-full"
-                                                width={300}
-                                                height={300}
+                                                className="object-cover"
+                                                unoptimized
+                                                fill
                                             />
                                             <div className={`w-full h-full flex justify-center items-center top-0 absolute bg-gray-800 ${selecteMediaList.findIndex(mediItem => mediItem._id === media._id) >= 0 ? "opacity-50" : "opacity-0"}`}>
                                                 <Check className="text-white w-10 h-10" />
@@ -112,9 +112,9 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
                                     <Image
                                         src={media.secure_url}
                                         alt={media.alt || "Media Image"}
-                                        className="object-cover w-full h-full"
-                                        width={300}
-                                        height={300}
+                                        className="object-cover"
+                                        fill
+                                        unoptimized
                                     />
                                     <div className={`w-full h-full flex justify-center items-center top-0 absolute bg-gray-800 ${selecteMediaList.findIndex(mediItem => mediItem._id === media._id) >= 0 ? "opacity-50" : "opacity-0"}`}>
                                         <Check className="text-white w-10 h-10" />

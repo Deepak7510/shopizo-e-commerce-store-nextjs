@@ -11,7 +11,7 @@ export default function UserLayout({
     return (
         <div className="max-w-[1600px] mx-auto">
             <Navbar />
-            <main className="mt-[80px]">{children}</main>
+            <main className="mt-[72px] md:mt-[80px]">{children}</main>
             <Footer />
         </div>
     );

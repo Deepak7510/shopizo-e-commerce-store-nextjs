@@ -62,15 +62,16 @@ export function MainSlider() {
                 {banners.map((bannerItem, index) => (
                     <CarouselItem
                         key={bannerItem._id || index}
-                        className="h-[350px] md:h-[500px] w-full relative"
+                        className="h-[300px] md:h-[500px] w-full relative"
                     >
                         <div className="w-full">
                             <Image
                                 src={bannerItem?.bannerImage.secure_url}
                                 alt={
-                                    bannerItem?.bannerImage.alt || bannerItem.title || "Banner"
+                                    bannerItem?.bannerImage.alt || bannerItem.title || "Slider image"
                                 }
                                 fill
+                                unoptimized
                                 className="object-cover"
                             />
                         </div>

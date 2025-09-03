@@ -32,14 +32,15 @@ const PromoBanner = async () => {
     const banners = result?.data?.banners as TypeOfBannerData[] | undefined;
 
     return (
-        <div className='grid md:grid-cols-2 gap-12'>
+        <div className='grid md:grid-cols-2 gap-5 md:gap-14'>
             {banners && banners.length > 0 ? (
                 banners.map((bannerItem) => (
-                    <div key={bannerItem._id} className="relative flex p-0 w-full h-[230px] md:h-[350px]">
+                    <div key={bannerItem._id} className="relative flex p-0 w-full h-[230px] md:h-[340px]">
                         <Image
                             src={bannerItem?.bannerImage.secure_url}
-                            alt={bannerItem?.bannerImage.alt || bannerItem.title || "Banner"}
+                            alt={bannerItem?.bannerImage.alt || bannerItem.title || "Promo banner image"}
                             fill
+                            unoptimized
                             className="object-cover rounded-md"
                         />
                         <div className='absolute left-10 bottom-10 z-10 space-y-1.5'>

@@ -4,6 +4,7 @@ import FeaturesProducts from "@/components/application/user/FeaturesProducts";
 import { MainSlider } from "@/components/application/user/MainSlider";
 import PromoBanner from "@/components/application/user/PromoBanner";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { RotateCw, Truck, Headphones, Gift } from "lucide-react";
 
 export default async function HomePage() {
@@ -12,22 +13,22 @@ export default async function HomePage() {
       {/* slider seaction  */}
       <MainSlider />
       {/* promotion Section  */}
-      <section className="my-20 px-2 md:px-25">
+      <section className="my-10 md:my-20 px-2 md:px-25">
         <PromoBanner />
       </section>
 
       {/* features Product Section  */}
-      <section className="my-20 px-2 md:px-25">
+      <section className="my-10 md:my-20 px-2 md:px-25">
         <FeaturesProducts />
       </section>
 
       {/* BigPromo Banner  */}
-      <section className="my-20 px-2 md:px-25">
+      <section className="my-10 md:my-20 px-2 md:px-25">
         <BigPromoBanner />
       </section>
 
       {/* CoustomerReviews  */}
-      <section className="my-20 px-2 md:px-25 mb-10">
+      <section className="my-10 md:my-20 md:mb-10 px-2 md:px-25 ">
         <CoustomerReviews />
       </section>
 
@@ -41,6 +42,7 @@ export default async function HomePage() {
                 Shop with confidence — easy returns within 7 days.
               </p>
             </div>
+            <Separator className="md:hidden" />
             <div className="flex flex-col items-center gap-0.5 text-center">
               <Truck className="w-7 h-7" />
               <h2 className="font-semibold text-lg">Free Shipping</h2>
@@ -48,6 +50,7 @@ export default async function HomePage() {
                 Enjoy fast and free delivery on all orders.
               </p>
             </div>
+            <Separator className="md:hidden" />
             <div className="flex flex-col items-center gap-0.5 text-center">
               <Headphones className="w-7 h-7" />
               <h2 className="font-semibold text-lg">24/7 Support</h2>
@@ -55,6 +58,7 @@ export default async function HomePage() {
                 Our team is here anytime to help you.
               </p>
             </div>
+            <Separator className="md:hidden" />
             <div className="flex flex-col items-center gap-0.5 text-center">
               <Gift className="w-7 h-7" />
               <h2 className="font-semibold text-lg">Member Discounts</h2>

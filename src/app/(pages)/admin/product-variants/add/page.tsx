@@ -458,10 +458,10 @@ const AddProductVariantPage = () => {
                                                         < div key={index} className="h-20 relative rounded overflow-hidden">
                                                             <Image
                                                                 src={mediaItem.secure_url}
-                                                                alt={mediaItem.alt || "Media Image"}
-                                                                className="object-cover w-full h-full"
-                                                                width={50}
-                                                                height={50}
+                                                                alt={mediaItem.alt || "selcted media image"}
+                                                                className="object-cover"
+                                                                fill
+                                                                unoptimized
                                                             />
                                                         </div>
                                                     )

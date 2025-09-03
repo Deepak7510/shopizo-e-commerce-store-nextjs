@@ -122,13 +122,13 @@ const EditMedia: React.FC<EditMediaProps> = ({ params }) => {
                         </div> :
                             data?.data.media ?
                                 <div className='flex flex-col md:flex-row gap-4 w-full'>
-                                    <div className='w-[200px]'>
+                                    <div className='w-[200px] h-56 relative'>
                                         <Image
                                             src={data?.data.media.secure_url}
-                                            alt={data?.data.media.alt || "Media Image"}
-                                            className="object-cover h-56 rounded"
-                                            width={200}
-                                            height={200}
+                                            alt={data?.data.media.alt || "Edit media image"}
+                                            className="object-cover rounded"
+                                            fill
+                                            unoptimized
                                         />
                                     </div>
                                     <Form {...form}>

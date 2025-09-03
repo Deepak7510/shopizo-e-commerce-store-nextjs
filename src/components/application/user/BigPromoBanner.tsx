@@ -34,14 +34,15 @@ const BigPromoBanner = async () => {
     return (
         <div>
             <h2 className="mb-5 font-medium text-2xl underline">Don&apos;t miss</h2>
-            <div className="space-y-10">
+            <div className="space-y-5 md:space-y-10">
                 {banners && banners.length > 0 ? (
                     banners.map((bannerItem) => (
-                        <div key={bannerItem._id} className="relative flex p-0 w-full h-[250px] md:h-[600px]">
+                        <div key={bannerItem._id} className="relative flex p-0 w-full h-[230px] md:h-[600px]">
                             <Image
                                 src={bannerItem?.bannerImage.secure_url}
                                 alt={bannerItem?.bannerImage.alt || bannerItem.title || "Banner"}
                                 fill
+                                unoptimized
                                 className="object-cover rounded-md"
                             />
                             <div className="absolute left-[50%] translate-x-[-50%] bottom-5 md:bottom-25 z-10 flex flex-col items-center gap-2 md:gap-6">

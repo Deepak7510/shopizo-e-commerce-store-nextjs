@@ -39,6 +39,15 @@ const MediaCard: React.FC<MediaCardProps> = ({
     return (
         <Card className="rounded shadow-none hover:border-violet-700 py-2 relative">
             <CardContent className="px-2">
+                <div className="w-full h-64 relative">
+                    <Image
+                        src={media.secure_url}
+                        alt={media.alt || "Media Image"}
+                        className="object-cover"
+                        fill
+                        unoptimized
+                    />
+                </div>
                 <Checkbox
                     checked={
                         selectedMedia &&
@@ -78,21 +87,12 @@ const MediaCard: React.FC<MediaCardProps> = ({
                                 Restore
                             </DropdownMenuItem>
                         )}
-
                         <DropdownMenuItem variant="destructive" className="text-red-700 hover:text-red-700!" onClick={() => handleDelete([media._id], deleteType)}>
                             <Trash className="text-red-700" />
                             {deleteType === "SD" ? "Move Into Trash" : "Delete Permanently"}
                         </DropdownMenuItem>
-
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <Image
-                    src={media.secure_url}
-                    alt={media.alt || "Media Image"}
-                    className="object-cover w-full h-64"
-                    width={300}
-                    height={300}
-                />
             </CardContent>
         </Card>
     );

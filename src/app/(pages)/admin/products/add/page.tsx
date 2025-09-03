@@ -448,9 +448,9 @@ const AddProductPage = () => {
                                                                 <Image
                                                                     src={mediaItem.secure_url}
                                                                     alt={mediaItem.alt || "Media Image"}
-                                                                    className="object-cover w-full h-full"
-                                                                    width={50}
-                                                                    height={50}
+                                                                    className="object-cover"
+                                                                    fill
+                                                                    unoptimized
                                                                 />
                                                             </div>
                                                         )

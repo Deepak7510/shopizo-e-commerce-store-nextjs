@@ -126,9 +126,9 @@ const bannersColumns: ColumnDef<
                     <Image
                         src={row.original.bannerImage.secure_url}
                         alt={row.original.bannerImage.alt || "banner image"}
-                        className="object-cover w-full h-full"
-                        width={100}
-                        height={100}
+                        fill
+                        unoptimized
+                        className="object-cover"
                     />
                 </div>
             }

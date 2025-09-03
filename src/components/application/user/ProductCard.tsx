@@ -12,9 +12,10 @@ const ProductCard = ({ productItem }: { productItem: any }) => {
                 <div className="h-44 md:h-64 relative w-full rounded-t-sm overflow-hidden">
                     <Image
                         src={productItem?.media[0]?.secure_url}
-                        alt={"Media Image"}
+                        alt={productItem?.media[0]?.alt || productItem.title || "Product image"}
                         className="object-cover"
                         fill
+                        unoptimized
                     />
                 </div>
                 <div className='p-1'>

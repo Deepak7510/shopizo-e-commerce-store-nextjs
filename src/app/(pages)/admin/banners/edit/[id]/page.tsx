@@ -424,10 +424,10 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                         >
                                                             <Image
                                                                 src={mediaItem.secure_url}
-                                                                alt={mediaItem.alt || "Media Image"}
-                                                                className="object-cover w-full h-full"
-                                                                width={50}
-                                                                height={50}
+                                                                alt={mediaItem.alt || "selected media Image"}
+                                                                className="object-cover"
+                                                                fill
+                                                                unoptimized
                                                             />
                                                         </div>
                                                     ))}

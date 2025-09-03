@@ -133,10 +133,10 @@ const ProductVariatsColumn: ColumnDef<
                             < div key={index} className="h-12 w-10 relative rounded overflow-hidden">
                                 <Image
                                     src={mediaItem.secure_url}
-                                    alt={"Selected Image"}
-                                    className="object-cover w-full h-full"
-                                    width={100}
-                                    height={100}
+                                    alt={mediaItem.alt || "Variants image"}
+                                    className="object-cover"
+                                    fill
+                                    unoptimized
                                 />
                             </div>
                         )

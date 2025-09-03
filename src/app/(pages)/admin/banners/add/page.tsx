@@ -380,10 +380,10 @@ const AddBannerPage = () => {
                                                     >
                                                         <Image
                                                             src={mediaItem.secure_url}
-                                                            alt={mediaItem.alt || "Media Image"}
-                                                            className="object-cover w-full h-full"
-                                                            width={50}
-                                                            height={50}
+                                                            alt={mediaItem.alt || "selected media image"}
+                                                            fill
+                                                            unoptimized
+                                                            className="object-cover"
                                                         />
                                                     </div>
                                                 ))}

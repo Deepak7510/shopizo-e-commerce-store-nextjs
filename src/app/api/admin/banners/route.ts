@@ -59,6 +59,7 @@ export const GET = async function (req: NextRequest): Promise<NextResponse> {
                 $match: {
                     $or: [
                         { title: { $regex: globalFilter, $options: "i" } },
+                        { name: { $regex: globalFilter, $options: "i" } },
                         { type: { $regex: globalFilter, $options: "i" } },
                     ],
                 }
