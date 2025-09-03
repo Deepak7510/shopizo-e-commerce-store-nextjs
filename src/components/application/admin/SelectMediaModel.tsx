@@ -81,10 +81,10 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
                         ) : status === "error" ? (
                             <div>error</div>
                         ) : allMediaList && allMediaList?.length > 0 ? (
-                            <div className="grid grid-cols-5 gap-2">
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                                 {allMediaList?.map((media) => {
                                     return <div onClick={() => handleSelecteMediaList(media)} key={media._id} className="border rounded overflow-hidden space-y-2">
-                                        <div className="h-64 relative">
+                                        <div className="h-52 md:h-64 relative">
                                             <Image
                                                 src={media.secure_url}
                                                 alt={media.alt || "Media Image"}
@@ -96,7 +96,7 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
                                                 <Check className="text-white w-10 h-10" />
                                             </div>
                                         </div>
-                                        <h2 className="text-sm font-medium px-2 line-clamp-1">{media.title || "No Title"}</h2>
+                                        <h2 className="text-xs md:text-sm font-medium px-2 line-clamp-1">{media.title || "No Title"}</h2>
                                     </div>
                                 })}
                             </div>
@@ -104,26 +104,6 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
                             <div>No Media</div>
                         )}
                     </>
-
-                    <div className="grid grid-cols-5 gap-2">
-                        {allMediaList?.map((media) => {
-                            return <div onClick={() => handleSelecteMediaList(media)} key={media._id} className="border rounded overflow-hidden space-y-2">
-                                <div className="h-64 relative">
-                                    <Image
-                                        src={media.secure_url}
-                                        alt={media.alt || "Media Image"}
-                                        className="object-cover"
-                                        fill
-                                        unoptimized
-                                    />
-                                    <div className={`w-full h-full flex justify-center items-center top-0 absolute bg-gray-800 ${selecteMediaList.findIndex(mediItem => mediItem._id === media._id) >= 0 ? "opacity-50" : "opacity-0"}`}>
-                                        <Check className="text-white w-10 h-10" />
-                                    </div>
-                                </div>
-                                <h2 className="text-sm font-medium px-2 line-clamp-1">{media.title || "No Title"}</h2>
-                            </div>
-                        })}
-                    </div>
 
                     <div className="flex justify-center my-4">
                         {hasNextPage ? (
