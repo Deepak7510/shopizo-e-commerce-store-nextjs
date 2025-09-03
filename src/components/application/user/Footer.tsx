@@ -2,11 +2,12 @@
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import ApplicationLogo from "../common/ApplicationLogo";
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
 function Footer() {
     return (
-        <footer className="bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 py-10">
-            <div className="px-6 md:px-20 grid md:grid-cols-4 sm:grid-cols-2 gap-8 md:gap-20">
+        <footer className="bg-muted dark:bg-zinc-900 dark:border-t text-gray-700 dark:text-gray-300 py-10">
+            <div className="px-6 md:px-10 grid md:grid-cols-4 sm:grid-cols-2 gap-8 md:gap-10">
 
                 {/* Branding */}
                 <div>
@@ -15,14 +16,13 @@ function Footer() {
                         Learn Web helps you master modern web development through practical projects and hands-on training.
                     </p>
                     <div className="flex mt-4 space-x-3 text-gray-500">
-                        {/* <a href="#"><FaFacebookF className="hover:text-blue-600 transition" /></a>
-                        <a href="#"><FaInstagram className="hover:text-pink-500 transition" /></a>
-                        <a href="#"><FaTwitter className="hover:text-blue-400 transition" /></a>
-                        <a href="#"><FaLinkedinIn className="hover:text-blue-700 transition" /></a> */}
+                        <a href="#"><Facebook className="h-6 w-6 hover:text-black dark:hover:text-white" /></a>
+                        <a href="#"><Instagram className="h-6 w-6 hover:text-black dark:hover:text-white" /></a>
+                        <a href="#"><Twitter className="h-6 w-6 hover:text-black dark:hover:text-white" /></a>
+                        <a href="#"><Linkedin className="h-6 w-6 hover:text-black dark:hover:text-white" /></a>
                     </div>
                 </div>
 
-                {/* Quick Links */}
                 <div>
                     <h3 className="text-black dark:text-white text-lg font-semibold mb-4">Quick Links</h3>
                     <ul className="space-y-2 text-sm">

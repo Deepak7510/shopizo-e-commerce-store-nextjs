@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { adminRoutes } from "@/lib/client/routes";
-import React from "react";
+import React, { useEffect } from "react";
 import {
     Form,
     FormControl,
@@ -54,8 +54,16 @@ const AddCouponPage = () => {
             code: "",
             discountPercentage: 0,
             minShoppingAmount: 0,
+            validity: undefined,
         }
     });
+
+    const discountPercentage = form.watch("discountPercentage")
+    const minShoppingAmount = form.watch("minShoppingAmount")
+    useEffect(() => {
+        form.setValue("discountPercentage", discountPercentage && Number(discountPercentage))
+        form.setValue("minShoppingAmount", minShoppingAmount && Number(minShoppingAmount))
+    }, [discountPercentage, minShoppingAmount, form]);
 
     async function onSubmit(data: TypeOfAddCouponInput) {
         const result = await createCouponService(data);

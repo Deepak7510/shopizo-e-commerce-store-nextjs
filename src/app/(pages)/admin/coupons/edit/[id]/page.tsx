@@ -52,8 +52,6 @@ const breadcrumbList: breadcrumbListType[] = [
 const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const router = useRouter()
     const { id } = use(params);
-    const { data, error: couponError, loading: couponLoading } = useFetch(`/api/admin/coupons/details/${id}`, {}, [id])
-
 
     const form = useForm<TypeOfEditCouponInput>({
         resolver: zodResolver(editCouponZodSchema),
@@ -65,6 +63,16 @@ const EditCouponPage = ({ params }: { params: Promise<{ id: string }> }) => {
             validity: undefined,
         },
     });
+
+    const discountPercentage = form.watch("discountPercentage")
+    const minShoppingAmount = form.watch("minShoppingAmount")
+    useEffect(() => {
+        form.setValue("discountPercentage", discountPercentage && Number(discountPercentage))
+        form.setValue("minShoppingAmount", minShoppingAmount && Number(minShoppingAmount))
+    }, [discountPercentage, minShoppingAmount, form]);
+
+
+    const { data, error: couponError, loading: couponLoading } = useFetch(`/api/admin/coupons/details/${id}`, {}, [id])
 
     useEffect(() => {
         if (data?.data?.coupon) {

@@ -83,6 +83,35 @@ const AddProductPage = () => {
         },
     });
 
+    const title = form.watch("title");
+    const mrp = form.watch("mrp");
+    const sellingPrice = form.watch("sellingPrice");
+    const discountPercentage = form.watch("discountPercentage");
+
+    useEffect(() => {
+        const slugValue = slugify(title.toLowerCase());
+        form.setValue("slug", slugValue);
+    }, [title, form]);
+
+    useEffect(() => {
+        form.setValue("discountPercentage", discountPercentage && Number(discountPercentage))
+        form.setValue("mrp", mrp && Number(mrp))
+        form.setValue("sellingPrice", sellingPrice && Number(sellingPrice))
+    }, [discountPercentage, mrp, sellingPrice, form]);
+
+    useEffect(() => {
+        form.setValue("discountPercentage", discountPercentage && Number(discountPercentage))
+        form.setValue("mrp", mrp && Number(mrp))
+        form.setValue("sellingPrice", sellingPrice && Number(sellingPrice))
+    }, [discountPercentage, mrp, sellingPrice, form]);
+
+    useEffect(() => {
+        if (selectedMedia && selectedMedia.length > 0) {
+            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
+            form.setValue("media", mediaIds);
+        }
+    }, [selectedMedia, form]);
+
     const {
         data: brandData,
         loading: brandLoading,
@@ -97,56 +126,22 @@ const AddProductPage = () => {
     const brands = brandData?.data?.brands as TypeOfBrandData[];
     const categories = categoryData?.data?.categories as TypeOfCategoryData[];
 
-    useEffect(() => {
-        const title = form.watch("title");
-        const slugValue = slugify(title.toLowerCase());
-        form.setValue("slug", slugValue);
-    }, [form.watch("title"), form]);
 
+    const category = form.watch("category")
     useEffect(() => {
-        if (selectedMedia && selectedMedia.length > 0) {
-            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
-            form.setValue("media", mediaIds);
-        }
-    }, [selectedMedia, form]);
-
-
-    useEffect(() => {
-        if (form.watch("category")) {
+        if (category) {
             async function fetchSubcategories() {
                 try {
-                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${form.watch("category")}`);
+                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${category}`);
                     const subcategories = response.data.data.subcategories;
                     setSubcategories(subcategories);
                 } catch (error: any) {
                     console.error(error);
                 }
             }
-
             fetchSubcategories();
         }
-    }, [form.watch("category"), form]);
-
-    useEffect(() => {
-        const mrp = form.watch("mrp");
-        const sellingPrice = form.watch("sellingPrice");
-        if (mrp > 0 || sellingPrice > 0) {
-            const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
-            form.setValue("discountPercentage", discountPercentage);
-        }
-    }, [form.watch("mrp"), form.watch("sellingPrice"), form]);
-
-
-    if (brandError || categoryError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {brandError?.message ||
-                    categoryError?.message ||
-                    "Something went worng."}
-            </div>
-        );
-    }
-
+    }, [category, form]);
 
     async function onSubmit(data: TypeOfAddProductInput) {
         const result = await createProductService(data);
@@ -157,6 +152,16 @@ const AddProductPage = () => {
         form.reset();
         setSelectedMedia([]);
         toast.success(result.message);
+    }
+
+    if (brandError || categoryError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {brandError?.message ||
+                    categoryError?.message ||
+                    "Something went worng."}
+            </div>
+        );
     }
 
     return (

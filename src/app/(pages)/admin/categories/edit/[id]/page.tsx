@@ -40,10 +40,6 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const paramsValue = use(params);
     const id = paramsValue.id;
     const router = useRouter()
-    const { data, loading, error } = useFetch(`/api/admin/categories/details/${id}`, {}, [id]);
-
-
-
     const form = useForm<TypeOfEditCategoryInput>({
         resolver: zodResolver(editCatgeoryZodSchema),
         defaultValues: {
@@ -60,6 +56,8 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
         const slugValue = slugify(categoryName.toLowerCase())
         form.setValue("slug", slugValue)
     }, [categoryName, form])
+
+    const { data, loading, error } = useFetch(`/api/admin/categories/details/${id}`, {}, [id]);
 
     useEffect(() => {
         if (data?.data?.category) {
@@ -88,7 +86,6 @@ const EditCategoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
     if (error) {
         return <div className='text-xl text-red-700 font-medium'>{error?.message}</div>
     }
-
 
     return (<div className='space-y-3'>
         <BreadCrumb breadcrumbList={breadcrumbList} />

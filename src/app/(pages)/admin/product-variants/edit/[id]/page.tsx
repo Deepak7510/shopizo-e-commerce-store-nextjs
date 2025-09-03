@@ -106,6 +106,32 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
         },
     });
 
+    const stock = form.watch("stock");
+    const mrp = form.watch("mrp");
+    const sellingPrice = form.watch("sellingPrice");
+    const discountPercentage = form.watch("discountPercentage");
+
+    useEffect(() => {
+        form.setValue("discountPercentage", discountPercentage && Number(discountPercentage))
+        form.setValue("mrp", mrp && Number(mrp))
+        form.setValue("sellingPrice", sellingPrice && Number(sellingPrice))
+        form.setValue("stock", stock && Number(stock))
+    }, [discountPercentage, stock, mrp, sellingPrice, form]);
+
+    useEffect(() => {
+        if (mrp > 0 || sellingPrice > 0) {
+            const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
+            form.setValue("discountPercentage", discountPercentage);
+        }
+    }, [mrp, sellingPrice, form]);
+
+    useEffect(() => {
+        if (selectedMedia && selectedMedia.length > 0) {
+            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
+            form.setValue("media", mediaIds);
+        }
+    }, [selectedMedia, form]);
+
     const {
         data: productData,
         loading: productLoading,
@@ -126,22 +152,6 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
 
     const products = productData?.data?.products;
     const colors = colorData?.data?.colors
-
-    useEffect(() => {
-        const mrp = form.watch("mrp");
-        const sellingPrice = form.watch("sellingPrice");
-        if (mrp > 0 || sellingPrice > 0) {
-            const discountPercentage = Math.floor(((mrp - sellingPrice) / mrp) * 100);
-            form.setValue("discountPercentage", discountPercentage);
-        }
-    }, [form.watch("mrp"), form.watch("sellingPrice"), form]);
-
-    useEffect(() => {
-        if (selectedMedia && selectedMedia.length > 0) {
-            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
-            form.setValue("media", mediaIds);
-        }
-    }, [selectedMedia, form]);
 
 
     useEffect(() => {
@@ -166,15 +176,7 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
     }, [productVariantData, form]);
 
 
-    if (productError || productVariantError || colorError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {productError?.message ||
-                    productVariantError?.message || colorError?.message ||
-                    "Something went worng."}
-            </div>
-        );
-    }
+
 
     async function onSubmit(data: TypeOfEditProductVarinatInput) {
         const result = await updateProductVariantService(data);
@@ -186,6 +188,16 @@ const EditProductVariantPage = ({ params }: { params: Promise<{ id: string }> })
         setSelectedMedia([]);
         toast.success(result.message);
         return router.push(adminRoutes.productVariants.productVariants);
+    }
+
+    if (productError || productVariantError || colorError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {productError?.message ||
+                    productVariantError?.message || colorError?.message ||
+                    "Something went worng."}
+            </div>
+        );
     }
 
     return (

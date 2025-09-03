@@ -14,7 +14,11 @@ import CommonDataTable from "@/components/application/admin/CommonDataTable";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { TypeOfProductData } from "@/types/admin.products.types";
 import Image from "next/image";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import EditAction from "@/components/application/admin/EditAction";
 import DeleteAction from "@/components/application/admin/DeleteAction";
 import { Card } from "@/components/ui/card";
@@ -31,91 +35,92 @@ const breadcrumbList: breadcrumbListType[] = [
     },
 ];
 
-const ProductsColumns: ColumnDef<
-    TypeOfProductData,
-    unknown
->[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
-            ),
-            enableSorting: false,
-            enableHiding: false,
+const ProductsColumns: ColumnDef<TypeOfProductData, unknown>[] = [
+    {
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "title",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Title
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            );
         },
-        {
-            accessorKey: "title",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Title
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                );
-            },
-        },
-        {
-            accessorKey: "slug",
-            header: "Slug",
-        },
-        {
-            accessorKey: "brand.name",
-            header: "Brand",
-            cell: ({ row }) => row.original.brand?.name || "-",
-        },
+    },
+    {
+        accessorKey: "slug",
+        header: "Slug",
+    },
+    {
+        accessorKey: "brand.name",
+        header: "Brand",
+        cell: ({ row }) => row.original.brand?.name || "-",
+    },
 
-        {
-            accessorKey: "category.name",
-            header: "Category",
-            cell: ({ row }) => row.original.category?.name || "-",
+    {
+        accessorKey: "category.name",
+        header: "Category",
+        cell: ({ row }) => row.original.category?.name || "-",
+    },
+    {
+        accessorKey: "subcategory.name",
+        header: "Subcategory",
+        cell: ({ row }) => row.original.subcategory?.name || "-",
+    },
+    {
+        accessorKey: "mrp",
+        header: "MRP",
+    },
+    {
+        accessorKey: "sellingPrice",
+        header: "Selling price",
+    },
+    {
+        accessorKey: "discountPercentage",
+        header: "Discount",
+        cell: ({ row }) => {
+            return <span>{row.original.discountPercentage || 0} %</span>;
         },
-        {
-            accessorKey: "subcategory.name",
-            header: "Subcategory",
-            cell: ({ row }) => row.original.subcategory?.name || "-",
-        },
-        {
-            accessorKey: "mrp",
-            header: "MRP",
-        },
-        {
-            accessorKey: "sellingPrice",
-            header: "Selling price",
-        },
-        {
-            accessorKey: "discountPercentage",
-            header: "Discount",
-            cell: ({ row }) => {
-                return <span>{row.original.discountPercentage || 0} %</span>
-            }
-        },
-        {
-            accessorKey: "media",
-            header: "Media",
-            cell: ({ row }) => {
-
-                const media = row.original.media
-                return <div className="flex gap-1">
-                    {
-                        media && media.length > 0 && media.map((mediaItem, index) =>
-                            < div key={index} className="h-12 w-10 relative rounded overflow-hidden">
+    },
+    {
+        accessorKey: "media",
+        header: "Media",
+        cell: ({ row }) => {
+            const media = row.original.media;
+            return (
+                <div className="flex gap-1">
+                    {media &&
+                        media.length > 0 &&
+                        media.map((mediaItem, index) => (
+                            <div
+                                key={index}
+                                className="h-12 w-10 relative rounded overflow-hidden"
+                            >
                                 <Image
                                     src={mediaItem.secure_url}
                                     alt={mediaItem.alt || "Selected Image"}
@@ -124,38 +129,29 @@ const ProductsColumns: ColumnDef<
                                     fill
                                 />
                             </div>
-                        )
-                    }
+                        ))}
                 </div>
-            }
+            );
         },
+    },
 
-        {
-            accessorKey: "createdAt",
-            header: "Created At",
-            cell: ({ row }) => {
-                const date = new Date(row.getValue("createdAt"));
-                return (
-                    <span>
-                        {dateResolver(date)}
-                    </span>
-                );
-            },
+    {
+        accessorKey: "createdAt",
+        header: "Created At",
+        cell: ({ row }) => {
+            const date = new Date(row.getValue("createdAt"));
+            return <span>{dateResolver(date)}</span>;
         },
-        {
-            accessorKey: "updatedAt",
-            header: "Updated At",
-            cell: ({ row }) => {
-                const date = new Date(row.getValue("updatedAt"));
-                return (
-                    <span>
-                        {dateResolver(date)}
-                    </span>
-                );
-            },
+    },
+    {
+        accessorKey: "updatedAt",
+        header: "Updated At",
+        cell: ({ row }) => {
+            const date = new Date(row.getValue("updatedAt"));
+            return <span>{dateResolver(date)}</span>;
         },
-    ];
-
+    },
+];
 
 const Action = React.memo<{
     row: Row<TypeOfProductData>;
@@ -174,17 +170,23 @@ const Action = React.memo<{
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                {
-                    deleteType === "SD" && <EditAction row={row} editEndPoint={adminRoutes.products.editProduct} />
-                }
-                <DeleteAction row={row} handleDeleteAlert={handleDeleteAlert} deleteType={deleteType} />
+                {deleteType === "SD" && (
+                    <EditAction
+                        row={row}
+                        editEndPoint={adminRoutes.products.editProduct}
+                    />
+                )}
+                <DeleteAction
+                    row={row}
+                    handleDeleteAlert={handleDeleteAlert}
+                    deleteType={deleteType}
+                />
             </DropdownMenuContent>
         </DropdownMenu>
     );
 });
 
-Action.displayName = "Action"
-
+Action.displayName = "Action";
 
 const ProductPage = () => {
     const [deleteType, setDeleteType] = useState<TypeOfDeleteType>("SD");
@@ -216,7 +218,7 @@ const ProductPage = () => {
                     Action={Action}
                 />
             </Card>
-        </div >
+        </div>
     );
 };
 

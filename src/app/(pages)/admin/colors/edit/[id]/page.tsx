@@ -39,10 +39,6 @@ const EditColorPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const router = useRouter()
     const paramsValue = use(params);
     const id = paramsValue.id;
-    const { data, error, loading } = useFetch(`/api/admin/colors/details/${id}`, {}, [id]);
-
-
-
 
     const form = useForm<TypeOfEditColorInput>({
         resolver: zodResolver(editColorZodSchema),
@@ -62,6 +58,7 @@ const EditColorPage = ({ params }: { params: Promise<{ id: string }> }) => {
         form.setValue("slug", slugValue)
     }, [colorName, form]);
 
+    const { data, error, loading } = useFetch(`/api/admin/colors/details/${id}`, {}, [id]);
 
     useEffect(() => {
         if (data?.data?.color) {

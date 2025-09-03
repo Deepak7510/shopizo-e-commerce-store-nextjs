@@ -90,12 +90,6 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
         },
     });
 
-    const {
-        data,
-        loading: bannerDataLoading,
-        error: bannerDataError,
-    } = useFetch(`/api/admin/banners/details/${id}`, {}, [id]);
-
     useEffect(() => {
         if (selectedMedia && selectedMedia.length > 0) {
             if (selectedMedia.length > 1) {
@@ -107,6 +101,12 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
             form.setValue("bannerImage", mediaIds[0]);
         }
     }, [selectedMedia, form]);
+
+    const {
+        data,
+        loading: bannerDataLoading,
+        error: bannerDataError,
+    } = useFetch(`/api/admin/banners/details/${id}`, {}, [id]);
 
     useEffect(() => {
         if (data?.data?.banner) {

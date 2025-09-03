@@ -43,7 +43,6 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
     const paramsValue = use(params);
     const id = paramsValue.id;
     const router = useRouter()
-    const { data: subcatgory, loading, error } = useFetch(`/api/admin/subcategories/details/${id}`, {}, [id]);
 
     const { data: categoriesData, loading: categoryLoading, error: categoryError } = useFetch(
         `/api/admin/categories/get-all`,
@@ -68,6 +67,8 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
         form.setValue("slug", slugValue)
     }, [categoryName, form]);
 
+    const { data: subcatgory, loading, error } = useFetch(`/api/admin/subcategories/details/${id}`, {}, [id]);
+
     useEffect(() => {
         if (subcatgory) {
             form.reset({
@@ -79,7 +80,6 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
             })
         }
     }, [subcatgory, form]);
-
 
     async function onSubmit(data: TypeOfEditSubcategoryInput) {
         const result = await updateSubcategoryService(data);
@@ -93,12 +93,8 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
         return
     }
 
-    if (error) {
-        return <div className='text-xl text-red-700 font-medium'>{error.message}</div>
-    }
-
-    if (categoryError) {
-        return <div className='text-xl text-red-700 font-medium'>{categoryError.message}</div>
+    if (error || categoryError) {
+        return <div className='text-xl text-red-700 font-medium'>{error?.message || categoryError?.message}</div>
     }
 
     return (<div className='space-y-3'>

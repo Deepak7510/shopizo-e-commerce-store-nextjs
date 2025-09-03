@@ -62,12 +62,52 @@ const breadcrumbList: breadcrumbListType[] = [
 ];
 
 const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const router = useRouter()
-    const { id } = use(params)
+    const router = useRouter();
+    const { id } = use(params);
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
-    const [subcategories, setSubcategories] = useState<TypeOfSubcategoryData[] | []>([])
+    const [subcategories, setSubcategories] = useState<
+        TypeOfSubcategoryData[] | []
+    >([]);
+
+    const form = useForm<TypeOfEditProductInput>({
+        resolver: zodResolver(editProductZodSchema),
+        defaultValues: {
+            _id: "",
+            title: "",
+            slug: "",
+            brand: "",
+            category: "",
+            subcategory: "",
+            media: [],
+            description: "",
+        },
+    });
+
+    const mrp = form.watch("mrp");
+    const sellingPrice = form.watch("sellingPrice");
+    const discountPercentage = form.watch("discountPercentage");
+    const title = form.watch("title");
+
+    useEffect(() => {
+        const slugValue = slugify(title.toLowerCase());
+        form.setValue("slug", slugValue);
+    }, [title, form]);
+
+    useEffect(() => {
+        form.setValue("discountPercentage", discountPercentage && Number(discountPercentage))
+        form.setValue("mrp", mrp && Number(mrp))
+        form.setValue("sellingPrice", sellingPrice && Number(sellingPrice))
+    }, [discountPercentage, mrp, sellingPrice, form]);
+
+    useEffect(() => {
+        if (selectedMedia && selectedMedia.length > 0) {
+            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
+            form.setValue("media", mediaIds);
+        }
+    }, [selectedMedia, form]);
+
 
     const {
         data: brandData,
@@ -86,45 +126,17 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         error: productDataError,
     } = useFetch(`/api/admin/products/details/${id}`, {}, [id]);
 
-    const form = useForm<TypeOfEditProductInput>({
-        resolver: zodResolver(editProductZodSchema),
-        defaultValues: {
-            _id: "",
-            title: "",
-            slug: "",
-            brand: "",
-            category: "",
-            subcategory: "",
-            media: [],
-            description: "",
-        },
-    });
-
     const brands = brandData?.data?.brands as TypeOfBrandData[];
     const categories = categoryData?.data?.categories as TypeOfCategoryData[];
 
-
-
-    const watchedTitle = form.watch("title");
     const watchedCategory = form.watch("category");
-
-    useEffect(() => {
-        const slugValue = slugify(watchedTitle.toLowerCase());
-        form.setValue("slug", slugValue);
-    }, [watchedTitle, form]);
-
-    useEffect(() => {
-        if (selectedMedia && selectedMedia.length > 0) {
-            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
-            form.setValue("media", mediaIds);
-        }
-    }, [selectedMedia, form]);
-
     useEffect(() => {
         if (watchedCategory) {
             async function fetchSubcategories() {
                 try {
-                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${watchedCategory}`);
+                    const response = await axiosInstance.get(
+                        `/api/admin/subcategories/get/${watchedCategory}`
+                    );
                     const subcategories = response.data.data.subcategories;
                     setSubcategories(subcategories);
                 } catch (error: any) {
@@ -147,10 +159,23 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 media: product?.media?.map((m: any) => m._id) || [],
                 brand: product.brand || "",
                 description: product.description || "",
-            })
-            setSelectedMedia(product.media)
+            });
+            setSelectedMedia(product.media);
         }
-    }, [productData, form])
+    }, [productData, form]);
+
+
+    async function onSubmit(data: TypeOfEditProductInput) {
+        const result = await updateProductService(data);
+        if (!result.success) {
+            toast.error(result.message);
+            return;
+        }
+        form.reset();
+        setSelectedMedia([]);
+        toast.success(result.message);
+        return router.push(adminRoutes.products.products);
+    }
 
     if (brandError || categoryError || productDataError) {
         return (
@@ -163,18 +188,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         );
     }
 
-    async function onSubmit(data: TypeOfEditProductInput) {
-        const result = await updateProductService(data);
-        if (!result.success) {
-            toast.error(result.message);
-            return;
-        }
-        form.reset();
-        setSelectedMedia([]);
-        toast.success(result.message);
-        return router.push(adminRoutes.products.products)
-    }
-
     return (
         <div className="space-y-1">
             <BreadCrumb breadcrumbList={breadcrumbList} />
@@ -185,9 +198,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     </h1>
                     <div className="flex items-center gap-2">
                         <Button asChild size={"sm"}>
-                            <Link href={adminRoutes.products.products}>
-                                Show Products
-                            </Link>
+                            <Link href={adminRoutes.products.products}>Show Products</Link>
                         </Button>
                     </div>
                 </div>
@@ -195,9 +206,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
-                        {categoryLoading ||
-                            brandLoading ||
-                            productDataLoading ? (
+                        {categoryLoading || brandLoading || productDataLoading ? (
                             <ProductFormSkeleton />
                         ) : (
                             <Form {...form} key={form.watch("_id") || "Edit Product"}>
@@ -212,12 +221,11 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="title"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Title <span className="text-red-600">*</span></FormLabel>
+                                                        <FormLabel>
+                                                            Title <span className="text-red-600">*</span>
+                                                        </FormLabel>
                                                         <FormControl>
-                                                            <Input
-                                                                placeholder="Enter the title"
-                                                                {...field}
-                                                            />
+                                                            <Input placeholder="Enter the title" {...field} />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -230,7 +238,9 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="slug"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Slug <span className="text-red-600">*</span></FormLabel>
+                                                        <FormLabel>
+                                                            Slug <span className="text-red-600">*</span>
+                                                        </FormLabel>
                                                         <FormControl>
                                                             <Input
                                                                 readOnly
@@ -249,7 +259,9 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="brand"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Brand <span className="text-red-600">*</span></FormLabel>
+                                                        <FormLabel>
+                                                            Brand <span className="text-red-600">*</span>
+                                                        </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             value={field.value}
@@ -263,10 +275,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                                 {brands &&
                                                                     brands.length > 0 &&
                                                                     brands?.map((item: TypeOfBrandData) => (
-                                                                        <SelectItem
-                                                                            key={item._id}
-                                                                            value={item._id}
-                                                                        >
+                                                                        <SelectItem key={item._id} value={item._id}>
                                                                             {item.name}
                                                                         </SelectItem>
                                                                     ))}
@@ -283,7 +292,9 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="category"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Category <span className="text-red-600">*</span></FormLabel>
+                                                        <FormLabel>
+                                                            Category <span className="text-red-600">*</span>
+                                                        </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             value={field.value}
@@ -319,7 +330,10 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="subcategory"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Subcategory <span className="text-red-600">*</span></FormLabel>
+                                                        <FormLabel>
+                                                            Subcategory{" "}
+                                                            <span className="text-red-600">*</span>
+                                                        </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             value={field.value}
@@ -355,7 +369,10 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="description"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Description <span className="text-red-600">*</span></FormLabel>
+                                                        <FormLabel>
+                                                            Description{" "}
+                                                            <span className="text-red-600">*</span>
+                                                        </FormLabel>
                                                         <FormControl>
                                                             <div>
                                                                 <ReactQuill
@@ -383,7 +400,9 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="media"
                                                 render={() => (
                                                     <FormItem className="flex flex-col justify-center items-center">
-                                                        <FormLabel>Media <span className="text-red-600">*</span></FormLabel>
+                                                        <FormLabel>
+                                                            Media <span className="text-red-600">*</span>
+                                                        </FormLabel>
                                                         <FormControl>
                                                             <Button
                                                                 type="button"
@@ -399,9 +418,13 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 )}
                                             />
                                             <div className="flex gap-2 justify-center mt-4 flex-wrap">
-                                                {
-                                                    selectedMedia && selectedMedia.length > 0 && selectedMedia.map((mediaItem, index) =>
-                                                        < div key={index} className="h-20 relative rounded overflow-hidden">
+                                                {selectedMedia &&
+                                                    selectedMedia.length > 0 &&
+                                                    selectedMedia.map((mediaItem, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="h-20 relative rounded overflow-hidden"
+                                                        >
                                                             <Image
                                                                 src={mediaItem.secure_url}
                                                                 alt={mediaItem.alt || "Selected media image"}
@@ -410,9 +433,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                                 unoptimized
                                                             />
                                                         </div>
-                                                    )
-                                                }
-
+                                                    ))}
                                             </div>
                                         </div>
                                     </div>
@@ -427,7 +448,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     </CardContent>
                 </Card>
             </Card>
-        </div >
+        </div>
     );
 };
 

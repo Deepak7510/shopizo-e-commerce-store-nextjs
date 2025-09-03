@@ -50,7 +50,6 @@ const EditBrandPage = ({ params }: { params: Promise<{ id: string }> }) => {
         }
     })
 
-
     const brandName = form.watch("name");
     useEffect(() => {
         const slugValue = slugify(brandName.toLowerCase())

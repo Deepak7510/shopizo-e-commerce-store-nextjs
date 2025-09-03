@@ -9,9 +9,9 @@ import {
     ShoppingCart,
     Users2,
     Star,
-    Image,
     Sun,
     Square,
+    ImageIcon,
 } from "lucide-react";
 
 import { adminRoutes } from "./routes";
@@ -80,6 +80,6 @@ export const adminAppSidebarMenu = [
     {
         title: "Media",
         url: adminRoutes.medias.media,
-        icon: <Image />,
+        icon: <ImageIcon />,
     },
 ];
