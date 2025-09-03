@@ -54,7 +54,7 @@ const AddCouponPage = () => {
             code: "",
             discountPercentage: 0,
             minShoppingAmount: 0,
-        },
+        }
     });
 
     async function onSubmit(data: TypeOfAddCouponInput) {

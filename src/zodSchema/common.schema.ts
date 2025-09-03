@@ -1,21 +1,11 @@
 import { z } from "zod";
 
-
-const toNumber = (val: unknown): number => {
-    if (val === "" || val === null || val === undefined) return 0;
-    const num = Number(val);
-    return isNaN(num) ? 0 : num;
-};
-
 const commonZodSchema = z.object({
     name: z
         .string()
         .nonempty("Name is required")
         .min(3, "Name must be atleast 4 character"),
-    email: z
-        .string()
-        .nonempty("Email is required")
-        .email("Invalid email format"),
+    email: z.string().nonempty("Email is required").email("Invalid email format"),
     password: z
         .string()
         .nonempty("Password is required")
@@ -35,7 +25,10 @@ const commonZodSchema = z.object({
     path: z.string().nonempty("Path url is required"),
     thumbnail_url: z.string().url().optional(),
     _id: z.string().nonempty("Id is required"),
-    title: z.string().nonempty("Title is required").min(3, "Title must be at least 3 characters"),
+    title: z
+        .string()
+        .nonempty("Title is required")
+        .min(3, "Title must be at least 3 characters"),
     alt: z
         .string()
         .nonempty("Alt is required")
@@ -54,58 +47,68 @@ const commonZodSchema = z.object({
     website: z.string().optional(),
     productId: z.string().nonempty("Product id is required"),
     sku: z
-        .string().nonempty("SKU is required")
+        .string()
+        .nonempty("SKU is required")
         .min(3, "SKU must be at least 3 characters long")
         .max(50, "SKU must not exceed 50 characters"),
     size: z
-        .string().nonempty("Size is required")
+        .string()
+        .nonempty("Size is required")
         .min(1, "Size must not be empty"),
     color: z
-        .string().nonempty("Color is required")
+        .string()
+        .nonempty("Color is required")
         .min(3, "Color must be at least 3 characters long"),
     material: z
-        .string().nonempty("Material is required")
+        .string()
+        .nonempty("Material is required")
         .min(3, "Material must be at least 3 characters long"),
 
-
-    mrp: z.preprocess(
-        toNumber,
-        z.number({
+    mrp: z
+        .number({
             required_error: "MRP is required",
-            invalid_type_error: "MRP must be a number"
+            invalid_type_error: "MRP must be a number",
         })
-            .positive("MRP must be greater than 0")
-            .refine((val) => val !== undefined, { message: "MRP is required" })
-    ),
-    sellingPrice: z.preprocess(
-        toNumber,
-        z.number({
+        .positive("MRP must be greater than 0")
+        .refine((val) => val !== undefined, { message: "MRP is required" }),
+    sellingPrice: z
+        .number({
             required_error: "Selling Price is required",
-            invalid_type_error: "Selling Price must be a number"
+            invalid_type_error: "Selling Price must be a number",
         })
-            .positive("Selling Price must be greater than 0")
-            .refine((val) => val !== undefined, { message: "Selling Price is required" })
-    ),
-    discountPercentage: z.preprocess(
-        toNumber,
-        z.number({ required_error: "Discount Percentage is required", invalid_type_error: "Discount must be a number" }).min(0, "Discount can't be negative").max(100, "Discount can't be more than 100%")
-    ),
-    stock: z.preprocess(
-        toNumber,
-        z.number({ invalid_type_error: "Stock must be a number" }).int("Stock must be an integer").nonnegative("Stock cannot be negative").optional()
-    ),
-    minShoppingAmount: z.preprocess(
-        toNumber,
-        z.number({ invalid_type_error: "Min shopping amount must be a valid number" }).positive("Min shopping amount must be greater than 0").optional()
-    ),
-
+        .positive("Selling Price must be greater than 0")
+        .refine((val) => val !== undefined, {
+            message: "Selling Price is required",
+        }),
+    discountPercentage: z
+        .number({
+            required_error: "Discount Percentage is required",
+            invalid_type_error: "Discount must be a number",
+        })
+        .min(0, "Discount can't be negative")
+        .max(100, "Discount can't be more than 100%"),
+    stock: z
+        .number({ invalid_type_error: "Stock must be a number" })
+        .int("Stock must be an integer")
+        .nonnegative("Stock cannot be negative")
+        .optional(),
+    minShoppingAmount: z
+        .number({
+            invalid_type_error: "Min shopping amount must be a valid number",
+        })
+        .positive("Min shopping amount must be greater than 0")
+        .optional(),
 
 
     isDefault: z.boolean({ required_error: "Deafult is required" }),
     code: z
-        .string().nonempty("Code is required")
+        .string()
+        .nonempty("Code is required")
         .min(3, "Code must be at least 3 characters long"),
-    hexCode: z.string().nonempty("Hex code is required").startsWith("#", "Hex code start be #"),
+    hexCode: z
+        .string()
+        .nonempty("Hex code is required")
+        .startsWith("#", "Hex code start be #"),
     validity: z.coerce.date(),
     subtitle: z.string().optional(),
     buttonName: z.string().nonempty("Button name is required"),
