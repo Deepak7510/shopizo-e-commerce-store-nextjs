@@ -35,7 +35,7 @@ const SelectMediaModel: React.FC<SelectMediaModelProps> = ({ openSelectMediaMode
 
     const allMediaList = data?.pages
         ?.flatMap((group) => group.data.mediaList)
-        .filter((item) => item.secure_url) as mediaType[];
+        .filter((item: any) => item.secure_url) as mediaType[];
 
 
     function handleSelecteMediaList(media: mediaType) {

@@ -277,7 +277,7 @@ const EditBannerPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {bannerType.map((item) => (
+                                                                {bannerType.map((item: any) => (
                                                                     <SelectItem
                                                                         key={item.label}
                                                                         value={item.value}

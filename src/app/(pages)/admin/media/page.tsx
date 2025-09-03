@@ -64,7 +64,7 @@ const MediaPage = () => {
 
     const allMediaList = data?.pages
         ?.flatMap((group) => group.data.mediaList)
-        .filter((item) => item.secure_url);
+        .filter((item: any) => item.secure_url);
 
     function handleDeleteType(deleteTypeValue: TypeOfDeleteType) {
         setDeleteType(deleteTypeValue);

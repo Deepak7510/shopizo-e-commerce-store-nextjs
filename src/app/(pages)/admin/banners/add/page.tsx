@@ -237,7 +237,7 @@ const AddBannerPage = () => {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {bannerType.map((item) => (
+                                                            {bannerType.map((item: any) => (
                                                                 <SelectItem key={item.label} value={item.value}>
                                                                     {item.label}
                                                                 </SelectItem>
