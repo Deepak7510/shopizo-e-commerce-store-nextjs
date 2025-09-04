@@ -72,7 +72,7 @@ const bannersColumns: ColumnDef<
                 );
             },
             cell: ({ row }) => {
-                return <span>{stringShorter(row.original.name, 3)}</span>
+                return <span>{stringShorter(row.original.name, 15)}</span>
             }
         },
         {
@@ -89,14 +89,14 @@ const bannersColumns: ColumnDef<
                 );
             },
             cell: ({ row }) => {
-                return <span>{stringShorter(row.original.title, 3)}</span>
+                return <span>{stringShorter(row.original.title, 15)}</span>
             },
         },
         {
             accessorKey: "subtitle",
             header: "Sub title",
             cell: ({ row }) => {
-                return <span>{stringShorter(row.original.subtitle, 3)}</span>
+                return <span>{stringShorter(row.original.subtitle, 15)}</span>
             }
         },
         {

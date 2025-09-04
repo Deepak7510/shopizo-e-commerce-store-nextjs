@@ -13,26 +13,26 @@ export default async function HomePage() {
       {/* slider seaction  */}
       <MainSlider />
       {/* promotion Section  */}
-      <section className="my-10 md:my-20 px-2 md:px-25">
+      <section className="my-5 md:my-10 px-3 md:px-25">
         <PromoBanner />
       </section>
 
       {/* features Product Section  */}
-      <section className="my-10 md:my-20 px-2 md:px-25">
+      <section className="my-5 md:my-10 px-3 md:px-25">
         <FeaturesProducts />
       </section>
 
       {/* BigPromo Banner  */}
-      <section className="my-10 md:my-20 px-2 md:px-25">
+      <section className="my-5 md:my-10 px-3 md:px-25">
         <BigPromoBanner />
       </section>
 
       {/* CoustomerReviews  */}
-      <section className="my-10 md:my-20 md:mb-10 px-2 md:px-25 ">
+      <section className="my-5 md:my-10 md:mb-10 px-3 md:px-25 ">
         <CoustomerReviews />
       </section>
 
-      <section className="my-10 px-2 md:px-25">
+      <section className="my-5 px-3 md:px-25">
         <Card className="p-2 shadow-none dark:border-slate-700 dark:bg-slate-950/20">
           <div className="grid md:grid-cols-4 gap-5 mt-3">
             <div className="flex flex-col items-center gap-0.5 text-center">

@@ -65,7 +65,6 @@ const AddProductPage = () => {
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
-    const [subcategories, setSubcategories] = useState<TypeOfSubcategoryData[] | []>([])
 
     const form = useForm<TypeOfAddProductInput>({
         resolver: zodResolver(addProductZodSchema),
@@ -105,12 +104,7 @@ const AddProductPage = () => {
         form.setValue("sellingPrice", sellingPrice && Number(sellingPrice))
     }, [discountPercentage, mrp, sellingPrice, form]);
 
-    useEffect(() => {
-        if (selectedMedia && selectedMedia.length > 0) {
-            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
-            form.setValue("media", mediaIds);
-        }
-    }, [selectedMedia, form]);
+
 
     const {
         data: brandData,
@@ -123,25 +117,22 @@ const AddProductPage = () => {
         error: categoryError,
     } = useFetch(`/api/admin/categories/get-all`, {}, []);
 
+    const {
+        data: subcategoryData,
+        loading: subcategoryLoading,
+        error: subcategoryError,
+    } = useFetch(`/api/admin/subcategories/get-all`, {}, []);
+
     const brands = brandData?.data?.brands as TypeOfBrandData[];
     const categories = categoryData?.data?.categories as TypeOfCategoryData[];
+    const subcategories = subcategoryData?.data?.subcategories as TypeOfSubcategoryData[];
 
-
-    const category = form.watch("category")
     useEffect(() => {
-        if (category) {
-            async function fetchSubcategories() {
-                try {
-                    const response = await axiosInstance.get(`/api/admin/subcategories/get/${category}`);
-                    const subcategories = response.data.data.subcategories;
-                    setSubcategories(subcategories);
-                } catch (error: any) {
-                    console.error(error);
-                }
-            }
-            fetchSubcategories();
+        if (selectedMedia && selectedMedia.length > 0) {
+            const mediaIds = selectedMedia.map((mediaItem) => mediaItem._id);
+            form.setValue("media", mediaIds);
         }
-    }, [category, form]);
+    }, [selectedMedia, form]);
 
     async function onSubmit(data: TypeOfAddProductInput) {
         const result = await createProductService(data);
@@ -154,11 +145,12 @@ const AddProductPage = () => {
         toast.success(result.message);
     }
 
-    if (brandError || categoryError) {
+    if (brandError || categoryError || subcategoryError) {
         return (
             <div className="text-xl text-red-700 font-medium">
                 {brandError?.message ||
                     categoryError?.message ||
+                    subcategoryError?.message ||
                     "Something went worng."}
             </div>
         );
@@ -184,7 +176,7 @@ const AddProductPage = () => {
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
                         {categoryLoading ||
-                            brandLoading
+                            brandLoading || subcategoryLoading
                             ? (
                                 <ProductFormSkeleton />
                             ) : (
@@ -449,7 +441,7 @@ const AddProductPage = () => {
                                                 <div className="flex gap-2 justify-center mt-4 flex-wrap">
                                                     {
                                                         selectedMedia && selectedMedia.length > 0 && selectedMedia.map((mediaItem, index) =>
-                                                            < div key={index} className="h-20 relative rounded overflow-hidden">
+                                                            < div key={index} className="h-20 w-16 relative rounded overflow-hidden">
                                                                 <Image
                                                                     src={mediaItem.secure_url}
                                                                     alt={mediaItem.alt || "Media Image"}

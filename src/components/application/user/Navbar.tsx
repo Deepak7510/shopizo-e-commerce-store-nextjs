@@ -22,7 +22,7 @@ import { authRoutes, userRoutes } from "@/lib/client/routes";
 
 const NavCategories = () => {
     const { loading, data } = useFetch('/api/user/categories/get-all', {}, []);
-    const categories = data?.data?.allDataList as TypeOfCategoryData[]
+    const categories = data?.data?.categories as TypeOfCategoryData[]
 
     return <ul className="flex gap-8 font-medium">
         <li className="hover:text-muted-foreground transition-all"> <Link href={userRoutes.home}>Home</Link></li>
@@ -57,41 +57,43 @@ const Navbar = () => {
 
 
     return (
-        <header className="w-full text-muted-foreground z-50 fixed top-0 left-0 bg-background flex px-2 md:px-8 justify-between items-center h-18 md:h-20 border-b">
-            <ApplicationLogo />
-            <nav className="hidden md:block">
-                <NavCategories />
-            </nav>
-            <div className="flex  gap-1 md:gap-2 justify-center items-center">
-                <Button onClick={() => setOpenSearch(pre => !pre)} size={"icon"} variant={"ghost"}><Search /></Button>
-                <ShoppingCart />
-                <ThemeButton />
-                <div>
-                    {
-                        isAuthenticated ?
-                            <UserProfileMenu userInfo={userInfo!} />
-                            :
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Button variant={"ghost"} size={'icon'} asChild>
-                                        <Link href={authRoutes.login} >
-                                            <UserCircleIcon />
-                                        </Link>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p> Login/Register</p>
-                                </TooltipContent>
-                            </Tooltip>
-                    }
+        <header className="w-full z-50 fixed top-0 left-0 bg-background text-muted-foreground border-b">
+            <div className="max-w-[1600px] mx-auto flex justify-between items-center px-2 md:px-8 h-18 md:h-20">
+                <ApplicationLogo />
+                <nav className="hidden md:block">
+                    <NavCategories />
+                </nav>
+                <div className="flex  gap-1 md:gap-2 justify-center items-center">
+                    <Button onClick={() => setOpenSearch(pre => !pre)} size={"icon"} variant={"ghost"}><Search /></Button>
+                    <ShoppingCart />
+                    <ThemeButton />
+                    <div>
+                        {
+                            isAuthenticated ?
+                                <UserProfileMenu userInfo={userInfo!} />
+                                :
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button variant={"ghost"} size={'icon'} asChild>
+                                            <Link href={authRoutes.login} >
+                                                <UserCircleIcon />
+                                            </Link>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p> Login/Register</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                        }
+                    </div>
                 </div>
+                {
+                    openSearch &&
+                    <div className="w-full border-b left-0 absolute top-[100%] px-10 pb-4 bg-background">
+                        <SearchHandler openSearch={openSearch} setOpenSearch={setOpenSearch} />
+                    </div>
+                }
             </div>
-            {
-                openSearch &&
-                <div className="w-full border-b left-0 absolute top-[100%] px-10 pb-4 bg-background">
-                    <SearchHandler openSearch={openSearch} setOpenSearch={setOpenSearch} />
-                </div>
-            }
         </header>
     )
 }

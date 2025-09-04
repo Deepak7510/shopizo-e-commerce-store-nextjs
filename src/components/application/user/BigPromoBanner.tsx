@@ -37,7 +37,7 @@ const BigPromoBanner = async () => {
             <div className="space-y-5 md:space-y-10">
                 {banners && banners.length > 0 ? (
                     banners.map((bannerItem) => (
-                        <div key={bannerItem._id} className="relative flex p-0 w-full h-[230px] md:h-[600px]">
+                        <div key={bannerItem._id} className="relative flex p-0 w-full h-[220px] md:h-[600px]">
                             <Image
                                 src={bannerItem?.bannerImage.secure_url}
                                 alt={bannerItem?.bannerImage.alt || bannerItem.title || "Banner"}
@@ -45,8 +45,8 @@ const BigPromoBanner = async () => {
                                 unoptimized
                                 className="object-cover rounded-md"
                             />
-                            <div className="absolute left-[50%] translate-x-[-50%] bottom-5 md:bottom-25 z-10 flex flex-col items-center gap-2 md:gap-6">
-                                <h2 className="text-white text-2xl md:text-5xl font-extrabold">{bannerItem.title}</h2>
+                            <div className="absolute left-[50%] translate-x-[-50%] bottom-5 md:bottom-25 z-10 flex flex-col items-center justify-center text-center gap-2 md:gap-6">
+                                <h2 className="text-white text-xl md:text-5xl font-extrabold">{bannerItem.title}</h2>
                                 <p className="font-medium text-white text-base md:text-2xl">{bannerItem.subtitle}</p>
                                 <Button
                                     variant={"secondary"}

@@ -81,7 +81,7 @@ const ColorssColumns: ColumnDef<TypeOfColorData, unknown>[] = [
         accessorKey: "description",
         header: "Description",
         cell: ({ row }) => {
-            return <span>{(row.original.description && stringShorter(row.original.description, 3)) || "-"}</span>
+            return <span>{(row.original.description && stringShorter(row.original.description, 15)) || "-"}</span>
         }
     },
     {

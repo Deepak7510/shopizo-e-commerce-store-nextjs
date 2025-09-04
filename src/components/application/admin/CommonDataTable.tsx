@@ -393,7 +393,7 @@ export function CommonDataTable<TData, TValue>({
                     )}
                 </>
             </div>
-            <Card className="rounded-md p-0 shadow-none overflow-hidden">
+            <Card className="rounded-md w-full p-0 shadow-none overflow-hidden">
                 <Table>
                     <TableHeader className="bg-muted">
                         {table.getHeaderGroups().map((headerGroup) => (

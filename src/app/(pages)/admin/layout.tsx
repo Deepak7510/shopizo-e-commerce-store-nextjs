@@ -9,7 +9,7 @@ const AdminLayout = ({ children }: Readonly<{
 }>) => {
     return <SidebarProvider>
         <AppSidebar />
-        <main className='min-h-screen w-full md:w-[calc(100vw-16rem)] relative'>
+        <main className='min-h-screen w-full md:w-[calc(100%-16rem)] relative'>
             <Header />
             <div className='p-1 md:px-4 md:py-2'>
                 {children}

@@ -22,7 +22,7 @@ import {
 import EditAction from "@/components/application/admin/EditAction";
 import DeleteAction from "@/components/application/admin/DeleteAction";
 import { Card } from "@/components/ui/card";
-import { dateResolver } from "@/lib/client/helperFunction";
+import { dateResolver, stringShorter } from "@/lib/client/helperFunction";
 
 const breadcrumbList: breadcrumbListType[] = [
     {
@@ -71,10 +71,12 @@ const ProductsColumns: ColumnDef<TypeOfProductData, unknown>[] = [
                 </Button>
             );
         },
+        cell: ({ row }) => stringShorter(row.original.title, 15) || "-",
     },
     {
         accessorKey: "slug",
         header: "Slug",
+        cell: ({ row }) => stringShorter(row.original.slug, 15) || "-",
     },
     {
         accessorKey: "brand.name",

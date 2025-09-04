@@ -62,7 +62,7 @@ export function MainSlider() {
                 {banners.map((bannerItem, index) => (
                     <CarouselItem
                         key={bannerItem._id || index}
-                        className="h-[300px] md:h-[500px] w-full relative"
+                        className="h-[230px] md:h-[500px] w-full relative"
                     >
                         <div className="w-full">
                             <Image
@@ -75,18 +75,18 @@ export function MainSlider() {
                                 className="object-cover"
                             />
                         </div>
-                        <div className="absolute left-[20%] md:left-[15%] translate-x-[-15%] bottom-15 z-10  flex flex-col gap-3 md:gap-6">
-                            <h2 className="font-extrabold text-white text-3xl md:text-5xl">
+                        <div className="absolute left-[15%] bottom-10 md:bottom-15 z-10 flex flex-col gap-1 md:gap-6">
+                            <h2 className="font-extrabold text-white text-2xl md:text-5xl">
                                 {bannerItem.title}
                             </h2>
                             {bannerItem.subtitle && (
-                                <p className="font-medium text-white text-xl md:text-2xl">
+                                <p className="font-medium text-white text-lg md:text-2xl">
                                     {bannerItem.subtitle}
                                 </p>
                             )}
                             <Button
                                 variant={"secondary"}
-                                className="rounded-full md:size-fit w-fit px-15 border-none dark:bg-white text-black"
+                                className="rounded-full size-8 md:size-fit px-15 border-none dark:bg-white text-black"
                                 asChild
                             >
                                 <Link href={bannerItem.link}>

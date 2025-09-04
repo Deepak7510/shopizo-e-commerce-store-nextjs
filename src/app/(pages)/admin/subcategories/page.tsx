@@ -75,15 +75,10 @@ const subCategoriesColumns: ColumnDef<
             header: "Slug",
         },
         {
-            accessorKey: "category.name",
-            header: "Category",
-            cell: ({ row }) => row.original.category?.name || "-",
-        },
-        {
             accessorKey: "description",
             header: "Description",
             cell: ({ row }) => {
-                return <span>{(row.original.description && stringShorter(row.original.description, 3)) || "-"}</span>
+                return <span>{(row.original.description && stringShorter(row.original.description, 15)) || "-"}</span>
             }
         },
         {

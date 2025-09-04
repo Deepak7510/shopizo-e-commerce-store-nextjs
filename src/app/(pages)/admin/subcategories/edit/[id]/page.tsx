@@ -18,8 +18,6 @@ import { useRouter } from 'next/navigation';
 import { updateSubcategoryService } from '@/services/client/admin/subcategories/updateSubcategoryService';
 import { TypeOfEditSubcategoryInput } from '@/types/admin.subcategories.types';
 import { editSubcategoryZodSchema } from '@/zodSchema/admin.subcategories.schema';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TypeOfCategoryData } from '@/types/admin.category.types';
 import { Textarea } from '@/components/ui/textarea';
 import SubcategoryFormSkeleton from '@/components/application/admin/SubcategoryFormSkeleton';
 
@@ -44,20 +42,12 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
     const id = paramsValue.id;
     const router = useRouter()
 
-    const { data: categoriesData, loading: categoryLoading, error: categoryError } = useFetch(
-        `/api/admin/categories/get-all`,
-        {},
-        []
-    );
-    const categories = categoriesData?.data.categories as TypeOfCategoryData[]
-
     const form = useForm<TypeOfEditSubcategoryInput>({
         resolver: zodResolver(editSubcategoryZodSchema),
         defaultValues: {
             _id: "",
             name: "",
             slug: "",
-            category: ""
         }
     })
 
@@ -75,7 +65,6 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
                 _id: subcatgory.data.subcategory._id || "",
                 name: subcatgory.data.subcategory.name || "",
                 slug: subcatgory.data.subcategory.slug || "",
-                category: subcatgory.data.subcategory.category._id || "",
                 description: subcatgory.data.subcategory.description || "",
             })
         }
@@ -93,8 +82,8 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
         return
     }
 
-    if (error || categoryError) {
-        return <div className='text-xl text-red-700 font-medium'>{error?.message || categoryError?.message}</div>
+    if (error) {
+        return <div className='text-xl text-red-700 font-medium'>{error?.message}</div>
     }
 
     return (<div className='space-y-3'>
@@ -116,7 +105,7 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
             <Separator className='mb-2' />
             <Card className="rounded-sm shadow-none py-3">
                 <CardContent>
-                    {loading || categoryLoading ?
+                    {loading ?
                         <SubcategoryFormSkeleton />
                         :
                         <Form {...form} key={form.watch("_id") || "edit-subcategory-form"}>
@@ -143,42 +132,6 @@ const EditSubCategoryPage = ({ params }: { params: Promise<{ id: string }> }) =>
                                             <FormControl>
                                                 <Input readOnly placeholder="Enter the slug" {...field} />
                                             </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="category"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Category <span className="text-red-600">*</span></FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                value={field.value}
-                                            >
-                                                <FormControl className="w-full" >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a Category" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {categoryLoading ? (
-                                                        <div className="text-sm">Loading...</div>
-                                                    ) : (
-                                                        categories &&
-                                                        categories.length > 0 &&
-                                                        categories.map(
-                                                            (item: TypeOfCategoryData) => (
-                                                                <SelectItem key={item._id} value={item._id}>
-                                                                    {item.name}
-                                                                </SelectItem>
-                                                            )
-                                                        )
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
                                             <FormMessage />
                                         </FormItem>
                                     )}

@@ -43,7 +43,6 @@ import Image from "next/image";
 import { TypeOfEditProductInput } from "@/types/admin.products.types";
 import { useRouter } from "next/navigation";
 import { updateProductService } from "@/services/client/admin/products/updateProductService";
-import axiosInstance from "@/lib/client/axios";
 import ProductFormSkeleton from "@/components/application/admin/ProductFormSkeleton";
 
 const breadcrumbList: breadcrumbListType[] = [
@@ -67,21 +66,20 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [openSelectMediaModel, setOpenSelectMediaModel] =
         useState<boolean>(false);
     const [selectedMedia, setSelectedMedia] = useState<mediaType[]>([]);
-    const [subcategories, setSubcategories] = useState<
-        TypeOfSubcategoryData[] | []
-    >([]);
 
     const form = useForm<TypeOfEditProductInput>({
         resolver: zodResolver(editProductZodSchema),
         defaultValues: {
-            _id: "",
             title: "",
             slug: "",
             brand: "",
             category: "",
             subcategory: "",
-            media: [],
+            mrp: 0,
+            sellingPrice: 0,
+            discountPercentage: 0,
             description: "",
+            media: [],
         },
     });
 
@@ -96,9 +94,12 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }, [title, form]);
 
     useEffect(() => {
-        form.setValue("discountPercentage", discountPercentage && Number(discountPercentage))
-        form.setValue("mrp", mrp && Number(mrp))
-        form.setValue("sellingPrice", sellingPrice && Number(sellingPrice))
+        form.setValue(
+            "discountPercentage",
+            discountPercentage && Number(discountPercentage)
+        );
+        form.setValue("mrp", mrp && Number(mrp));
+        form.setValue("sellingPrice", sellingPrice && Number(sellingPrice));
     }, [discountPercentage, mrp, sellingPrice, form]);
 
     useEffect(() => {
@@ -107,7 +108,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
             form.setValue("media", mediaIds);
         }
     }, [selectedMedia, form]);
-
 
     const {
         data: brandData,
@@ -126,26 +126,16 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         error: productDataError,
     } = useFetch(`/api/admin/products/details/${id}`, {}, [id]);
 
+    const {
+        data: subcategoryData,
+        loading: subcategoryLoading,
+        error: subcategoryError,
+    } = useFetch(`/api/admin/subcategories/get-all`, {}, []);
+
     const brands = brandData?.data?.brands as TypeOfBrandData[];
     const categories = categoryData?.data?.categories as TypeOfCategoryData[];
+    const subcategories = subcategoryData?.data?.subcategories as TypeOfSubcategoryData[];
 
-    const watchedCategory = form.watch("category");
-    useEffect(() => {
-        if (watchedCategory) {
-            async function fetchSubcategories() {
-                try {
-                    const response = await axiosInstance.get(
-                        `/api/admin/subcategories/get/${watchedCategory}`
-                    );
-                    const subcategories = response.data.data.subcategories;
-                    setSubcategories(subcategories);
-                } catch (error: any) {
-                    console.error(error);
-                }
-            }
-            fetchSubcategories();
-        }
-    }, [watchedCategory]);
 
     useEffect(() => {
         if (productData?.data?.product) {
@@ -154,10 +144,13 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 _id: product._id || "",
                 title: product.title || "",
                 slug: product.slug || "",
+                brand: product.brand || "",
                 category: product.category || "",
                 subcategory: product.subcategory || "",
+                mrp: product.mrp || 0,
+                sellingPrice: product.sellingPrice || 0,
+                discountPercentage: product.discountPercentage || 0,
                 media: product?.media?.map((m: any) => m._id) || [],
-                brand: product.brand || "",
                 description: product.description || "",
             });
             setSelectedMedia(product.media);
@@ -165,6 +158,18 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }, [productData, form]);
 
 
+
+    if (brandError || subcategoryError || categoryError || productDataError) {
+        return (
+            <div className="text-xl text-red-700 font-medium">
+                {brandError?.message ||
+                    categoryError?.message ||
+                    productDataError?.message ||
+                    subcategoryError?.message ||
+                    "Something went wrong."}
+            </div>
+        );
+    }
     async function onSubmit(data: TypeOfEditProductInput) {
         const result = await updateProductService(data);
         if (!result.success) {
@@ -175,17 +180,6 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
         setSelectedMedia([]);
         toast.success(result.message);
         return router.push(adminRoutes.products.products);
-    }
-
-    if (brandError || categoryError || productDataError) {
-        return (
-            <div className="text-xl text-red-700 font-medium">
-                {brandError?.message ||
-                    categoryError?.message ||
-                    productDataError?.message ||
-                    "Something went wrong."}
-            </div>
-        );
     }
 
     return (
@@ -206,26 +200,27 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
                 <Card className="rounded-sm shadow-none py-3">
                     <CardContent>
-                        {categoryLoading || brandLoading || productDataLoading ? (
+                        {categoryLoading || brandLoading || subcategoryLoading || productDataLoading ? (
                             <ProductFormSkeleton />
                         ) : (
-                            <Form {...form} key={form.watch("_id") || "Edit Product"}>
+                            <Form {...form}>
                                 <form
                                     onSubmit={form.handleSubmit(onSubmit)}
                                     className="space-y-3"
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2  gap-3">
-                                        <div className="md:col-span-2">
+                                        <div>
                                             <FormField
                                                 control={form.control}
                                                 name="title"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>
-                                                            Title <span className="text-red-600">*</span>
-                                                        </FormLabel>
+                                                        <FormLabel>Title <span className="text-red-600">*</span></FormLabel>
                                                         <FormControl>
-                                                            <Input placeholder="Enter the title" {...field} />
+                                                            <Input
+                                                                placeholder="Enter the title"
+                                                                {...field}
+                                                            />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -238,9 +233,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="slug"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>
-                                                            Slug <span className="text-red-600">*</span>
-                                                        </FormLabel>
+                                                        <FormLabel>Slug <span className="text-red-600">*</span></FormLabel>
                                                         <FormControl>
                                                             <Input
                                                                 readOnly
@@ -253,15 +246,14 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 )}
                                             />
                                         </div>
+
                                         <div>
                                             <FormField
                                                 control={form.control}
                                                 name="brand"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>
-                                                            Brand <span className="text-red-600">*</span>
-                                                        </FormLabel>
+                                                        <FormLabel>Brand <span className="text-red-600">*</span></FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             value={field.value}
@@ -275,7 +267,10 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                                 {brands &&
                                                                     brands.length > 0 &&
                                                                     brands?.map((item: TypeOfBrandData) => (
-                                                                        <SelectItem key={item._id} value={item._id}>
+                                                                        <SelectItem
+                                                                            key={item._id}
+                                                                            value={item._id}
+                                                                        >
                                                                             {item.name}
                                                                         </SelectItem>
                                                                     ))}
@@ -292,9 +287,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="category"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>
-                                                            Category <span className="text-red-600">*</span>
-                                                        </FormLabel>
+                                                        <FormLabel>Category <span className="text-red-600">*</span></FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             value={field.value}
@@ -330,10 +323,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="subcategory"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>
-                                                            Subcategory{" "}
-                                                            <span className="text-red-600">*</span>
-                                                        </FormLabel>
+                                                        <FormLabel>Subcategory <span className="text-red-600">*</span></FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             value={field.value}
@@ -363,16 +353,72 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 )}
                                             />
                                         </div>
+                                        <div>
+                                            <FormField
+                                                control={form.control}
+                                                name="mrp"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>MRP <span className="text-red-600">*</span> </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Enter the MRP"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <FormField
+                                                control={form.control}
+                                                name="sellingPrice"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Selling price <span className="text-red-600">*</span> </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Enter the Selling Price"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div>
+                                            <FormField
+                                                control={form.control}
+                                                name="discountPercentage"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Discount percentage <span className="text-red-600">*</span> </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                readOnly
+                                                                type="number"
+                                                                placeholder="Enter the Discount Percentage"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
                                         <div className="md:col-span-2">
                                             <FormField
                                                 control={form.control}
                                                 name="description"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>
-                                                            Description{" "}
-                                                            <span className="text-red-600">*</span>
-                                                        </FormLabel>
+                                                        <FormLabel>Description <span className="text-red-600">*</span></FormLabel>
                                                         <FormControl>
                                                             <div>
                                                                 <ReactQuill
@@ -400,9 +446,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 name="media"
                                                 render={() => (
                                                     <FormItem className="flex flex-col justify-center items-center">
-                                                        <FormLabel>
-                                                            Media <span className="text-red-600">*</span>
-                                                        </FormLabel>
+                                                        <FormLabel>Media <span className="text-red-600">*</span></FormLabel>
                                                         <FormControl>
                                                             <Button
                                                                 type="button"
@@ -410,7 +454,7 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                                 className="w-full md:min-w-md"
                                                                 variant={"outline"}
                                                             >
-                                                                Choose Media
+                                                                Choese Media
                                                             </Button>
                                                         </FormControl>
                                                         <FormMessage />
@@ -418,22 +462,20 @@ const EditProductPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                                 )}
                                             />
                                             <div className="flex gap-2 justify-center mt-4 flex-wrap">
-                                                {selectedMedia &&
-                                                    selectedMedia.length > 0 &&
-                                                    selectedMedia.map((mediaItem, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="h-20 relative rounded overflow-hidden"
-                                                        >
+                                                {
+                                                    selectedMedia && selectedMedia.length > 0 && selectedMedia.map((mediaItem, index) =>
+                                                        < div key={index} className="h-20 w-16 relative rounded overflow-hidden">
                                                             <Image
                                                                 src={mediaItem.secure_url}
-                                                                alt={mediaItem.alt || "Selected media image"}
+                                                                alt={mediaItem.alt || "Media Image"}
                                                                 className="object-cover"
                                                                 fill
                                                                 unoptimized
                                                             />
                                                         </div>
-                                                    ))}
+                                                    )
+                                                }
+
                                             </div>
                                         </div>
                                     </div>

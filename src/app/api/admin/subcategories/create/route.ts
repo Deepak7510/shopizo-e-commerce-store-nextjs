@@ -8,33 +8,32 @@ import { UserRole } from "@/models/User.model";
 import { addSubcategoryZodSchema } from "@/zodSchema/admin.subcategories.schema";
 import { NextRequest, NextResponse } from "next/server";
 
+export const POST = async function (
+  request: NextRequest
+): Promise<NextResponse> {
+  try {
+    await connectDB();
+    await verifyRole(request, UserRole.ADMIN);
 
-export const POST = async function (request: NextRequest): Promise<NextResponse> {
-    try {
-        await connectDB();
-        await verifyRole(request, UserRole.ADMIN);
+    const body = await request.json();
 
-        const body = await request.json();
-
-        const checkValidation = addSubcategoryZodSchema.safeParse(body);
-        if (!checkValidation.success) {
-            throw new ApiError(400, "Invalid input or missing fields", { error: checkValidation.error });
-        }
-
-        const { slug, category } = checkValidation.data;
-
-        const checkSubcategoryExisting = await SubcategoryModel.findOne({ $and: [{ slug }, { category }] });
-
-        if (checkSubcategoryExisting) {
-            throw new ApiError(400, "Already exist");
-        }
-
-        await SubcategoryModel.create<ISubcategory>(checkValidation.data);
-
-        return apiResponse(201, "Added successfully");
-
-    } catch (error) {
-        return errorHandler(error)
-
+    const checkValidation = addSubcategoryZodSchema.safeParse(body);
+    if (!checkValidation.success) {
+      throw new ApiError(400, "Invalid input or missing fields", {
+        error: checkValidation.error,
+      });
     }
-}
+
+    const { slug } = checkValidation.data;
+    const checkSubcategoryExisting = await SubcategoryModel.findOne({ slug });
+
+    if (checkSubcategoryExisting) {
+      throw new ApiError(400, "Already exist");
+    }
+    await SubcategoryModel.create<ISubcategory>(checkValidation.data);
+
+    return apiResponse(201, "Added successfully");
+  } catch (error) {
+    return errorHandler(error);
+  }
+};
