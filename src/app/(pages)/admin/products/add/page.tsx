@@ -43,7 +43,6 @@ import { mediaType } from "@/types/admin.media.types";
 import SelectMediaModel from "@/components/application/admin/SelectMediaModel";
 import Image from "next/image";
 import { createProductService } from "@/services/client/admin/products/createProductService";
-import axiosInstance from "@/lib/client/axios";
 import ProductFormSkeleton from "@/components/application/admin/ProductFormSkeleton";
 
 const breadcrumbList: breadcrumbListType[] = [

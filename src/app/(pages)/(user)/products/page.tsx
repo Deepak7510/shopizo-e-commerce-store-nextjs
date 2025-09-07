@@ -25,11 +25,13 @@ const ShopProductsPage = () => {
                     <BreadCrumb breadcrumbList={breadcrumbList} />
                 </div>
             </div>
-            <div className='flex w-full'>
-                <FilterSidebar />
-                <main className='h-[200vh]'>
+            <div className="px-3 md:px-25">
+                <div className='flex w-full'>
+                    <FilterSidebar />
+                    <main className='h-[200vh]'>
 
-                </main>
+                    </main>
+                </div>
             </div>
         </div>
     )

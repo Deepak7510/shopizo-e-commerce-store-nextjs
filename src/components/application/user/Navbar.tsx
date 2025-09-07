@@ -30,7 +30,7 @@ const NavCategories = () => {
         <li className="hover:text-muted-foreground transition-all"> <Link href={userRoutes.products}>Products</Link></li>
         {
             !loading && categories && categories.length > 0 && categories.map(item => {
-                return <li key={item._id} className="hover:text-muted-foreground transition-all"><Link key={item._id} href={''}>{item.name}</Link></li>
+                return <li key={item._id} className="hover:text-muted-foreground transition-all"><Link key={item._id} href={`${userRoutes.products}?categories=${item.slug}`}>{item.name}</Link></li>
             })
         }
     </ul>

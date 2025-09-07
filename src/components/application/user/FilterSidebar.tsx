@@ -1,6 +1,6 @@
 "use client"
 import useFetch from '@/hooks/useFetch'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Accordion,
     AccordionContent,
@@ -43,14 +43,19 @@ const FilterSidebar = () => {
     const router = useRouter();
 
     const { data: categoriesData, loading: categoryLoading } = useFetch('/api/user/categories/get-all');
-    const { data: subcategories, loading: subcategoryLoading } = useFetch('/api/user/subcategories/get-all');
-    const { data: brands, loading: brandLoading } = useFetch('/api/user/brands/get-all');
+    const { data: subcategoriesData, loading: subcategoryLoading } = useFetch('/api/user/subcategories/get-all');
+    const { data: brandsData, loading: brandLoading } = useFetch('/api/user/brands/get-all');
     const { data: colors } = useFetch('/api/user/colors/get-all');
 
-    console.log("catgeories", categories)
-    console.log("subcategories", subcategories)
-    console.log("brands", brands);
-    console.log("colors", colors);
+    // console.log("catgeories", categories)
+    // console.log("subcategories", subcategories)
+    // console.log("brands", brands);
+    // console.log("colors", colors);
+
+
+    useEffect(() => {
+        urlSearchParams.get("categories") && setCategories(urlSearchParams.get("categories")?.split(",") || [])
+    }, [searchParams])
 
     function handleCatgeory(slug: string) {
         let cpyCategory = [...categories];
@@ -63,13 +68,13 @@ const FilterSidebar = () => {
 
         console.log(cpyCategory)
         cpyCategory.length > 0 ? urlSearchParams.set("categories", cpyCategory.join(",")) : urlSearchParams.delete("categories");
-
         router.push(userRoutes.products + "?" + urlSearchParams);
     }
 
+    console.log(categories)
 
     return (
-        <aside className='border-r h-fit w-[250px] sticky top-10 left-0 p-2'>
+        <aside className='border-r h-fit w-[250px] sticky top-10 left-0 p-2 bg-muted'>
             <Accordion
                 type="multiple"
                 className="w-full"
@@ -83,7 +88,7 @@ const FilterSidebar = () => {
                                 categoriesData?.data?.categories.length > 0 ? categoriesData?.data?.categories.map((categoryItem: any) => {
 
                                     return <div key={categoryItem._id} className='flex gap-2 items-center'>
-                                        <Checkbox id={categoryItem._id} onCheckedChange={() => handleCatgeory(categoryItem.slug)} />
+                                        <Checkbox id={categoryItem._id} defaultChecked={categories.includes(categoryItem?.slug)} onCheckedChange={() => handleCatgeory(categoryItem.slug)} />
                                         <Label htmlFor={categoryItem._id}>{categoryItem?.name}</Label>
                                     </div>
 
@@ -100,7 +105,7 @@ const FilterSidebar = () => {
                     <AccordionContent className="flex flex-col gap-4 text-balance">
                         <div className='max-h-40 w-full overflow-y-auto space-y-2'>
                             {subcategoryLoading ? <Skeleton className='w-full h-5' /> :
-                                subcategories?.data?.subcategories?.length > 0 ? subcategories?.data?.subcategories.map((subcategoryItem: any) => {
+                                subcategoriesData?.data?.subcategories?.length > 0 ? subcategoriesData?.data?.subcategories.map((subcategoryItem: any) => {
 
                                     return <div key={subcategoryItem._id} className='flex gap-2 items-center'>
                                         <Checkbox id={subcategoryItem._id} />
@@ -120,7 +125,7 @@ const FilterSidebar = () => {
                     <AccordionContent className="flex flex-col gap-4 text-balance">
                         <div className='max-h-40 w-full overflow-y-auto space-y-2'>
                             {brandLoading ? <Skeleton className='w-full h-5' /> :
-                                brands?.data?.brands?.length > 0 ? brands?.data?.brands.map((brandItem: any) => {
+                                brandsData?.data?.brands?.length > 0 ? brandsData?.data?.brands.map((brandItem: any) => {
                                     return <div key={brandItem._id} className='flex gap-2 items-center'>
                                         <Checkbox id={brandItem._id} />
                                         <Label htmlFor={brandItem._id}>{brandItem?.name}</Label>
@@ -163,7 +168,7 @@ const FilterSidebar = () => {
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
-        </aside>
+        </aside >
     )
 }
 
