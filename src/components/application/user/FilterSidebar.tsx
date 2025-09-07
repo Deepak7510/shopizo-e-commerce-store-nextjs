@@ -47,15 +47,14 @@ const FilterSidebar = () => {
     const { data: brandsData, loading: brandLoading } = useFetch('/api/user/brands/get-all');
     const { data: colors } = useFetch('/api/user/colors/get-all');
 
-    // console.log("catgeories", categories)
-    // console.log("subcategories", subcategories)
-    // console.log("brands", brands);
-    // console.log("colors", colors);
+    console.log("colors", colors);
 
 
     useEffect(() => {
-        urlSearchParams.get("categories") && setCategories(urlSearchParams.get("categories")?.split(",") || [])
-    }, [searchParams])
+        const categories = searchParams.get("categories");
+        setCategories(categories ? categories.split(",") : []);
+    }, [searchParams]);
+
 
     function handleCatgeory(slug: string) {
         let cpyCategory = [...categories];
@@ -66,12 +65,14 @@ const FilterSidebar = () => {
         }
         setCategories(cpyCategory);
 
-        console.log(cpyCategory)
-        cpyCategory.length > 0 ? urlSearchParams.set("categories", cpyCategory.join(",")) : urlSearchParams.delete("categories");
+        if (cpyCategory.length > 0) {
+            urlSearchParams.set("categories", cpyCategory.join(","))
+        } else {
+            urlSearchParams.delete("categories");
+        }
         router.push(userRoutes.products + "?" + urlSearchParams);
     }
 
-    console.log(categories)
 
     return (
         <aside className='border-r h-fit w-[250px] sticky top-10 left-0 p-2 bg-muted'>
