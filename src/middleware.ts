@@ -17,28 +17,36 @@ export async function middleware(request: NextRequest) {
   }
 
   if (token) {
-    const secret = new TextEncoder().encode(
-      process.env.NEXT_PUBLIC_JOSE_SECRET_KEY
-    );
-    const { payload } = await jwtVerify(token, secret);
-    const user = payload;
+    try {
+      const secret = new TextEncoder().encode(
+        process.env.NEXT_PUBLIC_JOSE_SECRET_KEY
+      );
 
-    if (token && pathName.startsWith("/auth")) {
-      if (user?.role === "admin") {
+      const { payload } = await jwtVerify(token, secret);
+      const user = payload;
+
+      if (token && pathName.startsWith("/auth")) {
+        if (user?.role === "admin") {
+          return NextResponse.redirect(
+            new URL(adminRoutes.dashboard, request.url)
+          );
+        } else {
+          return NextResponse.redirect(new URL(userRoutes.home, request.url));
+        }
+      }
+
+      if (token && pathName.startsWith("/admin") && user?.role === "user") {
+        return NextResponse.redirect(new URL(userRoutes.home, request.url));
+      }
+
+      if (token && pathName === "/admin") {
         return NextResponse.redirect(
           new URL(adminRoutes.dashboard, request.url)
         );
-      } else {
-        return NextResponse.redirect(new URL(userRoutes.home, request.url));
       }
-    }
-
-    if (token && pathName.startsWith("/admin") && user?.role === "user") {
+    } catch (error) {
+      console.error(error);
       return NextResponse.redirect(new URL(userRoutes.home, request.url));
-    }
-
-    if (token && pathName === "/admin") {
-      return NextResponse.redirect(new URL(adminRoutes.dashboard, request.url));
     }
   }
 

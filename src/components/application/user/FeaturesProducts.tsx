@@ -5,12 +5,6 @@ async function getFeaturedProducts() {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/products/get-features-products`,
-      {
-        next: {
-          revalidate: 3600, // Revalidate every hour
-          tags: ['featured-products']
-        }
-      }
     )
 
     if (!res.ok) {

@@ -7,11 +7,11 @@ import { NextResponse } from "next/server";
 export const GET = async function (): Promise<NextResponse> {
   try {
     await connectDB();
-    const colors = await SubcategoryModel.find({ deletedAt: null }).select(
-      "name slug"
-    );
+    const subcategories = await SubcategoryModel.find({
+      deletedAt: null,
+    }).select("name slug");
     return apiResponse(200, "User subcategories fetched successfully", {
-      colors,
+      subcategories,
     });
   } catch (error) {
     return errorHandler(error);

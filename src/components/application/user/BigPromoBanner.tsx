@@ -3,17 +3,10 @@ import { TypeOfBannerData } from '@/types/admin.banners.types';
 import Image from 'next/image';
 import Link from 'next/link'
 
-// This will be called at build time, but won't break the build if API is down
 async function fetchBigPromoBanner() {
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/banners/get-all?type=bigpromo`,
-            {
-                next: {
-                    revalidate: 3600, // Revalidate every hour
-                    tags: ['big-promo-banners']
-                }
-            }
         )
 
         if (!res.ok) {

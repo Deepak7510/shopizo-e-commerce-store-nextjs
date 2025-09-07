@@ -8,12 +8,6 @@ async function fetchBigPromoBanner() {
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/banners/get-all?type=promo`,
-            {
-                next: {
-                    revalidate: 3600, // Revalidate every hour
-                    tags: ['promo-banners']
-                }
-            }
         )
 
         if (!res.ok) {
