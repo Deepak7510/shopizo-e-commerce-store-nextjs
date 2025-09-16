@@ -29,7 +29,7 @@ const PromoBanner = async () => {
         <div className='grid md:grid-cols-2 gap-5 md:gap-6'>
             {banners && banners.length > 0 ? (
                 banners.map((bannerItem) => (
-                    <div key={bannerItem._id} className="relative flex p-0 w-full h-[220px] md:h-[340px]">
+                    <div key={bannerItem._id} className="relative flex p-0 w-full h-[220px] md:h-[350px]">
                         <Image
                             src={bannerItem?.bannerImage.secure_url}
                             alt={bannerItem?.bannerImage.alt || bannerItem.title || "Promo banner image"}
